@@ -1,0 +1,226 @@
+---------- 1 -----------
+Evolución en los últimos 20 años de aplicaciones web.
+Desde solo Jsp, a mvc, mvc2, mvc2 mejorado, microservicios, cloud, contenedores, orquestration.
+Introducción.
+
+---------- 2 -----------
+front: jsp y servlet. jstl, scriptlets.
+Model1:
+browser->jsp multiples. Urls a los jsps. Model, bd, etc desde los jsp. Poco organizado, escala mal.
+
+Model2:
+Servlets. MVC. Browser - servlet usa model - jsp view
+Servlets y JSP
+
+Model2 mejorado.
+Front controller. Las peticiones van primero por un front controller, asi que se puede centralizar cosas como la seguridad. Dispatcher servlet. Struts, JSF, Struts2 y SpringMVC.
+Auth, etc en el front controller. Despues va a controller, model view.
+SpringBoot está aquí también.
+
+EJB es business layer.
+Capas: web, businness, data e integration (uso de otras API o WS)
+
+JDBC, SpringJDBC, Mybatis, JPA.
+
+Si tienes que implementar algo a través de varias capas AOP. Aspect Oriented Programming. Con Spring. Logging.
+Facade pattern con los EJB. Business Layer, varias llamadas a la capa de datos, evita diversas llamadas por red.
+
+Mocking, unit testing.
+
+---------- 3 -----------
+Web Services.
+PAra poder reutilizar el back y tener varios fronts. PAra intercomunicación de apps también.
+Machine to machine communication. platform independent. Language neutral. Son capaces de hablar con otros servicios sin que importe cómo estén implementados.
+Comunicación sobre la red.
+
+SOA SOAP
+Centralized Bus, Xml, SOAP.
+WSDL define los formatos. Contract, service definition. Tight coupling. Contract first approach.
+Mucha ceremonia.
+CXF, Apache Axis, SpringWS. JAX-WS
+
+REST
+define constraints. Client Service. Uniform interface resources. stateless. Respuestas cacheables, no necesitas alcanzar el servidor cada vez, la respuesta puede darla algún router del camino. Layered arquitecture.
+Richardson Maturity model define modelos de implementación de REST, pues se puede ser más riguroso o menos.
+0: REST como soap
+1: url como recursos
+2: como 2 pero buen uso de http
+3: HATEOAS, links adicionales para navegar en el servicio. Datos + acciones posibles.
+
+JAX-RS
+SpringMVC-REST
+SpringStarterWeb
+
+Buenas practicas:
+Consumer first
+Documentation swagger, openAPI
+Best use of HTTP status and methods
+Enterprise level standards, consistencia en toda tu empresa, uniformidad.
+Automation de test, generación de documentación, etc.
+
+---------- 4 -----------
+
+Angular, React, SpringBoot.
+
+Front End App + REST API + database =  Full stack App.
+
+El front suele ser Javascript moderno ECMAScript o Typescript.
+
+Back: Java, Phyton o NodeJS.
+
+Frameworks de front actuales: React, Vue, Angular.
+
+FW de Back: Springboot, JAX-RS, Django, Express.
+
+UI Explosion: mobile, desktop, tablets... Puedes tener una UI para cada dispositivo. Cliente pesado, cliente web... etc.
+
+Mejora la testabilidad del backend por separado.
+
+
+Angular:
+Components. Es el componente basico. Template, style + code, en typescript. Una aplicación estará compuesta por un conjunto de componentes, estos interactuan y hacen peticiones al back, se muestran, renderizan, se ocultan, etc. Son aplicaciones de una sola página, no hay recarga en el navegador.
+DataBinding: como se relacionan los compontes.
+Routing.
+Modulos, dependencias. App->Modules->components. Como si fueran librerias.
+Angular CLI para compilar, levantar, etc.
+Angular tiene un builtin ecosystem: tiene IOC, modulos para HTTP, etc.
+
+REACT:
+provee lo mínimo, y lo que necesites lo tiene que aprotar algun otro fw especifico.
+Components. Jsx capa sobre JS para la vista. State + properties.
+Features: react router (modules)
+Forms and validations Formic
+Axios REST.
+Virtual DOM muy buen rendimiento.Modificamos el DOM virtual, que es mas rapido. Y Reac tiene un temporizador de forma que periodicamente compara el DOM virtual con el real, y si hay cambios los aplica. Esto hace que sea mas rapido.
+No está pendiente de cada cosa que pueda pasar justo en el momento que pasa, si no que vas sobre un dom mucho más rápido, y cada cierto tiempo se evalua si hay diferencia.
+Snapshots.
+
+---------- 5 -----------
+
+SpringBoot SpringCloud
+
+Monolitos de miles de lineas que hablan con una sola base de datos. Dificil de mantener, entregas de mucho tiempo. Hacer un cambio es muy dificil (lenguaje, framework, etc). No evolucionas con el tiempo. De ahi los microservices.
+Netflix empezó esta moda, de hecho algunos de los servicios partieron de ahi.
+
+Servicios pequeños. Son servicios REST. Son independientes a la hora de desplegarlos. Puedes tener el 3 y el 4 y desplegar el 1 y el 2, y todo tiene que seguir funcionando.
+
+Cloud enabled. Deben ser conectables a la nube, desplegables en la nube. AWS, GCP, Azure... etc.
+
+Caracteristicas de los microservicios. Cuales son los retos que suponen.
+
+Deben ser desarrollados rapido.
+Automatizados al maximo.
+Infrastructure, piden mucha. Varias instancias de varios microservicios activos a la vez. Son escalables bajo alta demanda. No hay un mapeo estatico entre ellos. Service registry, load balancing, etc.
+
+Configuración centralizada en un servidor de configuración. Servidor de seguridad. API Gateway es donde pones todas las cosas comunes como la seguridad.
+
+Tracing and Monitoring, es muy importante tambien.
+
+Ventajas:
+time to market, entregas rapidas de funcionalidad.
+Nuevas tecnologias, puedes ir cambiando sin problema, son interdependientes los microservicios.
+Escalan facilmente, se crean mas instancias dinamicamente. Escalan ademas de forma independiente.
+
+Soluciones:
+frameworks como springboot. Autoconfiguracion. Monitorizacion, dev tools. Facil empezar.
+Spring Cloud, grupo de proyectos. Service reregistry (Eureka), load balancing (ribbon), API gateway (zuul), centralización de configuración con centralized server.
+Comunicacion asincrona. Colas de mensajes o comandos (mientras no se ejecute el pago, no se ejecuta la actualización de stock), servicios de sub/pub. Observer.
+
+Docker: uniformiza la forma de empaquetar los servicios, independiente de su tecnologia.
+
+Clod specific orchestration, Kubernetes. Cada microservicio tiene su contenedor, que pasa al ir incrementando instancias? Que pasa si uno se cae? Quien lo vuelve a levantar? Quien escala?
+Esto es lo que se llama orquestación. Cada unning instance es un container. Orquestarlos, monitorizarlos. Tienes herramientas específicas en cada proveedor de orquestración como AWS, GCP, Azure.
+
+AWS provee Elastic Container Service para orquestración, Azure Container, GCP usa Kubernetes (el standard). Kubernetes está soportado por los tres proveedores, o sea que maximiza la compatibilidad.
+kubernetes tiene service registry, monitorización, etc.
+
+Spring cloud:
+Comunicacion entre las instancias de los distintos microservicios levantados: service registry! Spring Cloud tiene Eureka. Cada servicio pregunta al Eureka como llamar a otro serviico.
+Ribbon load balanace. Feign (REST calls simple)
+Cada servicio puede tener varios entornos. Centralized config en el servidor de conf, que apunta a un repositorio Git para obtener la información de configuracion.
+Cada Servicio, al levantar, hablan con el servidor de configuracion. 
+API Gateway: tiene las cosas comunes. Authentication. Las peticiones pasan por el. Zuul.
+Tracing la petición a traves de todos los servicios. Distributed tracing. Zipking. Jaeger es una alternativa. Emiten mensajes a una cola que pasan por Zipkin.
+Sleuth asigna un id unico a cada petición, de modo que los mensajes de log a la cola MQ que monitoriza Zipkin van relacionados con ese id unico, y de esa forma se puede ver la trazabilidad, el recorrido de una petición para poder por ejemplo debuggear.
+Fault tolerant services: Hystrix se manejan los problemas con respuestas alternativas en caso de fallo.
+
+---------- 6 -----------
+
+Microservicios, Docker y Kubernetes.
+
+Retos: despliegue facil.
+Problemas de infrastructura
+stay cloud neutral 
+spring cloud integration in cloud is tough
+
+Soluciones:
+Docker, empaquetado uniforme de los microservicios.
+Cloud Infrastructure, host OS, Docker engine. Entonces podemos tener un conjunto de contenedores funcionando.
+Docker no tiene virtualization performance footprint. 
+Los contenedores son independientes.
+
+Como crear imagenes para contenedores docker? Existe una herramienta para eso. Cuando tienes la imagen de docker la pones en el docker registry. Entonces esta listo para desplegar.
+
+Para el problema de varios servicios con varias instancias, ahora con los contenedores, se hace orquestación. Kubernetes, y cloud specific. 
+AWS, GCP, Azure. 
+Kubernetes es cloud neutral. Se puede cambiar de nube porque todas son compatibles con kubernetes.Service discovery/registry. Load balancing by default, Self healing, levantar instancias si se caen. Zero downtime deployments. Configuracion.
+EKS, AKS, GKE, son los motores de kubernetes en las tres nubes.
+
+Cluster.nodes master nodel y worker nodes. K8 hay que decirle cuales son las imagenes de contenedor a gestionar y cual es la configuracion (autoscaling, cuantas instancias, ...) y Kubernetes crea el cluster.
+AWS tienes que gestionar el cluster, Fargate es más avanzado y no tienes que manejarlo tú. También es de AWS.
+
+---------- 7 -----------
+
+Razon para pasar a la nube: 
+-on demand provision. La carga cambia a lo largo del año. Black friday etc.
+-undifferntiated heavy lifting: todo lo que subyace en cuestiones de infrastructura, tecnologías, que no es relevante para el negocio, container orchestration, etc. Las cloud platforms evitan que tengas que ocuparte de esas cosas y te centres en el negocio, pues las plataformas son las responsables de lo otro.
+-availability: servidores en todo el mundo, pues se hace uso de la infrastructura de los grandes proveedores, como amazon. Gran rendimiento y disponiblilidad.
+
+
+Despliegue habitual: 
+-Si lo despleagmos en un data center nuestro bare metal (hardware fisico), virtual hardware, operation system, runtime (jvm), application (esta es la pila) todo esto es nuestra responsabilidad.
+-Si lo desplegamos en la nube podemos hacer uso de lo que se llama IaaS (infrastructure as a service) Azure AWS GCP. El proveedor te brinda el hardware y la virtualización (tu parcelita de hardware, cuota de disco, memoria, procesador, etc.), en lo que se llama VS virtual server. En AWS se llama Elastic Compute Cloud EC2, en GCP se llama Compute Engine CE, y en Azure es Azure Virtual Machine. IaaS son las capas restantes. 
+Si tienes VS puedes instalar tu OS, tu runtime, etc. Pero también lo puedes contratar a los proveedores de cloud. Pero como queremos evitar undifferentiated heavy lifting, surge otro concepto contratable: PaaS platform as a service: engloba todas las capas menos la de aplicación: hw, virtualizacion, os y runtime.
+Podemos decir necesito un tomcat en un windows. Y tenerlo. Y ya solo hay que desplegar en él. Si solo contratas IaaS eres responsable del OS, runtime y app.
+PaaS en AWS se llama Elastic Beanstalk, en GCP AppEngine y en Azure se llama Azure AppService o WebApps. Cualquier Springboot application se puede desplegar en estos tres PaaS facilmente. 
+Estas plataformas tambien ofrecen el servicio para las bases de datos, de modo que sólo eres responsable de los datos en sí. La solución se llama Managed Services.
+AWS MySql Relational Db Service 
+GCP Relational database for mysql
+
+Managed Service:
+	Available 99.9 varias instancias de la bd, replicación, etc.
+	Auto Backups
+
+
+-------
+AWS Elastic Beanstalk
+Azure webapps
+
+Google app engine es el mas antiguo (2008). Ranga prefiere los otros dos. Pasa por encima de GCP.
+No confundir EBS Elastic Block Store (que es almacenamiento en la nube) con EBS Elastic BeanStalk (que es de lo que hablamos aquí, PaaS)
+
+Conceptos relevantes para estos servicios:
+
+versión de la aplicación. Cambio de una versión a otra.
+entorno de la aplicación. Dev, QA, Stage, Prod.
+Soportan despliegue de war, jar, containers.
+EB CLI para cambiar entornos, levantar, parar, etc.
+Deployments sin downtime, BlueGreen deployments
+Load Balancing, autoscaling.
+CI/CD CodeBuild CodePipeline: si tienes un repo github, si tienes cambios puedes habilitar integración continua. Compila, empaqueta, despliega.
+
+Azure: app service plans: quiero tanta infrastructura con tales caracteristicas, FI BI PIVI etc, cada plan tiene distintas prestaciones y precios. Support for scaling, automated backups.
+Escogemos un plan en base al rendimiento y la capacidad que queremos contratar.
+En un service plan podemos tener desplegadas un conjunto de apps.
+
+apps - slots: algunos planes tienen varios slots, otros no.
+Resource groups. Agrupar los recursos y manejarlos juntos. Bd, runtime, application, etc.
+Maven plugin: facilita el despliegue de springboot apps.
+Buen autoscaling y load balancing en los planes avanzados.
+CI/CD en Azure se llama Azure Devops
+
+
+
+
+
+

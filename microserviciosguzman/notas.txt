@@ -1,0 +1,134 @@
+Introducción a los microservicios
+Conjunto de componentes pequeños que colaboran para llevar a cabo una gran tarea.
+Deconstrucción de monolitico. Miniaplicaciones o módulos. 
+Bd transaccional, bd con mongo, o ms que van contra la misma bd.
+Es más simple adaptar a nuevas tecnologías. Cambio de spring, cambio de orm, etc.
+web-flux, spring-mvc, node Js, etc.
+Tiempos de liberacion son mucho mas rapidos. Mucho mas cantidad de gente trabajando en monolitos, peores valoraciones de plazos.
+Mejor escalar los ms. Balanceo.
+
+-Funcion única
+-Independientes, http distinto. Se comunican mediante http. Los servicios no conocen la implementación de los demás servicios, y se pueden testear, desplegar, escalar y mantener de forma independiente.
+-Registro y autodescubrimiento de servicios. Desacopla de nuestro código la ubicación de nuestros microservicios. Cada servicio tiene un identificador usando Eureka.
+Cuando un microservicio se quiere comunicar con otro, lo hace a través de su nombre, no de una IP y puerto en duro. Pregunta a Eureka por el nombre del otro servicio y Eureka le da una dirección en la que puede encontrar una instancia viva del otro servicio.
+-Autoescalado y agilidad. Momentos puntuales de gran actividad. Creación dinámica de nuevas instancias. No es necesaria una gran insfraestructura todo el tiempo, sino bajo demanda.
+-Tolerancia a fallos. Errores, problemas de latencia... etc. Timeout, camino alternativo. Hystrix evita errores en cascada. Opciones alternativas.
+-Balanceo de carga. A través de l nombre de ms, a través de un algoritmo se evalua cual es la instancia que va a ejecutar la petición. Ribbon.
+-Configuración centralizada.
+
+Entrando en los ms. Punto de partida.
+
+El escenario contempla dos aplicaciones con servicios Rest que se van a comunicar mediante RESTTemplate.
+Posteriormente lo cambiamos a ms: Servidor de Registro, comunicación por el nombre del otro servicio, en lugar de por su puerto. Balanceo de carga.
+
+Creamos primero servicio-productos. DevTools y Web (Servlet web application with Spring MVC and Tomcat). Además, JPA, H2.
+Como es sabido, la clase principal de la aplicación lleva el decorador @SpringBootApplication, que a su vez tiene en su definición el uso de los decoradores: @SpringBootConfiguration, @EnableAutoconfiguration y @ComponentScan.
+
+application.properties-->
+
+spring.application.name=servicio-productos
+server.port=8001
+
+Estas son configuraciones mínimas que debiera tener todo ms en nuestro sistema.
+Creando entity en package models.entity: Producto.
+
+Decorador @Temporal nos permite configurar el tipo de timestamp que vamos a manejar: fecha completa sin hora, fecha con hora, solo hora, etc.
+de javax.persistence. DATE, TIME, TIMESTAMP java.sql.time.
+
+@Column(name="create_at")
+@Temporal(TemporalType.DATE) <-- solo la fecha
+private Date createAt;
+
+Código de la entity:
+
+package com.micros.guzman.productos.models.entity;
+
+import java.io.Serializable;
+import java.sql.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+@Entity
+@Table(name = "productos")
+public class Producto implements Serializable{
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String nombre;
+	private Double precio;
+	@Column(name="create_at")
+	@Temporal(TemporalType.DATE)
+	private Date createAt;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	...
+}
+
+Es buena practica que las entities implemente Serializable
+
+Capa de Servicio para el micro. Haremos uso de JPA y de un repository. Los repository con Interfaces que ya proveen out of the box con los métodos CRUD, además de facilitar un convenio de nombres para la declaración a mayores de otros métodos de consulta de columnas. En el primer caso no es necesario declararlos, en el segundo hay que declararlos en la I para que el fw incluya la implementación.
+Patron de acceso a datos: DAO. Spring Data JPA. Hay para otras bases de datos como Mongo, Cassandra, etc. La interfaz CRUD Repository.
+
+public interface CrudRepository<T, ID> extends Repository<T, ID> {
+
+  <S extends T> S save(S entity);      
+
+  Optional<T> findById(ID primaryKey); 
+
+  Iterable<T> findAll();               
+
+  long count();                        
+
+  void delete(T entity);               
+
+  boolean existsById(ID primaryKey);   
+
+  // … more functionality omitted.
+}
+
+JPARepository, @Query
+
+ejemplo:
+
+public interface UserRepository extends JpaRepository<User, Long>{
+
+@Query("select u from User u where u.emailAddress=?1")
+User findByEmailAddress(String emailAddress);
+
+}
+
+Creamos el Interface 
+
+package com.micros.guzman.productos.model.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.micros.guzman.productos.models.entity.Producto;
+
+public interface ProductosRepository extends JpaRepository<Producto,Long>{
+
+}
+
+Creamos una fachada para acceder a los DAO, o sea, la capa de servicio.
+
+@Service + @Autowired
+
+Creamos package models.service. Creamos interface IProductosService:
+findAll, findById, etc.
+
+
+
+
+Open feign
+

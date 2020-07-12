@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetCourseDetailsResponse xmlns="http://carregal.com/courses"
+xsi:schemaLocation="http://carregal.com/courses course-details.xsd"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<CourseDetails>
+		<id>123</id>
+		<name>Course WS</name>
+		<description>Short course on web services</description>
+	</CourseDetails>
+</GetCourseDetailsResponse>

@@ -1,0 +1,521 @@
+OOP design patterns.
+
+Git: in28minutes Design patterns for beginners.
+
+Behavioural, Creational y Structural.
+
+Creando objetos: creational.
+Structural: composicion, que compone una clase, que relacion tiene con otras clases, contiene un objeto de otra clase?
+Behavioural: interacciones entre los objetos, como se comunican con otros objetos.
+
+Creational:
+
+1.- Prototype. Una copia inicializada para ser clonada cada vez que haga falta. Initial setup para partida de ajedrez, por ejemplo. Tiene mucho que ver con el clonado del prototype.
+
+2.-Builder pattern separa la construcción de la representación del objeto. Hay objetos con un muchas variables y tal vez quieres crear el objeto haciendo uso de un subconjunto de las opciones. No hace falta tener toda la combinatoria de constructores distintos si se hace uso del Builder pattern.
+Una cena: habrá quien quiera solo segundo y postre. Otros se saltarán el postre pero tomarán copas. Hay muchas combinaciones.
+
+package com.in28minutes.patterns;
+
+public class BuilderPattern {
+
+	static class Coffee {
+		private Coffee(Builder builder) {
+			this.type = builder.type;
+			this.sugar = builder.sugar;
+			this.milk = builder.milk;
+			this.size = builder.size;
+		}
+
+		private String type;//Should be a enum Lazy bum
+		private boolean sugar;
+		private boolean milk;
+		private String size;//Should be a enum Lazy bum
+
+		public static class Builder {
+			private String type;//Should be a enum Lazy bum
+			private boolean sugar;
+			private boolean milk;
+			private String size;//Should be a enum Lazy bum
+
+			public Builder(String type) {
+				this.type = type;
+			}
+
+			public Builder sugar(boolean value) {
+				sugar = value;
+				return this;
+			}
+
+			public Builder milk(boolean value) {
+				milk = value;
+				return this;
+			}
+
+			public Builder size(String value) {
+				size = value;
+				return this;
+			}
+
+			public Coffee build() {
+				return new Coffee(this);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String
+					.format("Coffee [type=%s, sugar=%s, milk=%s, size=%s]",
+							type, sugar, milk, size);
+		}
+
+	}
+
+	public static void main(String[] args) {
+		Coffee coffee = new Coffee.Builder("Mocha").milk(
+				true).sugar(false).size("Large").build();
+		System.out.println(coffee);
+		
+		//Simplifies Creation
+		//More Readable Code
+		//Values cannot be modified
+	}
+}
+
+Me estaba preguntando qué aportaba esto si existen los setters. Pues codigo más legible y evitar problemas asociados al uso de setters cuando hay multi threading.
+Simplifica, es más legible. Los valores no son modificables en un objeto construido así.
+
+3.- Singleton. Una sola instancia en la máquina virtual. Presidente de un país.
+Constructor privado. Se obtienen mediante Factorias? me suena esto.
+Es muy fácil crear un singleton con un Enum, ejemplo en código:
+
+package com.in28minutes.patterns;
+
+public class SingletonPattern {
+	static class Singleton {
+		private static Singleton instance = new Singleton();
+
+		private Singleton() {
+		}
+
+		public static Singleton getSingleInstance() {
+			return instance;
+		}
+
+	}
+}
+
+---
+
+package com.in28minutes.patterns;
+
+public enum MySingletonUsingEnum {
+	INSTANCE;
+	private MySingletonUsingEnum() {
+		System.out.println("Here");
+	}
+
+	public String retrieveSomething() {
+		return "DUMMY";
+	}
+
+}
+
+Dificil de testear con Unit testing. Los bean de Spring son singleton, a no ser que los quieras type='prototype'.
+
+4.- Factory Method: create a family of object types. Factoría de Person. Es como un constructor que en función de un parámetro devuelve una instancia de un subtipo o de otro. Female, Male are Person.
+Devuelve un Person.
+
+package com.in28minutes.patterns;
+/*
+ * instantiate an object from one among a set of classes based on some logic
+ */
+public class FactoryPattern {
+	public static class PersonFactory {
+		public static Person getPerson(String name,
+				String gender) {
+			if(gender.equalsIgnoreCase("M")){
+				return new Male(name);
+			}else if(gender.equalsIgnoreCase("F")){
+				return new Female(name);
+			} //So on..
+			return null;
+		}
+	}
+
+	static abstract class Person {
+		Person(String name){
+			this.name = name;
+		}
+		private String name;
+		abstract String getSalutation();
+		String getNameAndSalutation(){
+			return getSalutation() + " " + name;
+		}
+	}
+	
+	static class Male extends Person{
+		public Male(String name) {
+			super(name);
+		}
+
+		@Override
+		String getSalutation() {
+			return "Mr";
+		}
+		
+	}
+	
+	static class Female extends Person{
+		public Female(String name) {
+			super(name);
+		}
+
+		@Override
+		String getSalutation() {
+			return "Miss/Mrs";
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		Person male = PersonFactory.getPerson("Robinhood","M");
+		System.out.println(male.getNameAndSalutation());
+		Person female = PersonFactory.getPerson("Mary","F");
+		System.out.println(female.getNameAndSalutation());
+	}
+}
+
+Quien está usando este patrón conoce la clase Person, pero no sabe si está usando una Male o Female class. Ese detalle se abstrae en el uso de este patrón.
+Esconde la complejidad de crear el objeto. En vez de tener que saber si se tiene que crear una male o female, tenemos una factory tomando la decision por nosotros.
+
+Structural:
+
+5.- Proxy. Un objeto representando otro objeto. Debit card es una representación proxy de mi cuenta bancaria. Otro ejemplo: sistemas distribuidos con objetos proxy, que se ocupa de todos los detalles de la comunicación externa de forma transparente para nosotros. EJB es un ejemplo.
+
+6.- Decorator. Añadir responsabilidades a un objeto de forma dinámica, en runtime. Por ejemplo Java IO: LineNumberInputStream(BufferedInputStream(FileInputStream)). Se añaden responsabilidades de forma dinámica.
+Añade dificultad a la hora de crear los objetos, permite que sea dinámica la adición de responsabilidades. 
+
+7.- Facade ('fassád'). Una clase que representa a un subsistema entero. Ofrece:
+Menos interacciones por red,
+Reduce el acople
+Ayuda a delimitar el ámbito de las transacciones
+
+EventManager (WeddingManager, por ejemplo):
+Decoración
+Comida
+Invitaciones
+Musica
+
+Se encarga de todo, tu le das la información para cada cosa (cómo lo quieres todo) y el ejecuta en una orden.
+
+Online compra de libro:
+Verificar si hay stock
+ejecutar pago
+reservar unidad
+actualizar stock
+generar factura.
+
+Mientras la interfaz con la fachada no cambie, todos los detalles internos de la implementación pueden cambiar. Transacciones.
+
+8.- Adapter: se usa para emparejar interfaces de distintas clases. Conversión de objeto Java a objeto xml antes de usar un soap, o a json hacia un REST.
+
+package com.in28minutes.patterns;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/*
+ * translates one interface for a class into a compatible interface.[1] An adapter allows classes to work together that normally could not because of incompatible interfaces
+ */
+public class AdapterPattern {
+	static class CountriesInterface {
+		public List<String> getList() {
+			List<String> countries = Arrays.asList("IND",
+					"PAK", "SL");
+			return countries;
+		}
+	}
+
+	static class CountriesAdapter {
+		private static Map<String, String> countryCodeNameMapping = new HashMap<String, String>();
+		static {
+			countryCodeNameMapping.put("IND", "India");
+			countryCodeNameMapping.put("PAK", "Pakistan");
+			countryCodeNameMapping.put("SL", "Sri Lanka");
+			//...A lot of others as well
+		}
+
+		public List<String> getTranslatedList() {
+			List<String> countryCodes = new CountriesInterface()
+					.getList();
+			List<String> countryNames = new ArrayList<String>();
+			for (String country : countryCodes) {
+				countryNames.add(countryCodeNameMapping
+						.get(country));
+			}
+			return countryNames;
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println(new CountriesAdapter()
+				.getTranslatedList());
+	}
+}
+
+9.- Flyweight: Compartición de recursos escasos, como en las lineas de teléfono switched telephone network. Imaginemos que hay 50k lineas pero 20 millones de usuarios. No todos los usuarios las usan a la vez, por eso se hacen las consideraciones del uso eficiente y compartido de las lineas.
+Connection pools, jdbc. Tenemos un pool de 20 conexiones, y cuando viene una query buscamos una conexion, ejecutamos la query y liberamos. Nos ahorra el coste de crear una conexión y cerrarla para cada query.
+Crear instancias para una compartición eficiente.
+
+Behavioural:
+
+10.- Chain of responsability: gestión de excepciones es un buen ejemplo. Se tira una excepcion, y el runtime ve si la clase gestiona, si no eleva, si no eleva, etc.
+Chain of objects que manejan un evento. Lo manejas tu? no, y tú? no, y tú? sí.
+
+11.- Iterator. Acceso secuencial, acceso al siguiente y al anterior. Lista doblemente enlazada. Clase Iterator. Borrado eficiente, y recorrido eficiente de la colección.
+
+12.- State: altera la conducta del objeto en función de la variable/s que representa el estado actual del objeto. Fan control: level 0, level 1, etc.
+Se modela el state con una clase. Esto se llama composición, que una clase sea un atributo de otra (confirmar).
+
+En el ejemplo se define el estado como un atributo de tipo interface, y tenemos varias implementaciones de la interfaz que sobrescriben el método rotate, o sea, el método de girar la ruedecita del speed fan control.
+De off pasa a 1 y gira a x rpm, de 1 a 2, de 2 a 3 y de 3 a off.
+
+package com.in28minutes.patterns;
+
+/*
+ */
+public class StatePattern {
+	static class FanWallControl {
+		private SpeedLevel current;
+
+		public FanWallControl() {
+			current = new Off();
+		}
+
+		public void set_state(SpeedLevel state) {
+			current = state;
+		}
+
+		public void rotate() {
+			current.rotate(this);
+		}
+
+		@Override
+		public String toString() {
+			return String.format(
+					"FanWallControl [current=%s]", current);
+		}
+	}
+
+	interface SpeedLevel {
+		void rotate(FanWallControl fanWallControl);
+	}
+
+	static class Off implements SpeedLevel {
+		public void rotate(FanWallControl fanWallControl) {
+			fanWallControl.set_state(new SpeedLevel1());
+		}
+	}
+
+	static class SpeedLevel1 implements SpeedLevel {
+		public void rotate(FanWallControl fanWallControl) {
+			fanWallControl.set_state(new SpeedLevel2());
+		}
+	}
+
+	static class SpeedLevel2 implements SpeedLevel {
+		public void rotate(FanWallControl fanWallControl) {
+			fanWallControl.set_state(new SpeedLevel3());
+		}
+	}
+
+	static class SpeedLevel3 implements SpeedLevel {
+		public void rotate(FanWallControl fanWallControl) {
+			fanWallControl.set_state(new Off());
+		}
+	}
+
+	public static void main(String[] args) {
+		FanWallControl fanControl = new FanWallControl();
+		System.out.println(fanControl);
+		fanControl.rotate();
+		System.out.println(fanControl);
+		fanControl.rotate();
+		System.out.println(fanControl);
+		fanControl.rotate();
+		System.out.println(fanControl);
+		fanControl.rotate();
+		
+		/*
+		 * 
+		 * FanWallControl [current=com.rithus.patterns.StatePattern$Off@7a6d084b]
+FanWallControl [current=com.rithus.patterns.StatePattern$SpeedLevel1@2352544e]
+FanWallControl [current=com.rithus.patterns.StatePattern$SpeedLevel2@457471e0]
+FanWallControl [current=com.rithus.patterns.StatePattern$SpeedLevel3@7ecec0c5]
+		 * 
+		 */
+	}
+}
+
+
+13.- Strategy: la clase encapsula la implementación. Separamos el algoritmo, de modo que tenemos varias implementaciones.
+Se usa una interfaz para la operación en el código de la clase, y en el constructor se inyecta la implementación de esa interfaz para ser usada.
+
+
+package com.in28minutes.patterns;
+
+/*
+ * Separates Strategy - how you do something - into a separate class.
+ * Allows easy change of strategy at a later point.
+ */
+public class StrategyPattern {
+	interface Sortable {
+		public int[] sort(int[] numbers);
+	}
+
+	static class BubbleSort implements Sortable {
+		@Override
+		public int[] sort(int[] numbers) {
+			// Ideally the bubble sort is implemented completely here
+			return numbers;
+		}
+	}
+
+	static class QuickSort implements Sortable {
+		@Override
+		public int[] sort(int[] numbers) {
+			// Ideally the quick sort is implemented completely here
+			return numbers;
+		}
+	}
+
+	static class ComplexClass {
+		Sortable sorter;
+
+		ComplexClass(Sortable sorter) {
+			this.sorter = sorter;
+		}
+
+		void doAComplexThing() {
+			int[] values = null; // get from somewhere..
+			// ..logic..
+			sorter.sort(values);
+			// ..logic..
+		}
+	}
+
+	public static void main(String[] args) {
+		ComplexClass complexClassInstance = new ComplexClass(new BubbleSort());
+		// This can also be a setter..
+		complexClassInstance.doAComplexThing();
+	}
+}
+
+14.- Observer: se busca la manera de notificar de un cambio a un número de clases. Las clases se registran al evento como observers, entonces el programa centralizado notifica a los observers. Subastas y pujadores. Cuando hay una nueva puja todos los observers son notificados. Cuando hay un cambio en el objeto que está siendo observado, se produce la notificación.
+
+package com.in28minutes.patterns;
+
+import java.util.ArrayList;
+import java.util.List;
+/*
+ * You want to know when an event happens
+ */
+public class ObserverPattern {
+	static class SachinCenturyNotifier{
+		List<SachinFan> fans = new ArrayList<SachinFan>();
+		void register(SachinFan fan){
+			fans.add(fan);
+		}
+		void sachinScoredACentury(){
+			for(SachinFan fan:fans){
+				fan.announce();
+			}
+		}
+	}
+	
+	static class SachinFan {
+		private String name;
+		SachinFan(String name){
+			this.name = name;
+		}
+		void announce(){
+			System.out.println(name + "  notified");
+		}
+	}
+	
+	public static void main(String[] args) {
+		SachinCenturyNotifier notifier = new SachinCenturyNotifier();
+		notifier.register(new SachinFan("Ranga"));
+		notifier.register(new SachinFan("Ramya"));
+		notifier.register(new SachinFan("Veena"));
+		notifier.sachinScoredACentury();	
+		
+		/*
+		 * Ranga  notified
+Ramya  notified
+Veena  notified
+
+		 */
+	}
+}
+
+15.- Visitor pattern: Define una nueva operación a una clase sin realizar cambios sobre ella. 
+Ejemplo: cuando una persona pide un taxi, se registra la petición. La compañía entonces envia el taxi y el cliente *lo acepta*. Desde ese momento de entrar en el taxi (visitor), el cliente no está en control de su transporte, sino el taxi.
+https://manski.net/2013/05/the-visitor-pattern-explained/
+
+The Visitor Pattern 
+The visitor pattern consists of two parts:
+
+-A method called Visit() which is implemented by the visitor and is called for every element in the data structure
+-Visitable classes providing Accept() methods that accept a visitor
+
+Visitor: Convert To HTML. Putting It All Together:
+ 
+Now, to convert a document to HTML we can use this code:
+
+Document doc = ...;
+HtmlVisitor visitor = new HtmlVisitor();
+doc.Accept(visitor);
+Console.WriteLine("Html:\n" + visitor.Output);
+
+16.- Template method: diferir los pasos exactos de un algoritmo a una subclase. AbstractController en Spring Framework. Los detalles concretos se implementan en la subclase, pero el plano general (high level) se esboza en la clase.
+
+17.-Command: encapsular una petición o comando como un objeto. java.lang.Runnable run() threading->run de un thread. request en javaEE.
+
+18.- Memento. Capturar y restaturar el estado de un objeto para Redo/Undo. Salvar el estado de avance de un videojuego. Serialización implicada.
+
+19.- Mediator. Simplica la comunicación entre clases. Air Traffic Controller. Los vuelos hablan con el traffic controller, no entre ellos, pues sería un caos. ESB Enterprise Service Bus. Se ponen los mensajes en la ESB y un consumidor lo gestiona y devuelve la respuesta. Al que pone la petición en el bus no le interesa realmente quien la procesa, solo recibir la respuesta. 
+
+------------------- SOLID PRINCIPLES -----------------
+
+SRP Single Responsibility Principle
+OCP Open Closed Principle
+LSP Liskov Substitution Principle
+ISP Interface Segregation Principle
+DIP Dependency Inversion Principle
+
+SRP Una clase debería tener solamente un motivo para ser modificada. Una aplicación, una clase, una interfaz, etc. debería tener un cometido que se pueda resumir en una línea.
+Esto hace código reutilizable.
+
+OCP Las entidades de software deberían estar ABIERTAS a extensión, pero CERRADAS a modificación. Mejor que tener que modificar el código de un método si surgen nuevas casuisticas, buscar la manera de definir nuevas entidades que sobrescriban su propia logica de forma que sea coherente con el código que no se quiere modificar.
+El ejemplo que pone es un metodo para calcular area, que tiene if else para cada figura de un conjunto (circulo, rectángulo). Es preferible hacer una clase abstracta y subclases que proporcionen su propia funcion de area para que no haya que ampliar los if elses y solamente se itere por la colección de figuras.
+
+LSP Los subtipos deben ser sustituibles por sus clases base. El uso de herencia de objetos puede llegar a ser abusado solo para el reuso. Pone ejemplo de rectangulo con setters para base y altura y cuadrado que extiende de rectangulo, pero que en el caso de set base establece base y altura, y lo mismo en el caso de set altura, establece los dos valores. 
+Hacer pasar al cuadrado el mismo test unitario que al rectangulo produciría un error. Las clases padre deben poder ser sustituidas por las clases hijas para cualquier caso, porque un cuadrado ES un rectangulo, de modo que no puede fallar al sustituirlo en ningún caso.
+
+ISP La dependencia de una clase con otra se debería poder plasmar en una interfaz lo más pequeña posible. Es mejor tener un conjunto de interfaces con pocos métodos basados en submodulos de funcionalidad.
+Ejemplo: Perro y Tigre implementan la interfaz Animal, que tiene los métodos alimentar, y, como hace falta para el perro, acicalar. Obviamente no acicalamos a un tigre salvaje, pero necesitamos dar una implementación dummy para que compile<--MAL. Lo correcto es crear la interfaz Animal que declare el método alimentar y otra que sea Mascota, que EXTIENDE de Animal, que además tiene el método acicalar. Así cumplimos con el principio de Segregación de Interfaces.
+Mantener las interfaces lo más pequeñas posible. Las interfaces gordas con muchos métodos no son buenas. Además al modificarlas con metodos nuevos TODAS las clases que las implementan deben ser modificadas.
+
+DIP trata de establecer la dependencia con interfaces mejor que con clases concretas. Ejemplo: metodo copy desde lo que se escriba desde teclado se guarda en un dispositivo de salida, que puede ser disco o impresora. La solución mala es tener if elses para cada dispositivo de salida. La solución buena es que los dispositivos de entrada implementen la interfaz Reader (método read()) y que los de salida implementen Writer (método write()). De esta forma el metodo copy solo tiene de parametros el dispo de input y el de output y se hace uso de sus métodos read() y write() de forma transparente.
+ 
+
+
+
+
+
+

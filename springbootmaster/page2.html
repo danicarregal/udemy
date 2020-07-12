@@ -1,0 +1,268 @@
+Section 2:
+Introduction to Bootstrap 4
+4. What is bootstrap 4 and how to install it
+0:00
+8 days ago
+<p>Bootstrap es un toolkit css que permite hacer páginas responsivas fácilmente y además darles estilos. Provee también de componentes propios con funcionalidad añadida. Extensiones para Visual Studio Code: Highlight matching tag + live server.</p><p>Para hacer una pagina con bootstrap se parte de una starter-template. Podemos crear una carpeta en local, y dentro crear un archivo index.html. Después pegamos el contenido html de la starter-template. Para abrirlo con VScode arrastramos la carpeta al editor.</p>
+4:13
+8 days ago
+<p>Shift+alt+F formateo automatico.</p><p>Se incluye en el head el link al css y al final del body los includes de los js: jquery, popper y bootstrap en este orden.</p><p>Descargando el paquete compilado: bootstrap grid, bootstrap reboot (normalizar css entre dintintos navegadores) o bootstrap. Copiamos solo bootstrap css (que incluye a los otros dos) y lo pegamos en la carpeta del proyecto. Sustituimos los cdn del css y del js, tanto bootstrap como popper js. JQuery lo dejamos estar como cdn.</p>
+5. Main components of Bootstrap
+3:42
+8 days ago
+<p>Con la extensión live server, cada vez que guardas con control S se refresca el nuevo contenido en el navegador, sin tener que recargar la página.</p><p>Los componentes principales de bootstrap son: </p><ol><li><p>.container </p></li><li><p>.row </p></li><li><p>.column</p></li></ol><p>Notar que .<strong>row </strong>y .<strong>column </strong>siempre se aplican a <strong>divs</strong>. Pero .<strong>container </strong>class se puede asociar a otros elementos también como header o footer. Rows van dentro de containers y columns van dentro de rows.</p><p>VSCode tiene autocomplete de código. Escribiendo <strong>div.container</strong> e <strong>INTRO</strong> escribe <code>&lt;div class="container"&gt;&lt;/div&gt;</code></p><p>Creamos dentro de container un div row y dentro uno con la clase column. El container lleva un tamaño en función del tamaño de la pantalla. Si la pantalla cambia, cambia max-width del container.</p>
+4:05
+8 days ago
+<p>Los container pueden ser fluid (ocupa el 100% del ancho de la pantalla).</p><pre class="prettyprint linenums">&lt;div class="container red white"&gt; &lt;div class="row"&gt; &lt;div class="column"&gt;Hello there&lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;div class="container-fluid green white"&gt; &lt;div class="row"&gt; &lt;div class="column"&gt;Hello there&lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+6. Grid and columns 1
+1:04
+7 days ago
+<p>Columnas de grid: partimos de index.html 'vacío', solo contiene los includes y el vínculo con el css, además del markup de body.</p><p>Las columnas van dentro de una row y siempre se deben adaptar a 12, pero no necesariamente llegar a sumar 12. Lo único que no tiene sentido es que sumen mas de 12 y pretender que encajen en una sola fila.</p><p>Para una anchura de pantalla se establece la cuantía menor de 12 que debe ocupar usa columna:</p><p>div.col-sm-4 (small) (1/3 del ancho)</p><p>Si no pones pantalla (sm) y simplemente pones class col, ocupa toda la fila.</p><p>Si pones varios col sin tamaño establecido se reparten el espacio. Poniendo incluso 18 cols sin tamaño no las organiza en filas de 12, sino que mete las 18 en una única fila, con el mismo ancho. </p>
+2:13
+7 days ago
+<p>El la doc de bootstrap, sección grid layout, hay tabla con tamaños contemplados:</p><ol><li><p>sin sufijo (extra small) </p></li><li><p>-sm- (small) </p></li><li><p>-md- (medium) </p></li><li><p>-lg- (large) </p></li><li><p>-xl- (extra large).</p></li></ol><p>Cuando marcamos una col podemos especificar la porción de la fila que queremos establecer para esa columna en cada tamaño de pantalla.</p><p>Podemos poner col col-sm-6, que vale por: para pantallas extra small la columna ocupa todo el ancho, pero para pantallas small ocupa la mitad.</p><p>Tienen un margen lateral de 15px. medianil o gutter.</p><p>El tamaño especificado para un tipo de tamaño es válido para todos los tamaños iguales o mayores, a no ser que se sobrescriba la propiedad para tamaños mayores.</p>
+4:36
+7 days ago
+<p>Si a las columnas se les pone un cardinal, todo lo que pase de 12 se encabalga en la linea siguiente, aún si se trata de un container fluid (que ocupa todo el ancho de la pantalla).</p><p>Si no se pone cardinal da igual el tamaño de la pantalla, se ponen las columnas intentando encajar todas. Sería bueno saber qué pasa cuando en las columnas empieza a haber elementos de tamaño fijo.</p>
+4:55
+7 days ago
+<p>Ejemplo: queremos 4 columnas en small(&gt;=576) y más, pero 2 columnas en large (&gt;=992) y full en menores que small.</p><p>Esto da una columna por fila en col, 4 por fila en sm y md, y dos columnas por fila en lg y xl-</p><p>div.container</p><p>div.row</p><p>div.col-sm-3 col-lg-6</p><p>div.col-sm-3 col-lg-6</p><p>div.col-sm-3 col-lg-6</p><p>div.col-sm-3 col-lg-6</p><p>Como observación, no es que la suma de cardinales mayor que 12 para una fila carezca de sentido, sino que cuando es así, el contenido se acomoda en sucesivas filas conforme a los números.</p>
+5:53
+7 days ago
+<pre class="prettyprint linenums">&lt;div class="container mt15"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-3 col-lg-6 white red"&gt; 1 col or 4 cols or 2 cols (1)&lt;/div&gt; &lt;div class="col-sm-3 col-lg-6 white green"&gt;1 col or 4 cols or 2 cols (2)&lt;/div&gt; &lt;div class="col-sm-3 col-lg-6 white blue"&gt;1 col or 4 cols or 2 cols (3)&lt;/div&gt; &lt;div class="col-sm-3 col-lg-6 white black"&gt;1 col or 4 cols or 2 cols (4)&lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+7:10
+7 days ago
+<p>Si queremos imponer, por ejemplo, 4 columnas independientemente del ancho de la pantalla, lo hacemos con col-3:</p><pre class="prettyprint linenums">&lt;div class="container mt15"&gt; &lt;div class="row"&gt; &lt;div class="col-3 white red"&gt;4 cols (1)&lt;/div&gt; &lt;div class="col-3 white green"&gt;4 cols (2)&lt;/div&gt; &lt;div class="col-3 white blue"&gt;4 cols (3)&lt;/div&gt; &lt;div class="col-3 white black"&gt;4 cols (4)&lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre><p>Las column tiene que estar dentro de una row, pero no tiene por qué sumar 12... Una row puede corresponderse realmente con varias filas.</p><p>Es el nombre de la clase contenedora para divs de class column, pero la relación no es estricta.</p>
+7. Grid and columns 2
+5:04
+7 days ago
+<p>Para anidar contenido metemos rows dentro de columns y aplicamos los mismos principios.</p><pre class="prettyprint linenums"></pre>
+Section 3:
+Project 1
+9. Project 1 Navigation
+2:30
+6 days ago
+<p>Creamos carpeta nueva myproject1, con carpetas css y js conteniendo bootstrap.css y bootstrap.bundle.js</p><p>Copiamos el navbar de uno de los ejemplos de la pagina de bootstrap y lo vamos acomodando a nuesto proyecto.</p><p>elemento html <strong>nav</strong></p><p>class <strong>navbar </strong>(mandatory)</p><p><strong>navbar-expand-md</strong> significa que a partir de tamaño md se ve el menú, sino aparece colapsado como en móvil.</p><p><strong>navbar-dark</strong> ajusta el color de las letras para un <strong>bg-dark</strong>, y este ajusta un fondo oscuro para la barra.</p><p><strong>fixed-top</strong> es para que esté siempre visible en el top de la página, aunque el resto haga scroll.</p><p>Dentro del navbar, el div con la ul es el menú. En el del ejemplo hay un link deshabilitado y un drop down, que vamos a quitar para seguir el ejercicio, pues buscamos crear una página como project1.</p>
+3:01
+6 days ago
+<p>El <strong>ul </strong>tiene clase <strong>navbar-nav</strong> y los li tienen clase <strong>nav-item</strong>. Los elementos son a href y tienen clase <strong>nav-link</strong> las clases <strong>aria-controls</strong>, <strong>aria-expanded</strong> <strong>aria-label</strong>... son para screen readers.</p><p>En el ul, el primer elemento es Home, y tiene la clase active además de <strong>nav-item</strong>. Dentro del a hay un span con clase <strong>sr-only</strong> (screen reader only)</p><p>Vamos a poner un Jumbotron, que es como un cartel grande en la cabecera de la página.</p><p>Página Bootstrap, Components, Jumbotron. div class jumbotron:</p><pre class="prettyprint linenums">&lt;div class="container"&gt; &lt;div class="jumbotron"&gt; &lt;h1 class="display-3"&gt;Hello, people!&lt;/h1&gt; &lt;p&gt;Welcome to my portfolio website!&lt;/p&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+10. Project 1 Jumbotron
+1:03
+6 days ago
+<p>La clase display va de 4 a 1, siendo el 1 el más grande: <strong>display-3</strong></p><p>Usamos &lt;p class="<strong>lead</strong>"&gt; para el comentario bajo el título, pues resalta más.</p><p>Para dar el margen en el top del jumbotron, como en la referencia:</p><p>utility class para ello, aplicada al container <strong>mt-5</strong> (va del 1 al 5 siendo 5 el mayor).</p><p><strong>Ojo</strong>! si el navbar tiene la clase <strong>fixed-top</strong> flota sobre el contenido, de modo que el margen mt-5 será respecto al tope superior del documento. Si se le quita la clase fixed-top al navbar este se convierte en un elemento 'que ocupa espacio' y entonces el margen de mt-5 es respecto al navbar, como deseamos.</p><p>También existen las utility classes <strong>mb-[1-5]</strong>, <strong>ml-[1-5]</strong>, <strong>mr-[1-5]</strong> para bottom, left y right respectivamente.</p><p>Hay más clases de utilidad interesantes que se pueden ver en Utilites: Border, Spacing...</p>
+11. Project 1 About Me
+1:46
+6 days ago
+<p>La sección About Me tiene poca chicha: </p><p>Apenas un container con text-center, una row, una col y las clase display para los tamaños de los elementos h1 y h3.</p><pre class="prettyprint linenums">div&nbsp;class="container&nbsp;text-center" &nbsp;&nbsp;&nbsp;&nbsp;div&nbsp;class="row" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;div&nbsp;class="col" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h1&nbsp;class="display-2"&gt;About&nbsp;Me /h1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p&nbsp;class="font-weight-bold" My&nbsp;name&nbsp;is&nbsp;Daniel&nbsp;Carregal&nbsp;and&nbsp;I&nbsp;am&nbsp;a&nbsp;freelance&nbsp;photographer. /p &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h3&nbsp;class="display-4" Check&nbsp;out&nbsp;my&nbsp;work&nbsp;below /h3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/div &nbsp;&nbsp;&nbsp;&nbsp;/div /div</pre>
+1:51
+6 days ago
+<p>Doc under Layout Content Typography -&gt; Display classes</p>
+12. Project 1 Work Section
+0:13
+6 days ago
+<p>display-[1-4] siendo 1 el más grande, hace que los h1-h6 se vean iguales. La clase de display sobrescribe los tamaños de los elementos h.</p><p><br></p><p>Nuevo container con row y tres cols: como queremos 3 cols, son col-lg-4. Dentro de cada columna metemos un div.card</p><p>Dentro de cada div.card metemos una img.card-img-top</p><p>Tras el img.card-img-top metemos un div.card-body</p><p>card - card-body(&lt;div&gt;) - card-title(&lt;h&gt;) - card-text(&lt;p&gt;)</p><p>a.btn btn-dark btn-sm sin referencia a card</p><p>al container le ponemos my-5 (arriba y abajo, o sea, mt y mb a la vez).</p>
+2:11
+6 days ago
+<p>display-[1-4] siendo 1 el más grande, hace que los h1-h6 se vean uales. La clase de display sobrescribe los tamaños de los elementos h.</p><p>Nuevo container con row y tres cols: como queremos 3 cols, son col-lg-4. Dentro de cada columna metemos un div.card</p><p>Dentro de cada div.card metemos una img.card-img-top</p><p>Tras el img.card-img-top metemos un div.card-body</p><p>card - card-body(&lt;div&gt;) - card-title(&lt;h&gt;) - card-text(&lt;p&gt;)</p><p>a.btn btn-dark btn-sm sin referencia a card</p><p>al container le ponemos my-5 (arriba y abajo, o sea, mt y mb a la vez).</p><pre class="prettyprint linenums"></pre>
+3:30
+6 days ago
+<pre class="prettyprint linenums">&lt;div&nbsp;class="col-lg-4"&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;div&nbsp;class="card"&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;img&nbsp;src="./assets/animals.jpg"&nbsp;alt="animals"&nbsp;class="card-img-top"&gt; &nbsp;&nbsp;&nbsp;&nbsp; &lt;div&nbsp;class="card-body"&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;h5&nbsp;class="card-title"&gt;Animal&nbsp;photos&lt;/h5&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;p&nbsp;class="card-text"&gt;Some&nbsp;animal&nbsp;photos&lt;/p&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;a&nbsp;type="button"&nbsp;href="#"&nbsp;class="btn&nbsp;btn-dark&nbsp;btn-sm"&gt;Check&nbsp;it&nbsp;out!&lt;/a&gt; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/div&gt; &nbsp;&nbsp;&nbsp; &lt;/div&gt; &lt;/div&gt;</pre>
+13. Project 1 Footer
+1:43
+6 days ago
+<pre class="prettyprint linenums">&lt;footer class="container-fluid bg-dark text-light py-4"&gt; &lt;div class="container"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-3"&gt; &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark pl-0"&gt; &lt;a class="navbar-brand" href="#"&gt;Daniel Carregal&lt;/a&gt; &lt;/nav&gt; &lt;/div&gt; &lt;div class="col-sm-9"&gt; &lt;p class="float-sm-right pt-3"&gt;&amp;copy;Daniel Carregal - All Rights Reserved &lt;/p&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/footer&gt;</pre>
+14. Project 1 Responsive
+2:12
+6 days ago
+<p>Para hacerlo <strong>responsive</strong>: se ve mal el espacio cuando se colapsan por anchura. También necesitamos que cuando se pasa a una card por columna, el texto esté centrado.</p><p>Tambén necesitamos que colapse bien el footer. Podemos aplicar un mb-3 (margin bottom) pero no queremos que se aplique en todos los casos, sino cuando se vean solo una columna.</p>
+4:24
+6 days ago
+<p>Entonces aplicamos un margen de 0 en los casos en los que no queremos que salga, que es en los que pintamos más de una columna :)</p><p><strong>div.col-md-4 mb-3 mb-md-0</strong>&nbsp; así solo se aplica si es menor de md, caso en el que se pinta una sola col.</p><p>La misma lógica aplicamos para que el texto se vea centrado si hay una columna, y a la izquierda si se ven 3:</p><p><code>&lt;div class="row text-center text-lg-left"&gt;</code> <strong>bootstrap utility classes</strong></p><p>En cuanto al footer, lo que está causando el problema es el float-right.</p><p>Para resolverlo se aplica solo al tamaño para el que no falla:&nbsp; <strong>sm</strong> en adelante.</p>
+Section 4:
+04 Project 2
+16. Project 2 Navigation
+2:47
+4 days ago
+<p>Segundo proyecto, sobre página a favor del consumo de fruta. Tiene un navbar, tiene modales con vídeos de youtube, tiene un formulario, tiene footer, tiene cards, contenedores con imágenes flotando a izquierda y derecha, jumbotrons, dropdowns, etc.</p><p>Volvemos a la página de bootstrap y cogemos en la sección de ejemplos el código para el navbar. Le quitamos el formulario del final.</p><p>Cambiamos las clases .navbar-dark y .bg-dark por navabar-light y bg-light (utility classes para text colors y background colors). Eliminamos la clase&nbsp; fixed-top, para que el contenido empiece a apilarse bajo el navbar en cuando a colocación.</p><p>Para darle negrita a todos los textos del nav, ponemos la clase font-weight-bold en el elemento nav.</p><p>Para eliminar el highlight en el enlace About Us, dado que estamos en el home, le quitamos la clase active.</p>
+17. Project 2 Carousel
+0:59
+4 days ago
+<p>Para añadir algo de espacio entre el encabezado del dropdown y la flecha, hay que colocar 'algo' que ocupe ese espacio tras el texto del encabezado. El autor mete un salto de línea, yo he probado con un espacio y funciona. Pero también he metido un elemento inline al que se le puede fijar el ancho, como lo es &lt;img width="5px"/&gt;. Funciona.</p><p>Slider, es un componente de bootstrap que se llama Carousel así que vamos a la sección de ejemplos de bootstrap y lo cogemos.</p><p>Lo vamos a meter dentro de un container, ya que no es full width, y dentro de una row y col.</p>
+1:25
+4 days ago
+<p>En el carousel hay una ol con los elementos puntero (los segmentos en el inferior de la vista que sirven como enlace a cada una de las vistas sobre las que el carousel hace scroll). Luego está un div.carousel-inner con cada una de esas vistas. Después los a href con las flechas a izq y der para avanzar o retroceder manualmente. Se puede ajustar el tiempo de visualización de cada vista, así como otras facetas del control.</p>
+3:30
+4 days ago
+<p>Uno de los elementos de div.carousel-inner tiene la clase active.</p><p>Las clases aplicadas a las imagenes: d-block (display-block) y w-100 (ancho del 100%).</p><p>Añadimos captions a los elementos, vemos en la documentación:</p><pre class="prettyprint linenums">&lt;div class="carousel-caption d-none d-md-block"&gt; &lt;h5&gt;First slide label&lt;/h5&gt; &lt;p&gt;Nulla vitae elit libero, a pharetra augue mollis interdum.&lt;/p&gt; &lt;/div&gt;</pre><p>Pero no vamos a utilizar el h y el p, solo un h.</p><p>Les da color a las caption con las clases text-warning, text-danger y&nbsp; en el h2.</p><p>Si añadimos mas .carousel-item y no añadimos más elementos a ol.carousel-indicators, los elementos adicionales no serán alcanzables mediante los indicadores, pero si con los botones de next y previous.</p>
+18. Project 2 Newest arrivals
+4:24
+4 days ago
+<p>Siguiente sección, una linea horizontal, no tiene ancho total con lo que va en un div.container. Es oscura así que hr.bg-dark. Tiene espacion por arriba así que hr.mt-5.</p><p>Encabezado 'Newest arrivals', en un h3 (da igual al aplicarle la clase display-4, pues esta marca el tamaño).</p><p>Hay tres columnas con el borde eliptico, pero queremos una si la pantalla es menor de md. Las hacemos img.img-fluid para que tengan 100% de ancho y altura auto.</p><p>Bootstrap utility class para el border: border border-warning rounded-circle.</p><p>Si no se van a crear columnas no hay necesidad de crear fila. O sea, si solo se va a tener contenido que ocupe la totalidad del ancho de la parrilla, se mete en un container pero no en una row.</p>
+4:38
+4 days ago
+<p>Dentro del mismo container, pero fuera de la row, creamos un div normal, dandole las clases text-center.</p><p>Dentro simplemente colocamos un a.btn.btn-info.btn-lg (boton info un poco más grande): See All</p><p>De esta forma está centrado en el contenedor.</p><p>El siguiente fragmento, un banner verde en el centro de la pantalla, no lo metemos en un container solo para ver que no es estrictamente necesario hacer eso.</p><p>Creamos un div.w-50.mx-auto.py-5.text-center.text.white : 50% ancho de pantalla, bordes automáticos (lo centra), padding 5 unidades, text centrado y blanco.</p><p>Creamos dentro un encabezado display-3 (tamaño medio) .</p><p>Por ultimo, una linea verde. Va en container.text-center y es hr.bg-success (para ser verde).</p>
+7:53
+4 days ago
+<pre class="prettyprint linenums">&lt;div&nbsp;class="w-50&nbsp;bg-success&nbsp;p-5&nbsp;my-5&nbsp;mx-auto&nbsp;text-center&nbsp;text-white"&gt; &nbsp;&nbsp;&nbsp;&lt;h3&nbsp;class="display-3"&gt;Fruit&nbsp;is&nbsp;good!&lt;/h3&gt; &nbsp;&lt;/div&gt; &nbsp;&lt;div&nbsp;class="container"&gt; &nbsp;&nbsp;&nbsp;&lt;hr&nbsp;class="bg-success"&gt; &nbsp;&lt;/div&gt;</pre>
+19. Project 2 Watermelons and Grapes
+3:52
+4 days ago
+<p>Para poner el contenido de las dos columnas que tienen texto e imagen (columna izq tiene texto a la iz e imagen a la derecha, y columna derecha) se hace uso de la parrilla.</p><p>Se definen las dos columnas para tamaños mayores que small. El p tiene class lead para tener la letra un poco más grande.</p><p>Se define una relación 7-5 para texto-imagen.</p><pre class="prettyprint linenums">&lt;div class="col-md-6"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-7"&gt; &lt;h3 class="text-success"&gt;Watermelons&lt;/h3&gt; &lt;p class="lead"&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. &lt;/p&gt; &lt;/div&gt; &lt;div class="col-sm-5"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+20. Project 2 Modals Section
+4:20
+4 days ago
+<p>Si en una parrilla se definen tres columnas y las dos primeras tienen medida, por ejemplo: col-sm-3 y col-sm-6, la última no hace falta darle medida, pues ocupará el ancho restante.</p><p>En un div col podemos querer tener una imagen a la derecha del div. Tecnica offsetting: añadir columnas vacías a la izquierda. Se hace mediante clases css:</p><p>col-md-3 offset-md-4 ocuparía desde el slot 5 al 8 de la parrilla.</p><p><code>&lt;div class="col-md-1 offset-md-2"&gt;&lt;img src="./assets/banana.png" alt="banana"&gt;&lt;/div&gt;</code> </p>
+21. Project 2 Adding Modals
+2:22
+3 days ago
+<p>Buscamos los modales en la sección de componentes de la doc de bootstrap. Se componen de un div con class modal </p><p>y con partes en modal-content modal-header modal-body modal-footer.</p><p>Hay un boton con data-toggle="modal" y data-target="#id_del_div". Hay un div con ese id que tiene el layout del modal.</p><p>En el div, dejamos el esqueleto con modal-header, body y footer.</p><p>Header: h5.modal-title</p><p><br></p>
+3:50
+3 days ago
+<pre class="prettyprint linenums">&lt;div class="modal fade" id="bananaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"&gt; &lt;div class="modal-dialog" role="document"&gt; &nbsp; &lt;div class="modal-content"&gt; &nbsp; &nbsp;&lt;div class="modal-header"&gt; &nbsp; &nbsp; &lt;h3 class="text-warning"&gt;Bananas&lt;/h3&gt; &nbsp; &nbsp;&lt;/div&gt; &nbsp; &nbsp;&lt;div class="modal-body"&gt; &nbsp; &nbsp; &lt;iframe src="http://www.youtube.com/embed/dP15zlyra3c?html5=1"&gt;&lt;/iframe&gt; &nbsp; &nbsp;&lt;/div&gt; &nbsp; &nbsp;&lt;div class="modal-footer"&gt; &nbsp; &nbsp; &lt;button type="button" class="btn btn-secondary" data-dismiss="modal"&gt;Close&lt;/button&gt; &nbsp; &nbsp;&lt;/div&gt; &nbsp; &lt;/div&gt; &lt;/div&gt; &lt;/div</pre><p>&gt;</p>
+5:16
+3 days ago
+<p>Para poner un video Utilities - embed. Copiamos el ejemplo</p><pre class="prettyprint linenums">&lt;div class="embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</pre>
+7:03
+3 days ago
+<p>Para poner los botones que abren los modales creamos una fila con dos columnas col-md-6</p><p>Hay que poner data-target con el id del div de cada modal.</p><p>Estilo del botón: amarillo con texto blanco y bold-&gt; text-white font-weight-bold bg-warning (por qué no btn-warning?)</p><p>Hace gordo el botón dándole padding px-5.</p><p>Para hacer más grande el modal, al div.modal-dialog le damos clase modal-lg</p>
+22. Project 2 Footer
+4:01
+3 days ago
+<p>Para el footer, container-fluid (ocupa todo el ancho de la pantalla), y con bg-dark.</p><p>Row, y tres columnas 3, 3 y 6. md</p><p>Copiamos el nav y nos quedamos con la parte de brand.</p><p>Social icons font awesome website cdn. Copiamos el enlace. Lo ponemos en el header debajo de bootstrap css [OLD].</p><p>Ahora para incluir font-awesome se hace con un elemento &lt;script&gt;</p><pre class="prettyprint linenums">&lt;script&nbsp;src="https://kit.fontawesome.com/dd900b9281.js"&nbsp;crossorigin="anonymous"&gt;&lt;/script&gt;</pre><p>Columnas para los iconos. Facebook linkedIn y twitter. El color a los iconos se lo da con las clases de bootstrap.</p><p>primary es azul, info es turquesa, success es verde. Les damos a los botones padding superior de 5. </p><pre class="prettyprint linenums">&lt;div class="col-md-3 pt-5"&gt; &lt;a href="#" class="btn btn-primary btn-sm"&gt;&lt;i class="fab fa-facebook-square fa-3x"&gt;&lt;/i&gt;&lt;/a&gt; &lt;/div&gt;</pre>
+8:25
+3 days ago
+<p>El formulario lo mete en la columna final md-6. form.form-inline.</p><p>input cada elemento en bootstrap tiene que tener la clasr form-control. </p><p>Tenemos elemento Name y elemento Email con los type="text" y "email".</p><p>Para hacer los inputs del form más pequeños, form-control form-control-sm</p><p>Para los iconos de font awesome se utilizan elementos i dentro de enlaces type button:</p><p>The &lt;i&gt; tag defines a part of text in an alternate voice or mood. The content of the &lt;i&gt; tag is usually displayed in italic.</p><p><code>&lt;a href="#" class="btn btn-primary btn-sm"&gt;&lt;i class="fab fa-facebook-square fa-3x"&gt;&lt;/i&gt;&lt;/a&gt;</code> </p>
+23. Project 2 Responsive 1
+3:20
+3 days ago
+<p>Para ajustar paddings o margins en funcion del ancho de la pantalla:</p><pre class="prettyprint linenums">&lt;h3 class="display-4 text-center pt-2 pt-lg-4"&gt;Newest arrivals&lt;/h3&gt; .. &lt;div class="col-md-4 mb-5 mb-md-0"&gt; &lt;img src="./assets/mango.jpg" alt="mango" class="img-fluid border border-warning rounded-circle"&gt; &lt;/div&gt;</pre><p><br></p><p>Para modificar si algo es visible o no en función del tamaño de la pantalla:</p><pre class="prettyprint linenums">&lt;div class="w-50 bg-success p-5 my-5 mx-auto text-center text-white d-none d-lg-block"&gt; &lt;h3 class="display-3"&gt;Fruit is good!&lt;/h3&gt; &lt;/div&gt;</pre>
+24. Project 2 Responsive 2
+1:53
+3 days ago
+<p>Bootstrap utility: display. </p><p>lg</p><p>texto + img | img + texto</p><p>&lt;lg</p><p>1 col lo mismo de antes</p><p>&lt;md</p><p>text-center</p><p>img</p><p>texto</p><p>img</p><p>texto</p><p><br></p><p>Se plantea el problema con la imagen del melón, que para tamaños de pantalla mayores de sm el div va después del div con el texto, pero para tamaños inferiores debe ir antes. Mi solución consiste en crear dos div, uno antes y uno después, y que se visualice el que yo quiera en función del tamaño de pantalla. Bootstrap ofrece la forma correcta de hacer eso para no tener html duplicado, y se llama <strong>ordering.</strong></p>
+2:07
+3 days ago
+<pre class="prettyprint linenums">&lt;div class="col-lg-6"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-5 d-block d-sm-none"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;div class="col-sm-7"&gt; &lt;h3 class="text-success"&gt;Watermelons&lt;/h3&gt; &lt;p class="lead"&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. &lt;/p&gt; &lt;/div&gt; &lt;div class="col-sm-5 d-none d-sm-block"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+2:30
+3 days ago
+<p><br></p><pre class="prettyprint linenums">Mi solución (funciona):</pre><pre class="prettyprint linenums">&lt;div class="col-lg-6"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-5 d-block d-sm-none"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;div class="col-sm-7"&gt; &lt;h3 class="text-success"&gt;Watermelons&lt;/h3&gt; &lt;p class="lead"&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. &lt;/p&gt; &lt;/div&gt; &lt;div class="col-sm-5 d-none d-sm-block"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+2:34
+3 days ago
+<p>Con ordering:</p><p><br></p><pre class="prettyprint linenums">&lt;div class="col-lg-6"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-7 order-2 order-sm-1"&gt; &lt;h3 class="text-success"&gt;Watermelons&lt;/h3&gt; &lt;p class="lead"&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. &lt;/p&gt; &lt;/div&gt; &lt;div class="col-sm-5 order-1 order-sm-2"&gt; &lt;img src="./assets/watermelon.png" alt="watermelon"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+7:05
+3 days ago
+<p>mx-auto para centrar el contenido por ejemplo de botones. text-center funciona, pero no es la solución fetén. Se usa text-center para centrar más que mx-auto</p><p>float-left, float-right y float-none se pueden aplicar a los distintos tamaños de pantalla.</p><p>w-100, w-50, son para decir que algo ocupe un cierto porcentaje de la pantalla</p><p>Para centrar, meter algo en un div w-100 y hacer text-center funciona.</p><p><br></p>
+8:35
+3 days ago
+<pre class="prettyprint linenums">&lt;div class="container-fluid bg-dark mt-5 w-100 text-center text-lg-left"&gt; &lt;div class="row"&gt; &nbsp; &lt;div class="col-lg-3"&gt; &nbsp; &nbsp;&lt;nav class="navbar"&gt; &nbsp; &nbsp; &lt;a class="navbar-brand mx-auto mx-lg-0" href="#"&gt;&lt;img src="./assets/logo.png" alt="logo"&gt;&lt;/a&gt; &nbsp; &nbsp;&lt;/nav&gt; &nbsp; &lt;/div&gt; &nbsp; &lt;div class="col-lg-3 pt-5"&gt; &nbsp; &nbsp;&lt;a href="#" class="btn btn-primary btn-sm"&gt;&lt;i class="fab fa-facebook-square fa-3x"&gt;&lt;/i&gt;&lt;/a&gt; &nbsp; &nbsp;&lt;a href="#" class="btn btn-info btn-sm"&gt;&lt;i class="fab fa-twitter-square fa-3x"&gt;&lt;/i&gt;&lt;/a&gt; &nbsp; &nbsp;&lt;a href="#" class="btn btn-success btn-sm"&gt;&lt;i class="fab fa-linkedin fa-3x"&gt;&lt;/i&gt;&lt;/a&gt; &nbsp; &lt;/div&gt;</pre>
+11:02
+3 days ago
+<pre class="prettyprint linenums">&lt;div class="col-lg-6 pt-4 pb-5 pb-lg-0"&gt; &lt;form action="" class="form-inline"&gt; &lt;h4 class="text-success w-100 text-center text-lg-right"&gt;Sign up for our newsletter!&lt;/h4&gt; &lt;div class="w-100 text-center text-lg-right"&gt; &lt;input type="text" name="name" class="form-control form-control-sm" placeholder="Name"&gt; &lt;input type="email" name="email" class="form-control form-control-sm mt-2 mt-sm-0" placeholder="E-mail"&gt; &lt;button class="btn btn-sm btn-success text-white mt-3 mt-sm-0 float-left float-sm-none" type="submit"&gt;Sign Up!&lt;/button&gt; &lt;/div&gt; &lt;/form&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+Section 5:
+05 Project 3
+25. Project 3 Setup
+0:18
+a day ago
+<p>Barra superior, cabecera de la página:</p><p>nav lo copia de ejemplos. Le quita el form. y el dropdown., le quita el fixed-top.</p><p>bg-danger, font-weight-bold, text-white, cambiar los textos.</p><p>Añade el logo. Mete el navbar en un tag header. El resultado visual es el mismo, pero puede ser util si en la cabecera se quieren meter mas cosas. </p>
+26. Project 3 Navigation
+0:17
+a day ago
+<pre class="prettyprint linenums">&lt;header&gt; &lt;nav class="navbar navbar-expand-sm text-white navbar-dark bg-danger font-weight-bold"&gt; &lt;a class="navbar-brand" href="#"&gt;&lt;img src="./assets/logo.png" alt=""&gt;&lt;/a&gt; &lt;button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation"&gt; &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt; &lt;/button&gt; &lt;div class="collapse navbar-collapse" id="navbarsExampleDefault"&gt; &lt;ul class="navbar-nav mr-auto"&gt; &lt;li class="nav-item active"&gt; &lt;a class="nav-link" href="#"&gt;Home&lt;span class="sr-only"&gt;(current)&lt;/span&gt;&lt;/a&gt; &lt;/li&gt;</pre>
+0:27
+a day ago
+<pre class="prettyprint linenums"> &lt;li class="nav-item"&gt; &lt;a class="nav-link" href="#"&gt;Breaking News&lt;/a&gt; &lt;/li&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link" href="#"&gt;Contact&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/nav&gt; &lt;/header&gt;</pre>
+27. Project 3 Jumbotron
+0:09
+a day ago
+<p>v2 jumbotron: después del header. </p><p>section.jumbotron .text-center .bg-dark, .text-white</p><p>quitarle el borde redondeado .rounded-0</p><p>h1 display-3</p><p>p.lead copiar y pegar el texto.</p><p>botones pegados: dentro de un div.btn-group </p><p>button.btn.btn.primary</p><p>button.btn.btn.success</p><p>Espaciado: le da my-2 a los botones.</p>
+0:18
+a day ago
+<pre class="prettyprint linenums">&lt;section class="jumbotron rounded-0 bg-dark text-white text-center"&gt; &lt;h1 class="display-3"&gt;No. 1 News Website&lt;/h1&gt; &lt;p class="lead"&gt;The best place to catch latest news from around the world.&lt;/p&gt; &lt;div class="btn-group flex-wrap"&gt; &lt;button class="btn btn-primary my-2 text-white mx-auto"&gt;Read the latest news&lt;/button&gt; &lt;button class="btn btn-success my-2 text-white mx-auto"&gt;Sign up tp stay informed&lt;/button&gt; &lt;/div&gt; &lt;/section&gt;</pre>
+28. Project 3 News section
+0:54
+a day ago
+<p>v3 news section:</p><p>div.container</p><p>row</p><p>col-md-6</p><p>similar a la seccion con el watermelon y las grapes (tenia ordering)</p><p>img title text </p><p>ahora diferente. media layout <strong>media object</strong></p><p>dentro de la col un <strong>div.media y dentro un img, un div.media-body</strong></p><p>copiar el texto-&gt; h5 y p Para el control+espacio meterlos dentro de un tab kbd</p><p>Espacio a la izq del texto .mr-3 en la img. img-thumnail para el border</p><p>al media div .<strong>shadow border-top border-dark p-3</strong></p><p>copiamos el primer div.</p><p>Cambiamos el texto. pegar la imagen despues del <strong>media-body</strong>.</p><p>Hay que centrar la imagen verticalmente <strong>img.align-self-center</strong></p>
+1:13
+a day ago
+<pre class="prettyprint linenums">&lt;div class="media shadow border-top border-dark p-3"&gt; &lt;img class="img-thumbnail mr-3 d-none d-sm-block" src="./assets/media.jpg" alt="media"&gt; &lt;div class="media-body"&gt; &lt;img class="img-thumbnail mb-3 d-block mx-auto d-sm-none" src="./assets/media.jpg" alt="media"&gt; &lt;h5&gt;News title 1&lt;/h5&gt; &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco. laboris nisi ut aliquip ex ea commodo consequat. You can usually toggle fullscreen by pressing &lt;kbd&gt;ctrl + enter&lt;/kbd&gt;&lt;/p&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+29. Project 3 Our reporters and Most popular news
+0:13
+a day ago
+<p>v4 div.container-fluid bg-light </p><p>row</p><p>col-md-6</p><p>los headings son h4.display-4</p><p>content tables doc</p><p>bajo el h4 una <strong>table.table</strong> (una tabla de bootstrap siempre tiene que tener la clase table) y otras se pueden usar para estilos, pero table siempre.</p><p><strong>table-striped table-responsive-lg</strong></p><p>Es responsive por debajo de lg</p><p><strong>thead tr th</strong> # first-name last-name more-info </p><p><strong>tbody tr td</strong> 1 Donal Duck N/A N/A N/A N/A</p><p>quitarle el border top a la tabla lo hace en cada columna, probar en la fila .<strong>border-top-0</strong>. Nope, <strong>hay que quitarle el borde a cada columna td</strong></p><p>La sección está dentro de un container-fluid, pero <strong>dentro de otro container (boxed).</strong></p><p>mt-5 al container-fluid para el spacing con la section anterior.</p><p>Tambien necesita padding&nbsp; pt-3</p>
+4:19
+a day ago
+<pre class="prettyprint linenums">&lt;table class="table table-striped table-responsive-lg"&gt; &lt;thead&gt; &lt;tr&gt; &lt;th class="border-top-0"&gt;#&lt;/th&gt; &lt;th class="border-top-0"&gt;First Name&lt;/th&gt; &lt;th class="border-top-0"&gt;Last Name&lt;/th&gt; &lt;th class="border-top-0"&gt;More info&lt;/th&gt; &lt;th class="border-top-0"&gt;More info&lt;/th&gt; &lt;th class="border-top-0"&gt;More info&lt;/th&gt; &lt;th class="border-top-0"&gt;Last info&lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt;</pre>
+7:18
+a day ago
+<p>La tabla tiene scroll en virtud de responsive .</p><p>Siguiente elemento es una lista:</p><p>div.col-md-6</p><p>h4 display-4</p><p><strong>Components list</strong></p><p><strong>ul.list-group</strong> &lt;- en bootstrap van asi las listas.</p><p><strong>li.list-group-item</strong></p><p>tienen una interrogación con icono. Espacio bajo el h4 pb-3</p><p><strong>badges </strong>components <strong>span.badge.badge-danger</strong></p><p><strong>tooltip </strong>docs-&gt; <strong>inicializado con js (ver doc bootrsap)</strong></p><p>y ver el html en la doc dentro del html del span con los attr adicionales:</p><p>data-toggle="tooltip" data-placement="right" title="Tooltop on right"</p>
+9:10
+a day ago
+<pre class="prettyprint linenums">&lt;ul class="list-group"&gt; &lt;li class="list-group-item"&gt;Sheep spotted flying &lt;span class="badge badge-danger" data-toggle="tooltip" data-placement="right" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit."&gt;?&lt;/span&gt;&lt;/li&gt; &lt;li class="list-group-item"&gt;People can live without water &lt;span class="badge badge-danger" data-toggle="tooltip" data-placement="left" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit."&gt;?&lt;/span&gt;&lt;/li&gt; &lt;li class="list-group-item"&gt;Aliens are among us &lt;span class="badge badge-danger" data-toggle="tooltip" data-placement="right" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit."&gt;?&lt;/span&gt;&lt;/li&gt; &lt;/ul&gt;</pre>
+10:21
+a day ago
+<p>inicialización js de los tooltip:</p><pre class="prettyprint linenums">&lt;script&gt; $(function () { $('[data-toggle="tooltip"]').tooltip() }) &lt;/script&gt;</pre>
+30. Project 3 Recent events
+0:02
+a day ago
+<p>v5</p><p>otra columna </p><p>col-md-6. Si sabes lo que haces puedes meter más de 12 cols en una fila, vaya que puedes ir apilando sin tener que codificar nuevas div.row.</p><p>dentro de la fila, tras las dos primeras columnas, mete un <strong>div.w-100 para separar con py-3</strong></p><p>despues col-md-6 con un acordeón</p><p><strong>components - collapse (doc)</strong></p><p>copiamos uno de la pagina de bt</p><p>div.accordion tiene dentro <strong>div-card</strong> con <strong>div.card-header</strong> y dentro varios <strong>div.collapse</strong> con <strong>.show</strong> o no y attr <strong>data-parent="#id"</strong></p><p>Se va a quitar la cabecera y sustituye el h por un botón.</p><p>ese botón tendrá los <strong>data-toggle</strong> y demás atributos necesarios.</p>
+1:08
+a day ago
+<pre class="prettyprint linenums">&lt;div class="accordion" id="accordionExample"&gt; &lt;div class="card"&gt; &lt;button class="btn btn-primary text-left text-white font-weight-bold py-3" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"&gt; Team building in the woods &lt;/button&gt; &lt;div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample"&gt; &lt;div class="card-body"&gt; Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+31. Project 3 Useful info
+0:03
+a day ago
+<p>v6</p><p>h display-4</p><p>para los tabs vamos a <strong>components navs</strong></p><p><strong>ul.nav.nav-tabs role="tablist"</strong></p><p>Hay un ul para las tabs y el <strong>div para el contenido</strong>, que cambia conforme a la tab en la que estas.</p><p>El de contenido tiene <strong>tantos div dentro como tabs</strong>. Están <strong>ligados </strong>por el <strong>id</strong>.</p><p><strong>ul li.nav-item a.nav-link.active data-toggle="tab" href="#id_div_contenido" role="tab"</strong></p><p>texto de los tab blue bold </p>
+1:51
+a day ago
+<pre class="prettyprint linenums">&lt;ul class="nav nav-tabs flex-sm-row flex-column" id="myTab" role="tablist"&gt; &lt;li class="nav-item"&gt; &lt;a class="text-primary font-weight-bold nav-link active" data-toggle="tab" role="tab" href="#about"&gt;About Us&lt;/a&gt; &lt;/li&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link text-primary font-weight-bold" data-toggle="tab" role="tab" href="#profile"&gt;Company Profile&lt;/a&gt; &lt;/li&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link text-primary font-weight-bold" data-toggle="tab" role="tab" href="#contact"&gt;Contact&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt;</pre>
+3:10
+a day ago
+<pre class="prettyprint linenums">&lt;div class="tab-content mt-3" id="myTabContent"&gt; &lt;div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="home-tab"&gt; &lt;h3 class="text-success"&gt;About Us&lt;/h3&gt; &lt;p class="lead"&gt;Nunc feugiat quis tortor a aliquam. Vivamus ut suscipit nunc. Vestibulum mollis rutrum leo, tristique varius enim faucibus a. Fusce luctus ullamcorper purus nec pellentesque.&lt;/p&gt; &lt;/div&gt; &lt;div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab"&gt; &lt;h3 class="text-success"&gt;Company Profile&lt;/h3&gt; &lt;p class="lead"&gt;Nunc feugiat quis tortor a aliquam. Vivamus ut suscipit nunc. Vestibulum mollis rutrum leo, tristique varius enim faucibus a. Fusce luctus ullamcorper purus nec pellentesque.&lt;/p&gt; &lt;/div&gt;</pre>
+32. Project 3 Contact Us
+0:06
+a day ago
+<p>v7</p><p>container-fluid</p><p>row</p><p>col-md-6</p><p>heading h3 display-4 Contact Us</p><p>Dentro del form, por cada elemento del formulario hay un <strong>div.form-group</strong></p><p>los input son <strong>.form-control</strong> y tienen placeholder</p><p>Para que estén en una línea los tres primeros elementos del form los mete dentro de un div.row (se hace parrilla dentro del formulario).</p><p>Hace form-group para cada conjunto de elementos que quiere que se muestren juntos. Si cada control esta en un form-group sale uno en cada linea, sino salen en una linea por form-group.</p>
+2:30
+a day ago
+<p>Despues, para poder ajustarlos a tamaños de columna, los mete en una row y en cols. </p><p>Para tener un form-group con un checkbox tiene que tener <strong>.form-check </strong>y dentro un <strong>input type="checkbox"</strong> y su <strong>label.form-check-label for="exampleCheck1"</strong></p><p>Le damos padding px-5 a la col-md-6 y pb-5</p><p>Para poner el icono de email es un <strong>div.input-group-prepend</strong> que tiene dentro un <strong>div.input-group-text.</strong></p><p>entonces hay que crear un <strong>input-group</strong> y meter dentro </p><p>el <strong>input-group-prepend</strong> y el<strong> input</strong> que ya teniamos:</p><pre class="prettyprint linenums">&lt;div class="input-group"&gt; &lt;div class="input-group-prepend"&gt;&lt;span class="input-group-text bg-success text-white"&gt;@&lt;/span&gt;&lt;/div&gt; &lt;input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"&gt; &lt;/div&gt;</pre>
+3:22
+a day ago
+<pre class="prettyprint linenums">&lt;form&gt; &lt;div class="form-group"&gt; &lt;div class="row"&gt; &lt;div class="col-12 col-sm-3"&gt; &lt;select class="form-control" id="exampleFormControlSelect1"&gt; &lt;option&gt;Mr.&lt;/option&gt; &lt;option&gt;Ms.&lt;/option&gt; &lt;/select&gt; &lt;/div&gt; &lt;div class="col-12 col-sm mt-3 mt-sm-0"&gt; &lt;input type="text" class="form-control" placeholder="First name"&gt; &lt;/div&gt; &lt;div class="col-12 col-sm mt-3 mt-sm-0"&gt; &lt;input type="text" class="form-control" placeholder="Last name"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+3:40
+a day ago
+<pre class="prettyprint linenums">&lt;div class="form-group"&gt; &lt;div class="row"&gt; &lt;div class="col-md-6"&gt; &lt;div class="input-group"&gt; &lt;div class="input-group-prepend"&gt;&lt;span class="input-group-text bg-success text-white"&gt;@&lt;/span&gt;&lt;/div&gt; &lt;input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"&gt; &lt;/div&gt; &lt;small id="emailHelp" class="form-text text-muted"&gt;We'll never share your email with anyone else.&lt;/small&gt; &lt;/div&gt; &lt;div class="col-md-6"&gt; &lt;input type="text" class="form-control" placeholder="Phone"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;</pre>
+4:13
+a day ago
+<pre class="prettyprint linenums"> &lt;div class="form-group form-check"&gt; &lt;div class="row"&gt; &lt;div class="col-12 col-sm"&gt; &lt;input type="checkbox" class="form-check-input" id="exampleCheck1"&gt; &lt;label class="form-check-label" for="exampleCheck1"&gt;Sign up for our newsletter&lt;/label&gt; &lt;/div&gt; &lt;div class="col mt-2 mt-sm-0 pl-0"&gt; &lt;button type="submit" class="btn btn-primary float-sm-right"&gt;Submit&lt;/button&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt; &lt;/form&gt;</pre>
+33. Project 3 Contact Information1
+0:09
+a day ago
+<p>v8 Contact information section</p><p>col-md-6 bg-dark text-white</p><p>heading h1 class="font-weight-normal" reduce el bold del h1</p><p>table.table</p><p>tbody tr td</p><p>p-5</p>
+1:53
+a day ago
+<pre class="prettyprint linenums">&lt;div class="col-md-6 bg-dark text-white pt-3 p-sm-5"&gt; &lt;h1 class="font-weight-normal"&gt;Contact Information&lt;/h1&gt; &lt;table class="table"&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td&gt;E-mail&lt;/td&gt; &lt;td class="font-weight-bold"&gt;news@news.com&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Phone&lt;/td&gt; &lt;td class="font-weight-bold"&gt;111-222-333&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Adress&lt;/td&gt; &lt;td class="font-weight-bold"&gt;123 Baker Street&lt;/td&gt; &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt; &lt;/div&gt;</pre>
+34. Project 3 Footer
+0:08
+a day ago
+<p>v9</p><p>footer</p><p>elemento <strong>footer </strong>de html</p><p><strong>footer.container-fluid bg-secondary </strong>(gris claro)</p><p>row</p><p>div.col-md-4 copiamos <strong>navbar brand.</strong></p><p>text-light lo hace gris, no blanco. Para el enlace en el navbar del footer.</p><p>Para el menu de la derecha del footer</p><p>div.col-md-8</p><p><strong>components navs ul.nav con li's y a formatear</strong>.</p><p>text-light</p><p>padding top 2 y <strong>float-right</strong> a la lista (se revisará para responsive)</p><p>pone el primero a active y con font-weight-bold (en realidad no tiene estilo asociado a la clase active, con lo que tiene que ser manual). </p>
+1:11
+a day ago
+<pre class="prettyprint linenums">&lt;footer class="container-fluid bg-secondary"&gt; &lt;div class="row"&gt; &lt;div class="col-sm-4"&gt; &lt;nav class="navbar navbar-expand-sm"&gt; &lt;a class="navbar-brand text-light" href="#"&gt;News Website&lt;/a&gt; &lt;/nav&gt; &lt;/div&gt; &lt;div class="col-sm-8 text-light pt-2"&gt; &lt;ul class="nav float-sm-right flex-column flex-sm-row"&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link active text-light font-weight-bold" href="#"&gt;Home&lt;/a&gt; &lt;/li&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link text-light" href="#"&gt;Breaking News&lt;/a&gt; &lt;/li&gt; &lt;li class="nav-item"&gt; &lt;a class="nav-link text-light" href="#"&gt;Contact&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/div&gt; &lt;/footer&gt;</pre>
+35. Project 3 Cookies notification
+0:08
+a day ago
+<p>v10</p><p>cookies notificacion</p><p><strong>componenets alerts.</strong></p><p>copiamos un <strong>alert dismissable</strong></p><p>pegamos despues del footer. color warning</p><p>quitamos el margen inferior mb-0 <strong>fixed-bottom</strong> aunque hagamos scroll para arriba se ve en el bottom</p>
+0:56
+a day ago
+<pre class="prettyprint linenums">&lt;div class="alert alert-warning mb-0 alert-dismissible fixed-bottom fade show" role="alert"&gt; We use cookies on this website. &lt;button type="button" class="close" data-dismiss="alert" aria-label="Close"&gt; &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt; &lt;/button&gt; &lt;/div&gt;</pre>
+36. Project 3 Responsive 1
+2:57
+a day ago
+<p>v11 responsive1</p><p>Al header solo cambiarle el mod. de tamaño para convertirse en menu mobile: md -&gt; sm</p><p>Los botones, que estaban en un button-group le damos <strong>flex-wrap</strong> (al <strong>button-group</strong>), y para centrarlos <strong>mx-auto</strong>. Los botones ya tenían <strong>my-2</strong> cada uno.</p><p>Para los <strong>media objects</strong>, a los que solo les habíamos dejado media-body e img, hay que hacer la técnica de tener más de una imagen y esconderla con <strong>d-none y b-block</strong> para aquellos tamaños donde aplique. Por debajo de <strong>md </strong>tienen que estar a todo ancho.</p><p>Al 2º div mt-4 pero para cierto ancho mt-lg-0</p><p>Para la imagen del media tambien aplica <strong>mx-auto</strong> para centrarla. </p><p>En el segundo media hace lo mismo.</p>
+3:49
+a day ago
+<p>v12 responsive 2</p><p>Our reporters y Most popular news. Ajustar el responsive de la tabla para que se ajuste al modelo. Cambio a una en md. </p><p>Recent Events mas o menos bien, pero Useful (tabs) mal.</p><p>Meter margen encima de useful info pt-4 pt-md-0</p><p>ul <strong>flex-column flex-sm-row </strong>para que cambie layout de elementos en fila o columna en función del tamaño.</p><p>Form</p><p>Debajo de lg debe ser una col col-lg-6.</p><p>Por debajo de sm tiene que ser un campo por linea.</p><p><strong>col-sm-3</strong> para el genero, todos los md deben ser sm.</p><p>Esta mal en la primera linea first name y last name.</p><p>Para hacerlos de todo el ancho por debajo de sm: <strong>col-12 col-sm</strong></p><p>Hay que darles algo de espacio cuando están en una linea <strong>mt-3 mt-sm-0</strong></p>
+37. Project 3 Responsive 2
+2:27
+a day ago
+<p>Menos espacio, ya no es px-5 por debajo de sm</p><p>boton float-sm-right para que esté a la izq en pequeño</p><p><strong>col-12 y col-sm</strong> para checkbox y boton</p><p>El botón tiene espacio a la izq porque la col tiene padding. </p><p>Se elimina con <strong>pl-0 mt-2 mt-sm-0</strong></p><p>Siguiente contact info</p><p>quitar el padding en menor sm <strong>p-sm-5 pt-3 </strong></p><p>footer</p><p>below sm las col cogen todo el ancho</p><p>md por sm</p><p>el <strong>float-sm-right</strong></p><p><strong>flex-column flex-sm-row</strong> para que se pongan uno encima de otro los enlaces por debajo de sm.</p>

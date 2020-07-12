@@ -1,0 +1,518 @@
+Section 2:
+Introduction To Web Services
+5. What is a Web Service?
+1:59
+2 months ago
+<p>Una aplicación web retorna datos al interactuar con ella en forma de HTML, que no es el mejor formato para consumir desde otra aplicación: esta aplicación tiene las capas DATA, BUSINESS y WEB. Podemos reutilizar las capas DATA y BUSINESS si creamos un JAR solo con esas capas? Pero entonces una aplicacion en Visual Basic va a poder hacer uso de esas capas si están en JAva? Pero si se crea un servicio, y la capa de presentación hace uso de él, ya dara igual con qué está hecho el cliente.</p><p>Web services están pensados para la interoperabilidad entre aplicaciones a través de una red (misma máquina, misma red o a través de internet), independientemente de sus tecnologías.</p>
+6. Important How Questions related to Web Services
+3:10
+2 months ago
+<p>Para la interoperabilidad es imprescindible que el medio de comunicación sea agnóstico de las tecnologías empleadas tanto en el servicio como en los clientes: protocolo http con mensajes XML (SOAP), o info transportada en JSON para REST.</p><p>Es necesario que la aplicación que consume el servicio sepa el formato de la información que recibe, para poder procesarlo adecuadamente. Esto se resuelve con el concepto de Definición de Servicio. Sobre todo tiene sentido en SOAP, donde tiene que estar muy definido tanto el tipado de datos como las operaciones.</p><p>Request and response format.</p><p>Request Structure</p><p>Response Structure</p><p>Endpoint</p>
+7. Web Services - Key Terminology
+0:43
+2 months ago
+<p>Terminología: request es input, response is output. Message Exchange Format es XML o JSON. Service provider y service consumer: la aplicación consume el servicio web. Service definition: contrato entre el consumidor y el servicio: endpoint, estructura de la petición, estructura de la respuesta y formato de los datos.</p><p>Transporte: http sobre internet, o está el servicio comunicado a través de una cola MQ? Cliente y servicio se pueden comunicar a través de una cola en ambos sentidos. De esa forma ambos son publisher y consumer. Entre el cliente y la cola MQ (por ejemplo WebSphere MQ) está la capa SOAP. Lo mismo entre el service provider y la cola.</p>
+8. Introduction to SOAP Web Services
+1:44
+2 months ago
+<p>SOAP y REST no son comparables uno contra uno. SOAP tiene mensajes XML con envoltorio, cabecera y cuerpo. En ocasiones la cabecera es opcional.</p><p>Format: XML request y response. Transport: sobre MQ y sobre HTTP. Service definition WSDL (web service defition language): tiene todas las operaciones disponibles y los datos.</p><p>REST: hace el mejor uso de HTTP, replica su funcionalidad para pedir recursos de más naturalezas que simplemente html. Servicios&nbsp; que hacen uso de los conceptos ya presentes en http. Recurso-URI, representations: XML, HTML, JSON... Un recurso puede tener distintas representaciones. Se piensa en terminos de recursos. Transport es SOLO&nbsp;http, no hay un standard para la definición del servicio (WADL, Swagger). No hay restricciones en el formato del intercambio de información (aunque JSON es muy popular).</p>
+Section 3:
+Introduction to Spring Framework in 10 Steps
+16. Step 4 : Using Spring to Manage Dependencies - @Component, @Autowired
+2:27
+2 months ago
+<p>Spring: ¿qué beans maneja?@Component. ¿Qué dependencias tienen?@Autowired ¿Dónde buscar los beans?@ComponentScan. La anotación @SprinbBootApplication ya hace el component scan auto. Los beans que se declaran pasan a estar disponibles en el ApplicationContext. </p><p>Desde la aplicación (clase con @SpringBootApplication) podemos obtener el contexto fácilmente porque lo devuelve el método run que se invoca en public static main(). Y con el contexto podemos obtener los beans manejados por el contexto.</p><p>Se puede pedir un bean especificando una clase concreta, pero eso no será lo habitual, debido a que se busca un bajo acoplamiento. Se trabaja con Interfaces habitualmente.</p><p><br></p><p><br></p><p><br></p><p><br></p>
+18. Step 6 : Dynamic auto wiring and Troubleshooting - @Primary
+1:06
+2 months ago
+<p>Cuando hay más de una implementación de la misma interfaz, o beans definidos en una clase de configuración que son del mismo tipo, clase, etc. o bien se les asigna un nombre y luego se invocan con su @Qualifier, o también se les puede asignar un determinado perfil (@Profile), de modo que si en la configuración del proyecto (application.properties o yml) se habilita un determinado perfil, el fw podrá resolver de qué dependencia se trata. En otro caso, al no saber qué clase instanciar, el fw retornará un error de multiple beans. También se puede poner la anotacion @Primary en uno de los beans, y entonces será ese el que por defecto se utilice.</p>
+19. Step 7 : Constructor and Setter Injection
+1:23
+2 months ago
+<p>El autowired puede ser por constructor o por setter. Cuando es por setter ni siquiera es necesario declarar el metodo set, sino que con tener el atributo en la clase anotado con Autowired es suficiente.</p><p>Antiguamente lo que se hacía es que todas las dependencias obligatorias se inyectaban por constructor, y las opcionales por setter. Ahora no hay diferencia, si el contexto no es capaz de resolver un bean, el contexto no arranca.</p><p>No hay mucha diferencia, por no decir que no hay ninguna a nivel de fw.</p>
+20. Step 8 : Spring Modules
+3:19
+2 months ago
+<p>OXM: object to xml, spring tiene ese módulo, entiendo que puede ser bueno para servicios web SOAP.&nbsp; Transacciones: buenas herramientas para controlar la transaccionalidad de los métodos que constan de varias acciones atómicas.</p>
+Section 4:
+Introduction to Spring Boot in 10 Steps
+24. Step 1 : Introduction to Spring Boot - Goals and Important Features
+2:39
+2 months ago
+<p>web applicacion: spring-mvc, spring-core, validation fw, logging fw, y configurarlo todo: dispatcher servlet, view resolvers, etc. Con starter projects es muy facil, con los starters tienes casi todo esto incluido y preconfigurado. Con spring data, tienes ya configurada la conexion a bd, etc. Otra cosa, embedded servers. Con spring boot se arranca en contexto en un tomcat embebido. Spring boot actuator para la monitorizacion, es otra de las caracteristicas que vienen de gratis con spring boot.</p><p>Spring también facilita mucho la configuracion de distintos entornos. Dev, prod, etc. Creando properties files siguiendo un convenio de nombres, y ya está :)</p><p><br></p>
+25. Step 2 : Developing Spring Applications before Spring Boot
+0:37
+2 months ago
+<p>Antes de springboot había un montón de decisiones que tomar a la hora de configurar el proyecto. Por ejemplo, para un proyecto web&nbsp; necesitariamos spring-mvc, un fw de vaidacion, uno de logging, seguridad,.etc. A todo esto, había que elegir las versiones de cada uno también, teniendo en cuenta posibles problemas de compatibilidad. Despues un dispatcher servlet (que hace las veces de controlador) y un view resolver, que en base a un nombre que se le pase sabe encontrar qué vista es la que se tiene que emplear en la respuesta. Spring boot ayuda a que muchas de estas configuraciones sean hechas de forma automática.</p><p>Antes había una faceta que con springboot es automática, y es la gestión de excepciones (exeption handling).</p><p>En applicationContext.xml había que configurar beans para i18n, para viewresolver... y en web.xml el filtro de seguridad,</p><p>Antes había que configurar un filtro también para la seguridad, para que todas las peticiones fueran examinadas por él.</p>
+28. Step 5 : What is Spring Boot Auto Configuration?
+0:50
+2 months ago
+<p>Springboot: component scan + autoconfiguration.</p><p>Una de las dependencias de un proyecto spring boot es spring autoconfiguration. Ese modulo tiene autoconfiguraciones para muchas librerias, como por ejemplo servlet, validation, transaction, thymeleaf, session...etc</p><p>En el startup, al tener autoconfiguration, se recorren las clases del classpath a ver sobre cuales se pueden aplicar autconfiguraciones.</p>
+30. Step 7 : Spring Boot Starter Projects - Starter Web and Starter JPA
+0:50
+2 months ago
+<p>spring starter web facilita la creacion de aplicaciones web y de servicios REST.</p><p>Dependencias: tomcat, json, hibernate validation, spring web y spring web mvc, logging fw. Todos los starters de springboot heredan de spring boot starter: tienen spring boot fw, spring-auto-confgure,spring-boot-starter-logging, spring core&nbsp; y yaml.</p><p>Spring web: spring mvc + REST: autoconfigura el dispatcher servlet, etc. Starter test te habilita a crear test unitarios con junit y mockito.</p><p>Si quieres ORM hay que añadir spring boot starter data jpa: hibernate, hibernate common, spring common, spring orm, transaction-api...</p><p><br></p><p><br></p>
+31. Step 8 : Overview of different Spring Boot Starter Projects
+0:28
+2 months ago
+<p>spring boot starter web services para SOAP. spring starter web para Web y RESTful application. starter test: unit testing y integration testing. Spring jdbc para traditional JDBC. Para añadir HATEOAS (facilitar la navegación mediante enlaces dentro de un web service REST) a un proyecto con RESTful, existe un starter también: starter-hateoas. Starter security: basic, oauth... authorization + authentication. Data JPA para hibernate etc. Cache: starter cache. Starter data rest: expone servicios sencillos REST de los recursos. </p>
+3:24
+2 months ago
+<p>Más sofisticados pueden ser los starters para distintos embedded servers y monitoring con actuator: se pueden bear los beans creados, las llamadas a servicios, las llamadas a servicios que han fallado, etc.</p><p>Spring boot actuator lo que hace es exponer un conjunto grande de servicios REST que se pueden consultar. HAL standard: hal browser (otra dependencia que hay que poner)</p><p>&lt;dependency&gt;</p><p> &lt;groupId&gt;org.springframework.data&lt;/groupId&gt;</p><p> &lt;artifactId&gt;spring-data-rest-hal-browser&lt;/artifactId&gt;</p><p>&lt;/dependency&gt;</p>
+32. Step 9 : Spring Boot Actuator
+2:49
+2 months ago
+<p>localhost:8080/actuator mediante el hap browser vemos enlaces de interés.</p>
+4:19
+2 months ago
+<p>Para exponer el mayor numero de endpoints rest informativos de actuator, en application.properties se incluye:</p><p><strong>management.endpoints.web.exposure.include=*</strong></p><p>Accediendo tras el reinicio a localhost:8080/actuator vemos un número mayor de endpoints informativos de la salud de la aplicación en ejecución.</p>
+5:23
+2 months ago
+<p>si vamos a localhost:8080 se abre el hal browser y es una forma un poco más visual de navegar por todos los enlaces expuestos por actuator: beans, health, security, conditions (dependencias autoconfiguradas por estar en el classpath). Loggers, metrics: memoria</p>
+7:14
+2 months ago
+<p>En metrics se va a mostrar una lista de métricas como la memoria usada, y muchas más medidas interesantes. Concatenando el nombre de la metrica a la url podemos acceder a los valores de las métricas. Ejemplo: jvm.memory.used:</p><p>http://localhost:8080/actuator/metrics/jvm.memory.max</p><p>y el resultado:</p><pre class="prettyprint linenums">{ "name": "jvm.memory.max", "description": "The maximum amount of memory in bytes that can be used for memory management", "baseUnit": "bytes", "measurements": [{ "statistic": "VALUE", "value": 5565317119 }], "availableTags": [{ "tag": "area", "values": ["heap", "nonheap"] }, { "tag": "id", "values": ["Compressed Class Space", "PS Survivor Space", "PS Old Gen", "Metaspace", "PS Eden Space", "Code Cache"] }] }</pre>
+7:43
+2 months ago
+<p>Otra caracteristica interesante es httptrace: se ven todas las peticiones que ha recibido el servidor, y los resultados. Mappings tambien es interesante porque muestra todos los mappings a urls del proyecto.</p><p>The Actuator HTTP Trace and Auditing features are not enabled by default anymore, since the default repositories implementations are in-memory and may consume too many resources and are not cluster friendly. For robust, production-grade HTTP tracing we recommend the use of Spring Cloud Sleuth or similar.</p>
+33. Step 10 : Spring Boot Developer Tools
+0:44
+2 months ago
+<p>Dev tools reinicia el contexto de spring cuando detecta un cambio, de modo que no hay que parar y arrancar manualmente.</p><p>&lt;dependency&gt;</p><p> &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</p><p> &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</p><p>&lt;/dependency&gt;</p>
+Section 5:
+SOAP Web Services with Spring and Spring Boot
+35. Step 01 - Initialize a Spring Web Services application with Spring Boot
+2:38
+2 months ago
+<p>Para servicios web soap se debe incluir el starter-web-services: este modulo tiene en su pom dependencias con starter web, con spring-oxm y con spring-core.</p><p>Contract first approach: Service definition: xml, xsd (xml schema definition).</p><p>El servicio acepta request xml y devuelve response xml conforme al los schema de las definition.</p><p>Dentro del body va el autentico contenido de la peticion. En una petición al servicio, en el body, puede ir algo como </p><pre class="prettyprint linenums">&lt;ns2:GetCourseDetailsRequest xmlns:"http://in28min..."&gt; &lt;ns2:id&gt;Course1&lt;/ns2:id&gt; &lt;/ns2:GetCourseDetailsRequest&gt;</pre><p>y en la respuesta </p><pre class="prettyprint linenums">&lt;ns2:GetCourseDetailsResponse xmlns:"http://in28min..."&gt; &lt;ns2:id&gt;Course1&lt;/ns2:id&gt; &lt;ns2:name&gt;Course Fantastic&lt;/ns2:name&gt; &lt;ns2:author&gt;Daniel&lt;/ns2:author&gt; &lt;/ns2:GetCourseDetailsRequest&gt;</pre><p><br></p>
+36. Step 02 - Overview of creating SOAP Web Service using Contract First Approach
+2:26
+2 months ago
+<p>Cuando tenemos claro cómo han de ser la petición y la respuesta, es momento de crear el XSD, qué estructuras tienen la peticion y la respuesta. Después se genera el WSDL (lo genera el fw).</p><p>Para que el servicio maneje la petición JAXB la convierte a objeto Java, y para que el resultado de la ejecución del servicio Java, que está compuesto por objetos, viaje de vuelta como respuesta del servicio web, JAXB lo convierte en XML de vuelta.</p><p>JAXB plugin XML binding a partir de los XSD genera objetos.</p>
+39. Step 05 - Define XML Schema Definition (XSD) for Response - GetCourseDetailsResp
+1:45
+2 months ago
+<pre class="prettyprint linenums">&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://carregal.com/courses" xmlns:tns="http://carregal.com/courses" elementFormDefault="qualified"&gt; &lt;element name="GetCourseDetailsRequest"&gt; &lt;complexType&gt; &lt;sequence&gt; &lt;element name="id" type="integer"&gt;&lt;/element&gt; &lt;/sequence&gt; &lt;/complexType&gt; &lt;/element&gt; &lt;/schema&gt;</pre><p><br></p>
+1:46
+2 months ago
+<p>En el código vemos cómo se define targetNamespace, que se ha de usar después en el atributo <code>xsi:schemaLocation="namespace nombrexsd.xsd"</code> del xml del mensaje (ya sea de petición o de respuesta, el que corresponda).</p><p><code>complexType</code> se usa para definir un 'objeto' con atributos.</p><p><code>sequence </code>define el conjunto ordenado de atributos.</p><p><code>element </code>contiene cada uno de los atributos del objeto xml (distinguir el uso de la palabra atributo, que en este caso no se refiere a un atributo de tag xml, si no como sinónimo de 'campo' del objeto).</p><p><code>schema</code> es el tag que envuelve toda la definición.</p>
+1:52
+2 months ago
+<pre class="prettyprint linenums">&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://carregal.com/courses" xmlns:tns="http://carregal.com/courses" elementFormDefault="qualified"&gt; &lt;element name="GetCourseDetailsRequest"&gt; &lt;complexType&gt; &lt;sequence&gt; &lt;element name="id" type="integer"&gt;&lt;/element&gt; &lt;/sequence&gt; &lt;/complexType&gt; &lt;/element&gt; &lt;/schema&gt;</pre>
+40. Step 06 - More about XML Schema Definition and Implementing XSD Best Practices
+0:05
+2 months ago
+<p>En los xsd se pueden definir objetos reutilizables en más puntos del esquema, como vemos en el ejemplo de la Respuesta:</p><pre class="prettyprint linenums">&lt;element name="GetCourseDetailsResponse"&gt; &lt;complexType&gt; &lt;sequence&gt; &lt;element name="CourseDetails" type="tns:CourseDetails"&gt;&lt;/element&gt; &lt;/sequence&gt; &lt;/complexType&gt; &lt;/element&gt; &lt;complexType name="CourseDetails"&gt; &lt;sequence&gt; &lt;element type="integer" name="id"&gt;&lt;/element&gt; &lt;element type="string" name="name"&gt;&lt;/element&gt; &lt;element type="string" name="description"&gt;&lt;/element&gt; &lt;/sequence&gt; &lt;/complexType&gt;</pre>
+1:50
+2 months ago
+<p>BP1: A la hora de crear un xsd y definir un namespace, en la etiqueta raíz tenemos <code>&lt;schema xmlns="http://www.w3.org/2001/XMLSchema"&gt; </code></p><p>Esto no es una buena práctica, pues define un xmlns global. Es mejor poner un prefijo para los tags, de modo que sean así: <code>&lt;xs:element&gt;&lt;/xs:element&gt;</code> .</p><p>Una vez definido el prefijo, se usa tanto en los tags como en los tipos de datos. Ejemplo: <code>&lt;xs:element name="id" type="xs:integer"&gt;</code></p><p>La manera de conseguir declarar el namespace para poder usarlo es: </p><p><code>&lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"</code> </p>
+41. Step 07 - Introduction to Java API for XML Binding (JAXB) and Configuring JAXB 2
+0:37
+2 months ago
+<p>Para que el servicio convierta el cuerpo de la petición en un objeto Java que pueda manejar, y para que la repuesta obtenida por la ejecución pueda ser transformada de nuevo en xml para poder viajar de vuelta en la http response, hacemos uso de JAXB. Pues JAXB necesita el XSD para hacer las transformaciones.</p>
+0:55
+2 months ago
+<p>Hasta ahora, para que los documentos xml response y request reconocieran el xsd los teníamos ubicados en la misma carpeta física. Colocamos el xsd en <code>src/main.resources</code> que está en el classpath.</p><p>Existe un plugin que se llama jaxb maven plugin, que nos puede ayudar a crear los pojos que se asemejen a los objetos definidos en el xsd. Hay que definirlo en el pom jaxb2 maven</p><pre class="prettyprint linenums">&lt;!-- JAXB2 Maven Plugin --&gt; &lt;!-- XSD source folder --&gt; &lt;!-- Java Object Source Folder --&gt; &lt;!-- clear folder: false --&gt;</pre>
+5:50
+2 months ago
+<pre class="prettyprint linenums"> &lt;plugin&gt; &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt; &lt;artifactId&gt;jaxb2-maven-plugin&lt;/artifactId&gt; &lt;version&gt;1.6&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;xjc&lt;/id&gt; &lt;goals&gt; &lt;goal&gt;xjc&lt;/goal&gt; &lt;/goals&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;configuration&gt; &lt;!-- The package of your generated sources --&gt; &lt;outputDirectory&gt;${project.basedir}/src/main/java&lt;/outputDirectory&gt; &lt;packageName&gt;com.example.myschema&lt;/packageName&gt; &lt;schemaDirectory&gt;${project.basedir}/src/main/resources&lt;/schemaDirectory&gt; &lt;clearOutputDir&gt;false&lt;/clearOutputDir&gt; &lt;/configuration&gt; &lt;/plugin&gt; </pre>
+42. Step 08 - Configuring an Endpoint for GetCourseDetailsRequest
+0:07
+2 months ago
+<p>Con el plugin jaxb2-maven, en configuración se puede definir a qué paquete se extraen/generan los java extraidos del xsd. Si no hay un atributo package definido en la configuración, se crea un paquete cuyo nombre concuerda con el targetNamespace definido en el xsd.</p><pre class="prettyprint linenums">&lt;configuration&gt; &lt;!-- The package of your generated sources --&gt; &lt;outputDirectory&gt;${project.basedir}/src/main/java&lt;/outputDirectory&gt; &lt;packageName&gt;com.carregal.jaxb&lt;/packageName&gt; &lt;schemaDirectory&gt;${project.basedir}/src/main/resources&lt;/schemaDirectory&gt; &lt;clearOutputDir&gt;false&lt;/clearOutputDir&gt; &lt;/configuration&gt;</pre>
+4:15
+2 months ago
+<p>Aparentemente, el namespace declarado como targetNamespace juega un papel en la url del servicio, así como el nombre del objeto que trae la petición (parámetro de entrada del endpoint). Tenemos declarado :</p><pre class="prettyprint linenums">http://carregal.com/courses GetCourseDetailsRequest</pre><p>Entonces, el método de la clase que define el endpoint y que se invoca para obtener la respuesta del servicio va anotado con</p><p><code>@PayloadRoot(namespace="http://carregal.com/courses", localPart="GetCourseDetailsRequest")</code> </p><p>El método recibe un parámetro de tipo <code>GetCourseDetailsRequest,</code> que va anotado con&nbsp; <code>@RequestPayload</code>. A su vez, la cabecera va anotada como&nbsp; <code>@ResponsePayload</code>.</p>
+44. Step 10 - Spring Web Services Configuration - Generating WSDL
+0:00
+2 months ago
+<p>El XSD define los formatos en el contexto de la aplicación servidora del servicio, pero el servicio como todo necesita exponer un WSDL para que el cliente lo pueda consultar y conocer así el contrato con el servicio.</p><p>Hay entonces que montar una clase de @Configuration que va a declarar unos cuantos&nbsp; &nbsp;@Bean de interés.</p><pre class="prettyprint linenums">@Configuration @EnableWs</pre><p>Estas dos anotaciones en una clase de configuración habilitan la aplicación como servicio web. Los beans son:</p>
+0:02
+2 months ago
+<p>1.-ServletRegistrationBean: es necesario configurarlo porque a partir de él se detectan los&nbsp; @Endpoint por el fw. Se configura a partir de una instancia de MessageDispatcherServlet que recibe el contexto de la aplicación, y del path para nuestro servicio.</p><pre class="prettyprint linenums">MessageDispatcherServlet mds = new MessageDispatcherServlet(); mds.setApplicationContext(context); mds.setTransformWsdlLocations(true); return new ServletRegistrationBean(mds, "/ws/*"); }</pre>
+0:58
+2 months ago
+<p>Lo próximo que necesitamos es exponer nuestro WSDL. No lo creamos a mano, si no que Spring lo crea y expone por nosotros. Lo crea a partir de nuestro xsd.</p><p>Hay que definir un bean DefaultWsdl11Definition, y para eso es necesario inyectarle un XsdSchema que lo creamos en otro Bean que devuelve una instancia de SimpleXsdSchema. Para crear la instancia hace falta el classpath resource que apunte a nuestro xsd. Entonces, para el DefaultWsdl11Definition seteamos setPortType...</p><pre class="prettyprint linenums">@Bean(name="courses") public DefaultWsdl11Definition defaultWsdlDefinition(XsdSchema schema) { definition.setPortTypeName("CoursePort"); definition.setSchema(schema); definition.setTargetNamespace("http://carregal.com/courses"); definition.setLocationUri("/ws"); return definition; } @Bean XsdSchema getCoursesSchema() { return new SimpleXsdSchema(new ClassPathResource("course-details.xsd")); }</pre>
+7:39
+2 months ago
+<p>Hace falta la dependencia wsdl4j para poder crear automaticamente el wsdl:</p><p> </p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;wsdl4j&lt;/groupId&gt; &lt;artifactId&gt;wsdl4j&lt;/artifactId&gt; &lt;/dependency&gt;</pre>
+48. Step 14 - Quick introduction to different parts of a WSDL
+0:00
+2 months ago
+<p>Resumiendo lo visto en capitulos anteriores: se ha creado una clase anotada con @Endpoint que contiene los métodos que procesan las distintas peticiones que se pueden hacer al servicio web.&nbsp; Cada petición distinta tiene un método anotado con @PayloadRoot, anotación que tiene los atributos namespace y localPart. El localPart es el que tiene su entrada en el wsdl como operation. Estos metodos tambien estan anotados con @ResponsePayload. El parámetro de entrada, con el que se les informa, está anotado con @RequestPayload. </p><p><br></p>
+0:02
+2 months ago
+<p>Es típico no tener mucha lógica de conversión o de manejo de los datos en la capa de interface con el servicio web, en su definición de endpoints, por lo que se hace uso de capas de negocio como los Service para obtener la información, y de mapeadores para transformar objetos de negocio en objetos de presentación. En nuestro código de proyecto de pruebas hemos inyectado al @Endpoint un @Service y un @Mapper. Se definió el pojo de negocio y ese es el que devuelve el @Service. El @Endpoint devuelve objetos JAXB adecuados al XSD, transformados desde objeto de negocio a objeto de presentación mediante el @Mapper (MapStruct). </p>
+2:18
+2 months ago
+<p>wsdl: types, messages, portType, binding y service. Estructura comun.</p><p>Types: tipos presentes en el esquema. El xsd. Estructuras.</p><p>Messages: request y responses. Diferentes requests y responses de las operations. Solo se pueden enviar el requests o recibir en responses los tipos&nbsp; de Types que están en messages.</p><p>En portType es donde estan definidas las operaciones. De momento en este servicio están definidas dos operaciones. En cada operacion se mapea cual es la petición y cual es la respuesta (input message - output message). PortType es como una Interface, muestra los métodos disponibles.</p><p>Binding es como la implementacion. Se define, por ejemplo, transport (si es http, o MQ, etc). Se define el style=document para indicar que estamos intercambiando peticiones y respuestas completas xml. Otra alternativa sería RPC, entonces necesitariamos definir los parametros de entrada y salida. "Como exponemos las operaciones".</p><p>Service: .location address.</p>
+50. Step 16 - Improving the DeleteCourseDetailsRequest - Using an Enum for Status
+5:13
+2 months ago
+<pre class="prettyprint linenums"> // GetCourseDetailsRequest @PayloadRoot(namespace = "http://carregal.com/courses", localPart = "DeleteCourseDetailsRequest") @ResponsePayload public DeleteCourseDetailsResponse deleteCourseDetailsResquest(@RequestPayload DeleteCourseDetailsRequest request) { DeleteCourseDetailsResponse response = new DeleteCourseDetailsResponse(); response.setResult(statusMapper.statusToOpStatus(service.deleteById(request.getId()))); return response; }</pre>
+5:23
+2 months ago
+<pre class="prettyprint linenums">package com.carregal.SpringSoap.beans.mappers; import org.mapstruct.Mapper; import com.carregal.SpringSoap.beans.Status; import com.carregal.SpringSoap.jaxb.OpStatus; @Mapper(componentModel = "spring") public interface StatusMapper { public OpStatus statusToOpStatus(Status status); } </pre>
+51. Step 17 - Exception Handling and SOAP Fault Responses
+0:22
+2 months ago
+<p>Control de excepciones, se debe devolver un mensaje indicativo cuando el servicio falla. Fault Response. En el body de la respuesta se debe enviar un fault message en caso de un error. Si se produce una excepcion no capturada en el @PayloadRoot, el servicio responde, pero mal:</p><pre class="prettyprint linenums">&lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt; &lt;SOAP-ENV:Header/&gt; &lt;SOAP-ENV:Body&gt; &lt;SOAP-ENV:Fault&gt; &lt;faultcode&gt;SOAP-ENV:Server&lt;/faultcode&gt; &lt;faultstring xml:lang="en"&gt;java.lang.NullPointerException&lt;/faultstring&gt; &lt;/SOAP-ENV:Fault&gt; &lt;/SOAP-ENV:Body&gt; &lt;/SOAP-ENV:Envelope&gt;</pre><p>Realmente esto ya es algo, y es que spring se encarga de por lo menos producir una respuesta con un mensaje soap. Pero esto se puede mejorar.</p>
+2:51
+2 months ago
+<p>Una buena práctica es crear una Excepcion que extienda de <code>RuntimeException</code>, y disponer del constructor con mensaje para el error. De esta forma, cuando se produzca la situación anterior podemos elevar la excepción y la respuesta del servicio será más informativa. Para que la respuesta no sugiera que se trata de un error en el servidor (por ejemplo cuando se han pasado parametros de entrada no válidos), podemos anotar la clase de la excepcion custom como <code>@SoapFault</code> con distintos atributos: el primero es <code>faultCode=FaultCode.CLIENT</code> para indicar que se trata de un fallo de la aplicación consumidora. Otra alternativa es usar el atributo anterior pero con valor <code>faultCode=FaultCode.CUSTOM</code>, y entonces declarar además el atributo <code>customFaultCode="{aqui un namespace, una url}codigo*random*mio"</code></p><pre class="prettyprint linenums"></pre>
+6:05
+2 months ago
+<p>Anotando la excepcion con @SoapFault y con el atributo <code>faultCode=FaultCode.CUSTOM, customFaultCode="{namespace}randomErrorCode" </code>tenemos el siguiente resultado:</p><pre class="prettyprint linenums">&lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt; &lt;SOAP-ENV:Header/&gt; &lt;SOAP-ENV:Body&gt; &lt;SOAP-ENV:Fault&gt; &lt;faultcode xmlns:ns0="http://in28minutes.com/courses"&gt;ns0:ERR_001_NOT_FOUND&lt;/faultcode&gt; &lt;faultstring xml:lang="en"&gt;Identificador inválido:23&lt;/faultstring&gt; &lt;/SOAP-ENV:Fault&gt; &lt;/SOAP-ENV:Body&gt; &lt;/SOAP-ENV:Envelope&gt;</pre>
+52. Step 18 - Implementing Security for SOAP Web Services with WS Security
+0:12
+2 months ago
+<p>Implementando seguridad en servicio SOAP con WS-security. Transport independent. Authentication, digital signatures, certificates. XWSS es una implementación de WS-Security. Vamos a instaurar una política de seguridad con user y password. </p><p>Dependencias: spring-ws-security, pero con exclussions: spring-security-core:</p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;org.springframework.ws&lt;/groupId&gt; &lt;artifactId&gt;spring-ws-security&lt;/artifactId&gt; &lt;exclusions&gt; &lt;exclusion&gt; &lt;groupId&gt;org.springframework.security&lt;/groupId&gt; &lt;artifactId&gt;spring-security-core&lt;/artifactId&gt; &lt;/exclusion&gt; &lt;/exclusions&gt; &lt;/dependency&gt;</pre><p><br></p>
+1:45
+2 months ago
+<p>Se incluye también la dependencia xws security y javax activation, con la exclusion de javax.xml.crypto</p><p>Una vez con las dependencias, hay que añadir cambios a la @Configuration. Hay que declarar un @Bean XwsSecurityInterceptor y después añadirlo a la lista de interceptores de Spring. El interceptor necesita un callback handler, la lógica que se ejecuta al interceptar una petición, chequear si el usuario es válido.</p><p>Para poder añadir el interceptor a la lista de interceptores de spring hay que establecer que la clase de configuración extienda de WsConfigurerAdapter:</p><pre class="prettyprint linenums">@Configuration @EnableWs public class WebServiceConfig extends WsConfigurerAdapter { @Override public void addInterceptors(List&lt;EndpointInterceptor&gt; interceptors) { // TODO Auto-generated method stub interceptors.add(securityInterceptor()); super.addInterceptors(interceptors); } </pre><p><br></p>
+7:37
+2 months ago
+<p>Cuando se crea el interceptor, hay que definir un Callback Handler, y para el interceptor de seguridad vamos a definirlo como un <code>SimplePasswordValidationCallbackHandler</code>. A este handler hay que pasarle un map de usuarios para que pueda comprobar la validez. </p><p>Otra cosa necesaria es definir un xml llamado <code>securityPoliciy</code>.<code>xml</code>. Este se setea como <code>interceptor.setPolicyConfiguration(new ClassPathResource("securityPolicy.xml"));</code> </p><p>El xml define la necesidad de enviar usuario y password, pero también de que no se hacen operaciones de seguridad adicionales más complejas (en nuestro caso).</p>
+10:20
+2 months ago
+<p>Si tratamos en enviar una petición como hasta ahora, sin usuario ni password, el servicio responde con un error: </p><pre class="prettyprint linenums">&lt;SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"&gt; &lt;SOAP-ENV:Header/&gt; &lt;SOAP-ENV:Body&gt; &lt;SOAP-ENV:Fault&gt; &lt;faultcode&gt;SOAP-ENV:Client&lt;/faultcode&gt; &lt;faultstring xml:lang="en"&gt;com.sun.xml.wss.XWSSecurityException: Message does not conform to configured policy [ AuthenticationTokenPolicy(S) ]: No Security Header found; nested exception is com.sun.xml.wss.XWSSecurityException: com.sun.xml.wss.XWSSecurityException: Message does not conform to configured policy [ AuthenticationTokenPolicy(S) ]: No Security Header found&lt;/faultstring&gt; &lt;/SOAP-ENV:Fault&gt; &lt;/SOAP-ENV:Body&gt; &lt;/SOAP-ENV:Envelope&gt;</pre>
+12:00
+2 months ago
+<p><code>&lt;Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;Header&gt;&lt;Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"&gt;&lt;UsernameToken&gt;&lt;Username&gt;danielcro&lt;/Username&gt;&lt;Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"&gt;dani01&lt;/Password&gt;&lt;/UsernameToken&gt;&lt;/Security&gt;&lt;/Header&gt; &lt;Body&gt; &lt;GetCourseDetailsRequest xmlns="http://carregal.com/courses"&gt; &lt;id&gt;3&lt;/id&gt; &lt;/GetCourseDetailsRequest&gt; &lt;/Body&gt; &lt;/Envelope&gt;</code> </p>
+Section 6:
+RESTful Web Services with Spring and Spring Boot
+53. RESTful Web Services - An Overview
+0:16
+2 months ago
+<p>Se incluyen dependiencias de ws security, xwss y javax activation, con sus exclusiones. Se define un bean Xwss interceptor. A este interceptor hay que añadirlo a la lista de interceptores de peticiones -&gt; la clase configuration tiene que extender de WsConfigurerAdapter para poder hacer override de <code>addInterceptors</code> . El interceptor hay que setearle la policy que se define en un xml. Al interceptor hay que setearle un CallbackHandler, en nuestro caso un SimplePasswordValidationCallbackHandler, que se define como otro bean. Este bean maneja un map de usuarios validos. Con todo esto, ya estaría la configuracion lista.</p><p>Así, si se envía una petición sin las cabecera adecuada para indicar el user y password, se recibe automaticamente una respuesta de error producida por el propio interceptor.</p>
+0:40
+7 months ago
+validation, hateoas, versioning, filter, monitoring
+54. Step 01 - Initializing a RESTful Services Project with Spring Boot
+0:15
+22 days ago
+1:09
+7 months ago
+proyecto con spring-starter-web (mvc+rest), devtools,h2, jpa
+55. Step 02 - Understanding the RESTful Services we would create in this course
+0:50
+7 months ago
+recurso tiene URI, y representaciones
+4:38
+7 months ago
+al mapear recursos a URIs hay que tener en cuenta la precedencia y la pertenencia. Pej., un usuario crea un post: POST users/{id}/post
+5:54
+7 months ago
+validation, i18n,exception handling, versioning,content negociation, documentation, monitoring
+56. Step 03 - Creating a Hello World Service
+2:44
+21 days ago
+<p>Lo básico: Se define una clase como controladora de tráfico entrante de peticiones mediante la anotación @RestController, y en ella habrá distintos métodos para las peticiones entrantes. Esto se consigue mediante anotaciones @GetMapping, @PostMapping, @RequestMapping...</p><p>Al usar @RequestMapping se deben usar atributos de la anotacion:</p><p>method= RequestMethod.GET</p><p>path="/hello-world"</p><p><br></p><p>Si la clase estuviera marcada con la anotación @Controller, el return sería de un string con el nombre de la vista que se devilvería al navegador. En caso de @RestController lo que se devuelve con return puede ser cualquier objeto, y se devuelve de forma default en una cadena json.</p>
+3:26
+7 months ago
+path se usa en RequestMapping si se incluye mas de un atributo
+3:48
+22 days ago
+RequestMapping es genérico, pero necesita que se especifique el metodo HTTP
+57. Step 04 - Enhancing the Hello World Service to return a Bean
+0:49
+7 months ago
+Poner ResponseBody en el metodo del controlador no es necesario porque no es un @controller, sino un @restcontroller, por tando no es necesa
+58. Step 05 - Quick Review of Spring Boot Auto Configuration and Dispatcher Servlet
+1:28
+7 months ago
+estableciendo el nivel de logging para spring a debug, lo que quiere decir que se excribe todo a partir de info para arriba
+2:14
+7 months ago
+DispactcherServlet es el front controller que sabe que controller procesa la peticion
+3:43
+7 months ago
+boot autoconfig tambien incluye los message converters, responsables de la conversion a json del objeto retornado por el servicio
+4:16
+7 months ago
+Jackson beans detras de los message converters
+4:44
+7 months ago
+El dispatcher servlet maneja todas las peticiones, se ve mapeado a "/"
+5:07
+21 days ago
+<p>La autoconfiguracion de spring boot pone un dispatcher servlet escuchando en la ruta / por defecto. Se sigue el patrón llamado <strong>front controller</strong>. El dispatcher servlet conoce todos los mappings de la aplicación.<br><br>Para admitir parametros en la propia URI, el método que la gestiona tiene que declarar parámetros anotados con&nbsp; <strong>@PathVariable</strong>. Esta anotacion tiene <strong>atributos como name, o required</strong></p>
+5:29
+7 months ago
+en el arranque se leen todos los mappings de los controller, de modo que el front controller sabe que bean (controller) gestiona cierta URL
+6:35
+7 months ago
+@RestController ya incluye @ResponseBody, de ahi que no sea necesatia
+61. Step 08 - Implementing GET Methods for User Resource
+3:56
+21 days ago
+<pre class="prettyprint linenums">#spring.jackson.date-format=YYYY-MM-dd spring.jackson.serialization.write-dates-as-timestamps=false</pre><p>En application.properties podemos configurar como se escribe el json al serializar, y también como se lee al deserializar si fuese necesario.</p>
+62. Step 09 - Implementing POST Method to create User Resource
+4:00
+21 days ago
+<p>En las peticiones POST al servicio REST, que se utilizan para registrar nuevos usuarios en nuestro caso particular, la información para la creación del usuario se recibe en el cuerpo de la petición. Se emplea como parámetro del método una anotación que habilita el mapeo del body de la petición a un objeto de la clase que esperamos recibir para poder realizar la acción.</p><pre class="prettyprint linenums">@PostMapping(path="/users") public String createUser(@RequestBody User user){ ... }</pre>
+7:35
+21 days ago
+<p>Peticiones POST: idealmente queremos ver la respuesta HTTP Created en vez de la 200 OK, porque es más específica de la acción que queremos realizar. También queremos que el servicio devuelva la URI del recurso recién creado.</p><pre class="prettyprint linenums"> @PostMapping(path = "/users") public String createNewUser(@RequestBody User user) { User savedUser = usersDao.save(user); return "localhost:8080/users/" + savedUser.getId(); }</pre><p>Esta primera aproximación NO envía una respuesta con status adecuado y además la URI devuelta está generada "a mano". Veremos esto también, cómo hacerlo bien.</p>
+63. Step 10 - Enhancing POST Method to return correct HTTP Status Code and Location
+1:52
+21 days ago
+<p>Vemos ahora como devolver el estado http CREATED, y la URI del recurso. En el fw hay una clas ResponseEntity que modela la respuesta del servicio REST. Se compone sobre un genérico, y permite asociar el estado http en función del resultado de la ejecución. </p><p><code>ResponseEntity&lt;T&gt;.created(location);</code></p><p>Para conseguir la URI, buscamos la clase <code>ServletUriComponentsBuilder </code>y el método <code>fromCurrentRequest()</code> </p>
+5:47
+21 days ago
+<p>Para obtener la URI de una petición POST, necesaria para devolver ResponseEntity&lt;Object&gt;</p><pre class="prettyprint linenums">URI location = ServletUriComponentsBuilder. fromCurrentRequest().path("/{id}"). buildAndExpand(savedUser.getId()).toUri(); return ResponseEntity.created(location).build();</pre>
+6:16
+21 days ago
+<p>En la response del servicio, en las cabeceras, tenemos el atributo 'location' que contiene la URI del recurso creado, y 'Date' con la fecha y hora de creación del recurso. Asimismo, el status de la respuesta&nbsp;HTTP es 201 Created.</p>
+64. Step 11 - Implementing Exception Handling - 404 Resource Not Found
+4:45
+20 days ago
+<p>Para elegir el tipo de status http que se devuelve con un determinado error (controlado por una excepcion al efecto), se utiliza la anotación <code>@ResponseStatus(value = HttpStatus.NOT_FOUND)</code> </p><p>El servicio REST con SpringBoot tiene un default exception handling que es el que retorna cosas como el mensaje, path, error...</p><p>Es buena practica tener una estructura que homogeneice los mensajes de error para toda: definir una estructura estandarizada y que la sigan TODOS tus RESTful services.</p><p>Validacion + estructura estandar para gestionar</p>
+65. Step 12 - Implementing Generic Exception Handling for all Resources
+3:07
+20 days ago
+<p>Para estandarizar la gestión de excepciones se puede definir un pojo que contenta los campos que se quieren devolver con la información relativa al error: mensaje, timestamp, details... Esto debería ir no ya a nivel de proyecto, sino de organización. La clase del pojo puede llamarse así como ExceptionResponse.</p><p>Tenemos&nbsp; otra clase del framework spring, en este caso relacionada con la respuesta en caso de un error: ResponseEntityExceptionHandler. Es una clase abstracta. La extendemos y así podemos tener una exception handling customizada. El comportamiento definido por la implementación de esta clase se puede aplicar a todos los controller de la aplicación. </p><p><br></p>
+9:59
+20 days ago
+<p>Esta clase tiene que tener las anotaciones @Controller (o @RestController) y @ControllerAdvice, que es una anotación que tienen que tener todas las clases que declaren metodos con anotación @ExceptionHandler.</p><p>Al definir una clase que extiende <code>ResponseEntityExceptionHandler</code>, la excepción que teníamos declarada a la que le poníamos una anotación <code>@ResponseStatus(value = HttpStatus.NOT_FOUND)</code> ya no determina el status de la respuesta, sino que lo hace nuestra implementación de <code>ResponseEntityExceptionHandler</code> en cada método anotado con <code>@ExceptionHandler(Exception.class)</code> . Hay un método de estos sobrescrito para cada subconjunto de excepciones que queramos manejar. En esos métodos se crea la ResponseEntity, que llevar el status http que se asigne en cada caso.</p>
+10:18
+20 days ago
+<p>Creando un método con <code>@ExceptionHandler(UserNotFoundException.class)</code>, que es la exception que elevamos al no encontrar el user, podemos asignar el <code>httpStatus.NOT_FOUND</code> a la ResponseEntity, como esperaríamos. </p><p>Una buena práctica puede ser crear un jar con las respuestas que queremos dar a las excepciones comunes.</p>
+66. Step 13 - Exercise : User Post Resource and Exception Handling
+0:27
+20 days ago
+<p>Ejercicio 1: después de haber dado una implementación para findAllUsers, findUserById y para createUser, qué mejoras podemos añadir para el manejo de excepciones?</p><p>Ejercicio 2: crear métodos para los casos de uso de posts de usuarios de la red social (temática del servicio REST ejemplo para este curso):</p><pre class="prettyprint linenums">GET /users/{id}/posts POST /users/{id}/posts GET /users/{id}/posts/{post_id}</pre>
+67. Step 14 - Implementing DELETE Method to delete a User Resource
+1:59
+20 days ago
+<p>Añadir el recurso para borrar un usuario es sencillo. Se debe crear el método anotado con <code>@DeleteMapping("users/{id}")</code> </p><p>Una respuesta 200OK es perfectamente válida, pero también se puede devolver un ResponseEntity con No content().</p><p><code>return ResponseEntity.noContent().build().</code></p><p>Como los métodos del dao elevan excepciones manejadas por el framework al haber definido un ResponseEntityExceptionHandler, el manejo de excepciones controla bien el caso de querer borrar un recurso que no existe.</p>
+69. Step 15 - Implementing Validations for RESTful Services
+0:55
+20 days ago
+<p>Validación. Existe una API de Java sobre validación. Javax validation API: @Valid anotacion.&nbsp; Este API viene provista por starter web.</p><p>La anotación @Valid se utiliza en el @RequestBody, o sea, en el objeto que llega al servicio para ser procesado.</p><p>Se añaden más anotaciones en lo atrib de la clase a la que se mapea el requestbody:</p><pre class="prettyprint linenums">@Size(min = 2) private String name; @Past private Date birthDate;</pre><p>Con este mecanismo tan sencillo, si no se cumple alguna de las restricciones, la respuesta ess 400 Bad request. Esto no es completo, pues no aporta un mensaje con el error concreto.</p><p><br></p>
+4:31
+20 days ago
+<p>Para poder sobrescribir el comportamiento en caso de error de validación, tenemos que ir a nuestra clase ResponseEntityExceptionHandlerImpl y hacer @Override del método:</p><pre class="prettyprint linenums">@Override protected ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) { ExceptionResponse exceptionResponse = new ExceptionResponse(ex.getMessage(), new Date(), request.getDescription(false)); return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST); }</pre><p><br></p>
+4:41
+20 days ago
+<p>Ahora bien, en la casuistica de fallo de validación, los detalles del error, details en nuestro pojo ExceptionResponse, se saca de la excepcion, de su atributo <code>BindingResult()</code> </p><p>En el objeto BindingResult() está disponible toda la colección de errores, de modo que se puede iterar por ellos.</p>
+8:45
+19 days ago
+<p>En el paquete javax.validation API&nbsp;hay muchas más validaciones:</p><p>AssertFalse, AssertTrue, DecimalMax, DecimalMin, Digits, Future, Max, Min, NotNull, Null, Pattern (regex)...*. </p><p>Implementación: hibernate validation.</p><p>Resumen: en los pojos de recursos, en sus atributos, se hace uso de las anotaciones de validación. En el controller, se anotan los parámetros de los métodos con @Valid, para habilitar la validación.</p>
+71. Step 16 - Implementing HATEOAS for RESTful Services
+6:14
+19 days ago
+<p>HATEOAS: hypermedia state. Hay un starter para eso: starter-hateoas.</p><p>Este starter permite añadir enlaces a otros recursos haciendo uso del nombre de los métodos, de modo que si se cambiase el path en aquel método, también se refleja en el enlace provisto por HATEOAS.</p><p>La idea es crear un recurso, que se construye sobre un genérico, en el caso de nuestro ejemplo será un usuario, y devolver el recurso en vez del pojo User. Sobre el recurso podemos añadir enlaces haciendo uso de los nombres de métodos que ofrecen los otros recursos. Si hacemos import static de una clase, podemos tener acceso a todos sus metodos estaticos.</p>
+6:18
+19 days ago
+<pre class="prettyprint linenums">Resource&lt;User&gt; resource = new Resource&lt;User&gt;(user); ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers()); resource.add(linkTo.withRel("all-users"));</pre><p><br></p><pre class="prettyprint linenums">{ &nbsp;&nbsp;&nbsp;&nbsp;"id":&nbsp;1, &nbsp;&nbsp;&nbsp;&nbsp;"name":&nbsp;"Daniel", &nbsp;&nbsp;&nbsp;&nbsp;"birthDate":&nbsp;"2020-04-04&nbsp;11:23:07", &nbsp;&nbsp;&nbsp;&nbsp;"_links":&nbsp;{ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"all-users":&nbsp;{ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"href":&nbsp;"http://localhost:8080/users" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} &nbsp;&nbsp;&nbsp;&nbsp;} }</pre>
+73. Step 18 - Internationalization for RESTful Services
+2:10
+19 days ago
+<p>i18n: Vamos a habilitar un mecanismo por el que cuando recibamos una cabecera http "Accept-language" devolvamos los textos traducidos.</p><p>Configuracion: LocaleResolver, ResourceBundleMessageSource</p><p>Uso: Autowired MessageSource</p><p>@RequestHeader(value="Accept-Language", required=false) será uno de los parámetros del método de controlador, o recurso.</p><p>Entonces se recupera el texto traducido como messageSource.getMessage("helloWorld.message", null, locale)</p><p><br></p>
+2:41
+19 days ago
+<h4>org.springframework.web.servlet.i18n.SessionLocaleResolver</h4><p><br></p><p><code>org.springframework.web.servlet.LocaleResolver</code> implementation that uses a locale attribute in the user's session in case of a custom setting, with a fallback to the specified default locale or the request's accept-header locale.</p><p>This is most appropriate if the application needs user sessions anyway, i.e. when the <code>HttpSession</code> does not have to be created just for storing the user's locale. The session may optionally contain an associated time zone attribute as well; alternatively, you may specify a default time zone.</p><p>Custom controllers can override the user's locale and time zone by calling <code>#setLocale(Context)</code> on the resolver, e.g. responding to a locale change request. As a more convenient alternative, consider using <code>org.springframework.web.servlet.support.RequestContext.changeLocale</code>.</p>
+4:51
+19 days ago
+<p>Se configura un @Bean ResourceBundleMessageSource y se establece el base name como "messages", ya que se han definido los archivos de properties messages.properties y messages_fr.properties.</p><pre class="prettyprint linenums">@Bean ResourceBundleMessageSource messageSource() { ResourceBundleMessageSource messageSource=new ResourceBundleMessageSource(); messageSource.setBasename("messages"); return messageSource; } </pre>
+7:33
+19 days ago
+<h4>org.springframework.context.MessageSource</h4><p><br></p><p>Strategy interface for resolving messages, with support for the parameterization and internationalization of such messages.</p><p>Hemos definido un @Bean que devuelve un LocaleResolver implementado por SessionLocaleResolver(), y un @Bean que devuelve un MessageSource implementado por ResourceBundleMessageSource.</p><p>El primero lo declaramos para que resuelva un Locale por defecto: Locale.US.</p><p>El segundo es el que se inyecta en el controller o donde sea preciso, para tener acceso a las properties traducidas.</p>
+74. Step 18 - Part 2 - Internationalization
+0:54
+19 days ago
+<p>Una simplificación es obtener el Locale desde la clase LocalContextHolder.getLocale(). De esta manera no es necesario recoger el locale de las cabeceras de las peticiones para cada metodo del controller.</p><p>Otra simplificacion puede ser cambiar el SessionLocaleResolver por un AcceptHeaderLocaleResolver, de ese modo según si se recibe un locale en las cabeceras y existe el lenguaje en un properties, se hace uso del lebguaje elegido.</p><p>La tercera simplificación es incluir en application.properties la linea:</p><p><code>spring.messages.basename=messages</code></p><p>De este modo no es necesario configurar un ResourceBundleMessageSource (implementación de MessageSource). Se puede seguir haciendo @Autowire de una instancia de MessageSource en el controlador para poder invocar getMessage(args), pero la implementación la pone el framework sin que hayamos definido nosotros el bean.</p><p><br></p>
+75. Step 19 - Content Negotiation - Implementing Support for XML
+3:00
+19 days ago
+<p>Para poder permitir representaciones ademas de json, por ejemplo xml, tenemos que tener disponibles las librerias de dependencias necesarias en el proyecto. </p><pre class="prettyprint linenums">&lt;!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml --&gt; &lt;dependency&gt; &lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt; &lt;artifactId&gt;jackson-dataformat-xml&lt;/artifactId&gt; &lt;version&gt;2.10.3&lt;/version&gt; &lt;/dependency&gt;</pre><p><br></p>
+3:29
+19 days ago
+<pre class="prettyprint linenums">&lt;List&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;item&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;id&gt;1&lt;/id&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;name&gt;Daniel&lt;/name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;birthDate&gt;2020-04-05&nbsp;00:18:57&lt;/birthDate&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;/item&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;item&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;id&gt;2&lt;/id&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;name&gt;Veronica&lt;/name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;birthDate&gt;2020-04-05&nbsp;00:18:57&lt;/birthDate&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;/item&gt;</pre>
+76. Step 20 - Configuring Auto Generation of Swagger Documentation
+0:34
+19 days ago
+<p>Swagger es a REST lo que Wizdler a SOAP, una forma de presentar el contrato del servicio web al cliente. Debemos añadir la dependencia al pom. Hay que crear también una clase @Configuration para configurar Swagger.</p><p>La clase tiene que tener las anotaciones<code> @Configuration y @EnableSwagger</code> </p><p>Hay que definir un @Bean Docket, y se devuelve <code>new Docket(DocumentationType.SWAGGER2)</code> </p>
+4:30
+19 days ago
+<p>En la URL: localhost:8080/swagger-ui.html tenemos la visualización de los endpoints expuestos por el servicio REST, como esperabamos.</p><p>En la URL: localhost:8080/api-docs tenemos el servicio documentado en formato json.</p>
+79. Step 22 - Enhancing Swagger Documentation with Custom Annotations
+0:48
+18 days ago
+<p>En la información que exponemos en swagger, podemos configurar ciertos datos para que aparezcan: por ejemplo podemos poner información sobre las restricciones que impongamos en la validación. También podemos poner una persona de contacto en la sección Info. Empezando por Info:</p><p>En la clase con la configuración de swagger, y vemos el Bean Docket que tenemos definido. Al crear el Docket haciento uso del método apiInfo podemos pasar un bean con nuestra nueva Info de Api. Así de sencillo:</p><p><code>new Docket(DocumentationType.SWAGGER_2).apiInfo(DEFAULT_API_INFO);</code></p><p>Podemos copiar el objeto apiInfo de la clase Docket y modificarlo. </p><p>http://localhost:8080/v2/api-docs</p>
+6:18
+18 days ago
+<p>También en la info general mostrada por swagger, debemos actualizar los formatos consumidos y producidos por el servicio.</p><p>En el Docket, en apiInfo, hacemos uso de los metodos consumes y produces para pasarle dos HashSet de Strings con los formatos. Se puede observar en localhost:8080/v2/api-docs el resultado:</p><pre class="prettyprint linenums"> "consumes": [ "application/xml", "application/json" ], "produces": [ "application/xml", "application/json" ],</pre>
+7:18
+18 days ago
+<p>El siguiente objetivo es mostrar las restricciones de validación en la documentación del api. Hay que emplear la anotación <code>@ApiModel(description="")</code>&nbsp; en la cabecera de las clases 'de dominio', y la anotación <code>@ApiModelProperty(notes = "La fecha debe ser del pasado para ser válida")</code>&nbsp; en los atributos con restricciones declaradas por otras anotaciones de <code>javax.validation</code>.</p>
+8:41
+18 days ago
+<p>Hay muchas anotaciones de swagger que pueden resultar de utilidad a la hora de documentar nuestra api. Si hacemos control click en la anotación ApiModelProperty, esto nos lleva a un paquete dentro del jar llamado Swagger anotations.</p>
+80. Step 23 - Monitoring APIs with Spring Boot Actuator
+0:56
+18 days ago
+<p>Monitorización de servicios con actuator. Se debe incluir la dependencia en pom. También la de hal browser. Las url para acceder al panel de control de actuator han ido cambiando con el tiempo: <code>localhost:8080/actuator</code>, o <code>localhost:8080/application..</code>.</p><p>Para configurar que actuator muestre mucha informacion hay que establecer una property:</p><p><code>management.endpoints.web.exposure.include =*; //algo así</code></p><p><br></p>
+5:34
+18 days ago
+<p>Si vamos a http://localhost:8080/ se accede al hal browser, que muestra la informacion en un formato web. Tiene una barra de navegacion en la que podemos navegar a /actuator, y ver gráficamente métricas expuestas por actuator.</p><p>Cosas interesantes que se pueden ver:</p><p>beans manejados, mappings de urls, usuarios logueados y otros que han fallado la validación, métricas como la memoria empleada, uso de cpu...</p><p>http trace muestra las peticiones recibidas, con sus respuestas. Esto ya no está activo porque tiene gran impacto y no es seguro. Ahora se usan cosas como Zipking/Grafana, etc</p>
+81. Step 24 - Implementing Static Filtering for RESTful Service
+0:24
+17 days ago
+<p>Otra faceta lógica de los servicios REST es la del filtrado. Un recurso puede contener más atributos de los que se quiere transmitir, de modo que se han de habilitar mecanismos para elegir qué información se comparte. Por otro lado, dependiendo del tipo de petición, podría considerarse un conjunto distinto de campos en cada caso. En el segundo caso estaríamos hablando de filtrado dinámico. El filtrado estático, en el cual siempre se envía el mismo conjunto de datos de un recurso, se acomete facilmente mediante <code>@JsonIgnore</code>&nbsp; en los campos del recurso que NO queremos enviar en la respuesta.</p><p>Alternativamente se puede usar la anotación <code>@JsonIgnoreProperties(value={"at1","at2"})</code> con una lista de campos hardcodeados. Esto es peor si cambiar el nombre de los atributos y no se cambia el hardcodeo de las propiedades.</p>
+82. Step 25 - Implementing Dynamic Filtering for RESTful Service
+3:30
+17 days ago
+<p>El filtrado estático se configura sobre las clases DTO o de dominio, mediante anotaciones del estilo de @JsonIgnore. Se indica con ello qué atributos no formarán parte del json devuelto por el servicio.</p><p>El filtrado dinámico, por el cual podemos decidir qué campos devolver en función del método del controller que gestione la petición http, o de otros criterios, se realiza mediante la clase </p><p>MappingJacksonValue, que crea un wrapper sobre el DTO sobre el que se pueden establecer filtros. Ahora lo vemos...</p><p>Patrón DTO y mappers:</p><p>Este es el fragmento de pom para incluir la dependencia a mapstruct, una librería para proveer mappers entre entities y DTOs.</p><pre class="prettyprint linenums">&lt;dependency&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.mapstruct&lt;/groupId&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;mapstruct-jdk8&lt;/artifactId&gt; &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.3.0.Beta2&lt;/version&gt; &lt;/dependency&gt;</pre>
+3:31
+17 days ago
+<p>MappingJacksonValue es el tipo de objeto que devolvemos si tenemos filtrado dinámico. Los pasos son:</p><p>1.-Crear el filtro con alguno de los métodos estáticos de SimpleBeanPropertyFilter --&gt; filter</p><p>2.-Crear un objeto FilterProvider que contendrá todos los filtros, y añadir el filtro creado.</p><p>3.-Crear el objeto MappingJacksonValue alrededor del pojo, y setear los filtros contenidos en el FilterProvider.</p><pre class="prettyprint linenums">MappingJacksonValue mapping = new MappingJacksonValue(resource); SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name"); FilterProvider filters = new SimpleFilterProvider().addFilter("userFilter*ID*NAME", filter); mapping.setFilters(filters);</pre>
+5:08
+17 days ago
+<p>El método de controller retorna el MappingJacksonValue en vez del DTO. Y, también necesario, es:</p><p><br></p><p>4.-Una cosa más, en el DTO o pojo con la información, a nivel de clase hay que usar la anotación @JsonFilter("nombre del filtro"). Ese nombre del filtro es el mismo empleado en la llamada al método para añadir el filtro en el provider.</p><pre class="prettyprint linenums">@JsonFilter("userFilter*ID*NAME") public class User { </pre>
+83. Step 26 - Versioning RESTful Services - Basic Approach with URIs
+0:10
+17 days ago
+<p>Versionado:</p><p>-GITHUB del tipo de media (content negotiation or accept-header)</p><p>-Custom Headers (Microsoft)</p><p>-Versiones en URI (Twitter)</p><p>-Versiones en parámetros (Amazon)</p><p>Factores a tener en cuenta:</p><p>Polución de URIs, mal uso de las cabeceras HTTP, Caching, documentación... no hay solución favorita.</p><p><br></p>
+0:45
+16 days ago
+<pre class="prettyprint linenums">//------------ simple way of versioning--------- @GetMapping("person/v1") public Personv1 getPersonUrl() { return new Personv1(new Name("Daniel", "Carregal")); } @GetMapping("person/v2") public Personv2 getPersonUrl2() { return new Personv2("Daniel", "Carregal", "M"); }</pre>
+4:14
+17 days ago
+<p>Para tener varias versiones del servicio, una de las formas fáciles que vienen a la mente es mapeando diferentes URIs según la versión. Esta es la forma básica de versionado:</p><pre class="prettyprint linenums">GET v1/person GET v2/person</pre><p>Y suponiendo que tenemos DTOs distintos por versión, haciendo la prueba se reciben distintas versiones del recurso.</p>
+84. Step 27 - Versioning RESTful Services - Header and Content Negotiation Approach
+1:02
+16 days ago
+<pre class="prettyprint linenums">// ------------ params way of versioning--------- @GetMapping(value = "person/param", params = "version=1") public Personv1 getPersonParam() { return new Personv1(new Name("Daniel", "Carregal")); } @GetMapping(value = "person/param", params = "version=2") public Personv2 getPersonParam2() { return new Personv2("Daniel", "Carregal", "M"); }</pre><p><br></p>
+2:36
+16 days ago
+<pre class="prettyprint linenums">// ------------ headers way of versioning--------- @GetMapping(value = "person/header", headers = "X_API_VERSION=1") public Personv1 getPersonHeader() { return new Personv1(new Name("Daniel", "Carregal")); } @GetMapping(value = "person/header", headers = "X_API_VERSION=2") public Personv2 getPersonHeader2() { return new Personv2("Daniel", "Carregal", "M"); }</pre>
+4:32
+16 days ago
+<pre class="prettyprint linenums">// ------------ produces way of versioning--------- @GetMapping(value = "person/produces", produces = "application/vnd.company.app-v1+json") public Personv1 getPersonProduces() { return new Personv1(new Name("Daniel", "Carregal")); } @GetMapping(value = "person/produces", produces = "application/vnd.company.app-v2+json") public Personv2 getPersonProduces2() { return new Personv2("Daniel", "Carregal", "M"); }</pre>
+5:17
+16 days ago
+<p>El de produces es como el versionado usando el mime type, o media. Lleva en @GetMapping el atributo <code>produces</code> y el valor es el tipo de dato que acepta. Es una forma un poco artificiosa de indicar la versión del servicio.</p><p>Con parámetros es muy directa, pero se puede producir una cierta polución de urls. Pasa lo mismo con tener varios mapeos de URL según la versión del recurso que se desea consumir.</p><p>Con cabeceras como X_API_VERSION la petición no se puede hacer desde un navegador, además de que las cabeceras nunca se pensaron para pasar información como la versión del servicio que se desea invocar.</p><p>Consideraciones también se pueden hacer sobre los métodos de versionado que usan cabeceras, pues al tener la misma URL (pero distintas cabeceras) se inhabilita el cacheo de peticiones, pues la última sobrescribiría a la anterior aun en el caso de que llevasen cabeceras diferentes.</p>
+85. Step 28 - Implementing Basic Authentication with Spring Security
+0:01
+16 days ago
+<p>Para añadir seguridad básica al API debemos incluir un starter más: spring-starter-security.</p><p>Al arrancar la aplicación, en el log se puede ver:</p><p>Using generated security password: f33599d8-6da4-4421-8fc5-c3222d7e2e6d</p><p>Esta es una pasword default que se ha de usar con el username default, que es 'user'. Estos valores se pueden sobrescribir en applicacion.properties.</p><pre class="prettyprint linenums">spring.security.user.name=daniel spring.security.user.password=unapasswordcool </pre><p>Una vez habilitado el starter security, se ha de usar la auth básica para las peticiones. Esto es: usuario y password. En otro caso, la respuesta es 401 unauthorized en algunas versiones, o una pagina formulario para loguearse, en otras versiones.</p>
+Section 7:
+Introduction to JPA in 10 Steps
+86. Introduction to JPA - An Overview
+0:39
+16 days ago
+<p>Introducimos conceptos básicos de la OOP para notar que el diseño de datos en alamcenamientos persistentes como las bases de datos relacionales tiene de base una naturaleza distinta a la forma en que se maneja la infomación en un lenguaje de programación orientado a objetos.</p><p>Existe pues, una discordancia entre ambos planos:nombres de atributos y de columnas diferentes, manera de materializar las relaciones, la herencia, y más cosas.</p><p>Sistemas de conexión entre relacional y objetos, legacy en JDBC, spring JDBC e Ibatis (Mybatis). Estos 3 están basados en queries y resultsets, pero con diferencias.</p>
+87. Step 1 : Object Relational Impedence Mismatch
+1:24
+16 days ago
+<p>Conceptos de OOP:</p><p><strong>Abstraction.</strong> Abstraction means using simple things to represent complexity. We all know how to turn the TV on, but we don’t need to know how it works in order to enjoy it. In Java, abstraction means simple things like <strong>objects</strong>, <strong>classes</strong>, and <strong>variables</strong> represent more complex underlying code and data. This is important because it lets avoid repeating the same work multiple times.</p><p><strong>Encapsulation. </strong>This is the practice of keeping fields within a class private, then providing access to them via public methods. It’s a protective barrier that keeps the data and code safe within the class itself. This way, we can re-use objects like code components or variables without allowing open access to the data system-wide.</p>
+1:29
+16 days ago
+<p>Más conceptos de OOP:</p><p><strong>Inheritance. </strong>This is a special feature of Object Oriented Programming in Java. It lets programmers create new classes that share some of the attributes of existing classes. This lets us build on previous work without reinventing the wheel.</p><p><strong>Polymorphism. </strong>This Java OOP concept lets programmers use the same word to mean different things in different contexts. One form of polymorphism in Java is <strong>method overloading</strong>. That’s when different meanings are implied by the code itself. The other form is <strong>method overriding</strong>. That’s when the different meanings are implied by the values of the supplied variables. See more on this below.</p>
+88. Step 2 : World before JPA - JDBC, Spring JDBC and myBatis
+3:19
+16 days ago
+<p>JDBC, Spring JDBC y myBatis están basados en queries.</p><p>JDBC: conceptos como Statement, PreparedStatement, ResultSet.</p><p>El PreparedStatement es el patrón para inyectar los parámetros en las queries. Hay que escribir código para transformar la información devuelta en forma de ResultSet hacia objetos Java. Las queries tienen parámetros.</p><p>Con JDBC hay que configurar el datasource y obtenerlo, despues establecer una conexión.</p><p>A partir de la conexión crear la PreparedStatement pasando como parámetro la query con comodines. Sobre la PreparedStatement ir asignando cada uno de los valores de las variables de entrada. Después execute de la PreparedStatement. Hacer close sobre la PreparedStatement y después close sobre la Connection.</p><p>Y todo esto no tiene en cuenta el control de excepciones.</p>
+3:45
+16 days ago
+<p>SpringJDBC provee, sobre lo anterior, JdbcTemplate para facilitar las cosas. Es mucho más fácil pasar los parámetros y mucho más fácil mapear el resultado a un objeto Java.</p><p>Se necesitan muchas menos líneas de código para la misma operación. Existen los BeanPropertyRowMapper. Con ellos, si los nombres concuerdan, no es necesario crear un mapper específico para las filas del resultSet. Si no, puede ser necesario crear el Mapper que implemente la I RowMapper&lt;T&gt;:</p><p><br></p><pre class="prettyprint linenums">class TodoMapper implements RowMapper&lt;Todo&gt;{ @Override public Todo mapRow(ResultSet rs, int rowNum) throws SQLException{ Todo todo=new Todo(); todo.setId(rs.getInt("id")); .... return todo; } }</pre>
+5:38
+16 days ago
+<p>Con SpringJDBC, haciendo uso de JdbcTemplate, se accede a métodos para ejecutar queries de forma sencilla y con poco código:</p><pre class="prettyprint linenums">return jdbcTemplate.queryForObject("SELECT * FROM TODO where id=?", id, new TodoMapper()); </pre><p><strong>SpringJDBC </strong>provee una capa sobre JDBC, haciendo uso de conceptos como la JDBCTemplate.</p><p><strong>MyBatis </strong>elimina la necesidad de código para asignar los parámetros y para obtener los resultados. Ofrece conf. por xml o anotaciones sobre los pojos hacia la base de datos.</p><p>Las queries tienen parámetros que coinciden con los atributos de las clases manejadas. Como si se crease una clase para contener los parámetros de cierta query o conjunto que queries con los mismos parámetros.</p>
+89. Step 3 : Introduction to JPA
+0:03
+16 days ago
+<p>Estas tres maneras de acceder a la información de la base de datos (JDBC, SpringJDBC y MyBatis) hacen uso de queries. Es difícil mantener un proyecto si hay que rehacer cosas y leer y entender todas las queries. <strong>JPA </strong>trata de solventar ese problema, el de la mantenibilidad, el de la dependencia con la base de datos concreta, etc.</p><p><br></p>
+3:38
+16 days ago
+<p>JPA permite mapear clases a tablas, haciendo uso de Entities, relaciones, el entity manager para guardar cosas en la base de datos. También ofrece el API Criteria y JPQL que tienen funcionalidad adicional.</p><p>El jpql se puede usar en sustitución del SQL para hacer consultas. Es algo parecido pero más orientado a los objetos entity Java que a las columnas de una tabla de bd.</p><p>Anotaciones de JPA de las más comunes:</p><pre class="prettyprint linenums">@Entity @Table(name="Task") public class Task{ @Id @GeneratedValue private int id; @Column(name="description") private String desc; ... }</pre><p><br></p><p>Se pueden modelar las reaciones entre entities mediante anotaciones como:</p><p><br></p><p>@OneToMany, @ManyToMany, @ManyToOne @OneToOne</p><p><br></p><p>ejemplo:</p><pre class="prettyprint linenums">public class Employee{ ... @ManyToMany private List&lt;Task&gt; tasks; ... }</pre>
+5:03
+16 days ago
+<p>Otro uso interesante, herencia de clases Java que mapean a una unica tabla de base de datos:</p><p>Ejemplo: distintos tipos de empleado (fijo y temporal)</p><p><br></p><pre class="prettyprint linenums">@Entity @Inheritance(strategy=Inheritance.SINGLE_TABLE) @DiscriminatorColumn(name="EMPLOYEE_TYPE") public class Employee{ //Other employee atributes } public class FullTimeEmployee extends Employee{ protected Integer salary; } public class PartTimeEmployee extends Employee{ protected Float hourlyWage; }</pre><p>La columna employee_type de la base de datos, determina del tipo de empleado del que se trata.</p>
+92. Step 5 : Defining a JPA Entity - User
+2:12
+15 days ago
+<p>Creación de project para experimentar. Initializr con dependencias: H2, JPA, WEB.</p><p>Comparación entre Hibernate y JPA. En breve, se puede asumir que JPA es la interfaz e Hibernate es una implementación. JPA define todas las anotaciones. Hibernate es un fw de ORM. JPA define la especificación, es una API: entities, attributes, relaciones, manejo de las entities. Hibernate entiende los mapeos entre objetos y tablas, y garantiza que los datos se leen o guardan en la BD en base a los mapeos. Hibernate ofrece más cosas de las que especifica JPA.</p><p>Para el ejemplo creamos una entity User. JPA necesita que las entities tengan constructor por defecto sin parámetros.</p>
+4:29
+15 days ago
+<p>Para el ejemplo creamos una entity User. JPA necesita que las entities tengan constructor por defecto sin parámetros.</p><p>Para convertir un pojo en una entity: @Entity</p><p><code>import javax.persistence.Entity</code></p><pre class="prettyprint linenums">@Id @GeneratedValue(strategy = GenerationType.AUTO)&lt;-depende de la bd private Integer id;</pre>
+93. Step 6 : Defining a Service to manage the Entity - UserService and EntityManager
+3:10
+15 days ago
+<p>JPA define las anotaciones @<strong>Repository </strong>y @<strong>Transactional</strong>. La primera se usa para dar a ver al contexto de Spring que la clase es un DAO y que ha de estar disponible para inyectar (componente manejado).</p><p>La segunda indica que los métodos del repo están envueltos en transacción, de modo que si la ejecución se rompe en alguno de ellos, las operaciones que se hubieran realizado son anuladas.</p><p><strong>EntityManager</strong>: cuando un pojo se persiste con el EM, empieza a ser gestionado por el PersistenceContext, con lo que está vinculado a la bd mediante su Id, por ejemplo. Solo aquellos cambios que están en el PersistenceContext son trackeados por el EM.</p><p>El campo EntityManager en el DAO se inyecta por DI. Hay que darle la anotación @<strong>PersistenceContext</strong>.</p>
+94. Step 7 : Using a Command Line Runner to save the User to database.
+3:57
+15 days ago
+<p>Para probar la clase UserDaoService, que es tan sencilla como vemos:</p><pre class="prettyprint linenums">@Repository @Transactional public class UserDAOService { @PersistenceContext private EntityManager entityManager; public Integer insert(User user) { entityManager.persist(user); return user.getId(); } }</pre><p>vamos a usar un <strong>CommandLineRunner </strong>de SpringBoot. Este se lanza al inicio de la aplicación. </p><p>Nueva clase UserDaoServiceCommandLineRunner, la creamos nosotros. Debe <strong>implementar&nbsp; </strong>CommandLineRunner, que tiene un método: <strong>run</strong></p><p>Este CommandRunner se va a ejecutar al arrancar el contexto de Spring, al ejecutar la @<strong>SpringBootApplication</strong>.</p>
+95. Step 8 : Magic of Spring Boot and In Memory Database H2
+0:14
+15 days ago
+<p>Para sacar trazas a la consola podemos hacer uso de </p><pre class="prettyprint linenums">private static Logger logger = LoggerFactory.getLogger(UserDaoServiceCommandLineRunner.class);</pre><p>Dando implementación al método run de nuestro CommandLineRunner, de modo que se use el DAO y se inserte un usuario, observamos que realmente el sistema nos informa de que ha persistido un usuario. Lo ha hecho en la bd en memoria H2.</p><p>Para poder acceder a la consola de H2 desde el navegador (localhost:8080/h2-console) hace falta habilitar una opción en <code>applicacion.properties</code>.</p><p>La base de datos H2 se crea en base a los starters que tenemos definidos en el proyecto y a la autoconfiguración de SpringBoot.</p>
+1:46
+15 days ago
+<p>La base de datos in memory H2 es creada al arrancar la aplicación: se crea el schema, se crean las tablas, se pueblan las tablas etc. Y cuando la aplicación se cierra, toda la base de datos desaparece también. Es volátil porque es en memoria. Existen opciones para persistirla en disco, no obstante.</p>
+2:41
+15 days ago
+<p>Para ver en la consola los comandos y queries SQL que se invocan contra la base de datos, otra property:</p><p><code>spring.jpa.show-sql=true</code></p><p>Para poder acceder a la consola H2 desde el navegador, hay que habilitar la property en applicacion.properties:</p><p><code>spring.h2.console.enabled=true</code></p><p>Una vez se tiene acceso, la url de la bd es <code>jdbc:h2:mem:testdb</code></p><p><code>username: sa</code></p><p>Entramos en la consola, conectamos con la base de datos y vemos que, aunque no establecimos un <code>@Table(name="users")</code> en la entity, por defecto ya se establece con el mismo nombre de la entity pero en mayúscula.</p>
+2:51
+15 days ago
+<p>Podemos ver algo de información sobre la bd creada:</p><p><code>SELECT * FROM INFORMATION_SCHEMA.TABLES </code></p><p>La columna TABLE_TYPE = TABLE (por contraposición a SYSTEM_TABLE)</p><p>La columna SQL del registro </p><pre class="prettyprint linenums">CREATE MEMORY TABLE "PUBLIC"."USER"( "ID" INTEGER NOT NULL, "NAME" VARCHAR(255), "ROLE" VARCHAR(255) )</pre>
+8:02
+15 days ago
+<p>Todo lo relacionado con la base de datos en memoria, creación de la base de datos, el schema, las tablas, usuarios de acceso, la conexión, viene dado o autogenerado por spring boot autoconfiguration.</p><p>Podemos ver en la consola más información de todos los pasos ejecutados habilitando más nivel de detalle en el log:</p><p><code>logging.level.org.springframework=debug</code></p><p>En el log ahora se puede ver toda la configuración automática que se ha llevado a cabo en función de los starters y las dependencias del proyecto.</p><p>Por ejemplo, la configuración de la base de datos H2. Al tener tambien Data-JPA configura Hibernate (HibernateEntityManager). También el TransacionManager.</p><p>SpringBoot, en base a todos los jar que encuentra en el classpath, realiza la configuración más adecuada.</p><p>Un uso de las bases de datos in memory es UnitTesting, mocking, etc.</p>
+96. Step 9 : Introduction to Spring Data JPA
+3:27
+15 days ago
+<p>A raíz de haber escrito el código para un DAO service de una entity concreta, User, y en el momento de crear otro servicio para otra entity diferente, se comprueba que el código sería prácticamente igual salvo por la entity sobre la que aplica.</p><p>Este tipo de situación es la que hace pensar en el uso de Java Generics. Spring-Data-JPA lo tiene cubierto.</p><p>Si pensamos en un DAO para operaciones CRUD, todos los DAO de la aplicación serán parecidos.</p><p>Spring Data te habilita a escribir solo las interfaces, y provee las implementaciones dado el genérico indicado en la Interface.</p><p><br></p>
+3:37
+15 days ago
+<p>Es más, las operaciones CRUD más habituales que vienen a la mente, no hace falta ni declararlas, ya vienen OOTB.</p><p>Hay que crear, en este caso, una Interface que extienda de <code>JpaRepository&lt;User, Integer&gt;</code>.</p><p>Están disponibles gran cantidad de métodos para obtener registros, para crear, actualizar, borrar...</p><p>En el caso de la inserción que probamos antes desde un CommandLineRunner, ahora sería como sigue:</p><p><code>User savedUser = userRepo.save(user);</code></p><p>El método save vale para crear y para actualizar. Hay una tabla en la documentación de Spring que explica un convenio de nombres para operaciones de SELECT: por nombres de columnas, por rango de fechas... Los nombres de métodos que siguen el convenio son del estilo <code>FindFirstByFechaAfter(Date date)</code> .</p>
+5:04
+15 days ago
+<p>JpaRepository ofrece multitud de métodos para obtener información de la base de datos en forma de entities mapeadas con las tablas.</p><p>Por ejemplo:</p><p><code>Optional&lt;User&gt; optuser = userRepository.findById(1);</code></p><p>Es un optional porque podría no haber ningún resultado. Mediante el método get() del optional se accede a la entity, pero podría no existir, lo que derivaría en un error si tratamos de acceder a alguno de sus atributos.</p><pre class="prettyprint linenums">Caused by: java.util.NoSuchElementException: No value present at java.util.Optional.get(Unknown Source) ~[na:1.8.0_121]</pre><p> ...</p>
+97. Step 10 : More JPA Repository : findById and findAll
+2:06
+15 days ago
+<pre class="prettyprint linenums">User userRetrieved = userRepo.findById(23).orElse(null); logger.info(userRetrieved != null ? "Se ha encontrado un usuario" : "No existe el usuario"); List&lt;User&gt; users = userRepo.findAll(); logger.info("Usuarios: " + users); </pre><p>salida:</p><p>UserDaoServiceCommandLineRunner&nbsp; : No existe el usuario</p><p>UserDaoServiceCommandLineRunner&nbsp; : Usuarios: [User [id=1, name=Daniel, role=admin]]</p>
+2:33
+15 days ago
+<p>Llega el momento de cambiar el proyecto anterior, el servicio REST de usuarios y posts, para adaptarlo a Spring-Data-Jpa.</p><p>Hacemos tres cosas para empezar: deshabilitar spring-security, y habilitar:</p><pre class="prettyprint linenums">spring.jpa.show-sql=true spring.h2.console.enabled=true</pre><p>Para que application.properties nos asista a la hora de escribir configuraciones, hay que tener instalado Spring Tools en el IDE.</p>
+Section 8:
+Connecting RESTful Web Service to JPA
+100. Step 30 - Creating User Entity and some test data
+4:37
+15 days ago
+<p>Vemos que en el arranque se crea la tabla:</p><p>Hibernate: <code>create table user (id integer not null, birth_date timestamp, name varchar(255), primary key (id))</code> </p><p>Ponemos el archivo sql en resources dentro del proyecto: data.sql</p><p>Insertamos datos en la tabla:</p><pre class="prettyprint linenums">insert into user values (1,sysdate(),'Daniel'); insert into user values (2,sysdate(),'Vero'); insert into user values (3,sysdate(),'Chiquitin'); insert into user values (4,sysdate(),'Rosa'); insert into user values (5,sysdate(),'Jose Luis');</pre><p>Se debe recordar que en el script SQL no se pueden usar comillas dobles.</p>
+101. Step 31 - Updating GET methods on User Resource to use JPA
+1:27
+14 days ago
+<p>La funcionalidad de filtrado, por la que definimos un FilterProvider que contiene un conjunto de filtros, necesita que en la entity se use la anotación @JsonFilter.</p><p>En caso de que se defina un FilterProvider en alguno de los métodos de controller que retornan la entity o algún objeto construido alrededor de la entity anotada, parece que es imprescindible que el mismo filterProvider se defina en todos los endpoints que retornen objetos relacionados con esa misma entity.</p><p>La prueba realizada consiste en haber habilitado filtrado en el método get /users/{id} y después probar el método get /users. Como en el segundo no se programó el FilterProvider, pero en la entity se hace uso de la anotación @JsonFilter, se produce un error 500:</p><pre class="prettyprint linenums">{ "message": "...Cannot resolve PropertyFilter with id 'userFilter*ID*NAME' ; no FilterProvider configured "timestamp": "2020-04-09 10:28:25", "details": "uri=/users" }</pre>
+1:38
+14 days ago
+<p>No es necesario, aunque en el video el instructor lo usa, anotar la interface con @Repository, pues Spring ya 'sabe' que una interfaz que extiende JpaRepository ES un @Repository.</p><p>Otro apunte al respecto es que las anotaciones @Repository, @Service, @Component, etc suelen estar en implementaciones, no en interfaces.</p>
+102. Step 32 - Updating POST and DELETE methods on User Resource to use JPA
+3:02
+14 days ago
+<p>Para borrar recursos existe tanto el método delete(User) como el deleteById(id).</p><p>A la hora de ir a hacer save de un usuario, con userRepo.save(user) a mi me da error de ConstraintViolationException por el id. Yo lo envié sin valor asignado. Al instructor también le da el mismo error. La explicacion, tiene que ver, como era de esperar, con @GeneratedValue. En el curso no tenía más atributos esa anotación. Yo, personalmente, tenía :</p><p><code>strategy=GenerationType.AUTO. </code></p><p>Hibernate genera una Sequence empezando por 1 (PersistenceContext). Esto no tiene mucho sentido para mi, pues Hibernate debería tener en cuenta la base de datos.</p><p>Como habíamos insertado unos datos en el arranque mediante un script <code>data.sql</code> insertando 5 usuarios, el primero de los cuales con id=1, se ha producido la colisión.</p><p>Parece lógico pensar en configurar Hibernate para que la sequence empiece en un valor adecuado, en vez de en 1, o cambiar los ids en el script.</p>
+103. Step 33 - Creating Post Entity and Many to One Relationship with User Entity
+3:15
+14 days ago
+<p>En las relaciones siempre podemos establecer el atributo fetch, para que solo se obtengan las entities relacionadas en caso de que se acceda a la propiedad que contiene esa información.</p><p>Si tenemos una relación definida bilateralmente, para evitar un bucle infinito de relaciones, uno de los dos lados de la relación tiene que tener <strong>fetch=FetchType.LAZY</strong>.</p><pre class="prettyprint linenums">@ManyToOne(fetch=FetchType.LAZY) private User user; </pre><p>En las relaciones @<strong>OneToMany</strong>, para evitar tener una columna con la relación en ambas tablas, usamos el atributo <strong>mappedBy </strong>que especifica qué <strong>--&gt;campo de la otra entity&lt;--</strong> contiene la relación.</p><pre class="prettyprint linenums">@OneToMany(mappedBy = "user") List&lt;Post&gt; post;</pre>
+Section 9:
+RESTful Web Services - Best Practices
+106. Step 36 - Richardson Maturity Model
+0:07
+14 days ago
+<p>Maturity Model de Richardson. Como de <strong>RESTful </strong>es tu servicio REST:</p><p><strong>Nivel 0:</strong> exponer servicios SOAP al estilo REST (http pero con endpoints indicando nombres de métodos, o con el verbo http equivocado como GET http://server/deletePost)</p><p>Como que no se exponen recursos, sino más bien actions. Retrieve esto, delete lo otro...etc.</p><p><strong>Nivel 1:</strong> Se exponen recursos con las URI adecuadas, pero no se hace un buen uso de los métodos http.</p><p><strong>Nivel 2:</strong> Como el nivel 1 pero con los métodos HTTP adecuados.</p><p><strong>Nivel 3:</strong> Nivel 2 + <strong>HATEOAS</strong>. Datos más siguientes posibles acciones (uris para like, unlike, comment).</p>
+107. Step 37 - RESTful Web Services - Best Practices
+0:13
+14 days ago
+<p>Buenas prácticas de servicios REST:</p><ol><li><p><strong>Consumer </strong>first: buena <strong>documentación </strong>(swagger), <strong>hateoas</strong>, buen nombrado de los <strong>recursos</strong>.</p></li><li><p>Hacer buen uso de lo que ofrece <strong>HTTP</strong>: métodos, códigos de respuesta correctos (201, 404, 400, etc).</p></li><li><p>No enviar información <strong>sensible </strong>en las URIs.</p></li><li><p>Para los nombres de recursos, usar mejor <strong>plurales </strong>(/users/1 en vez de /user/1)</p></li><li><p>Usar <strong>nombres </strong>para los recursos, no verbos.</p></li><li><p>Cuando no sea posible usar nombres, seguir siempre un criterio <strong>uniforme</strong>.</p></li></ol>
+Section 10:
+Congratulations
+109. Congratulations
+0:01
+14 days ago
+<p>Learning Path 01 - Spring &amp; Spring Boot Developer</p><p>Learning Path 02 - Full Stack with React &amp; Angular</p><p>Learning Path 03 - Microservices - Docker &amp; Kubernetes</p><p>Learning Path 04 - Cloud with AWS, Azure &amp; PCF</p><p>Learning Path 05 - AWS with Docker &amp; Kubernetes</p>

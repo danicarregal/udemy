@@ -1,0 +1,32 @@
+Arreglos:
+son todos del mismo tipo, primitivos o objetos de clases.
+
+Son vectores, se accede a través del índice. Empieza en 0. 
+
+int[] c = new int[6];
+Esto inicializa en memoria con todo a ceros.
+
+int[] c = {1,23,4,31,3};
+
+El índice tiene que ser un entero o un valor casteable a un entero. 
+
+Multidimensionales: dos indices o más. Cada elemento de un arreglo puede ser un arreglo.
+int[][] arregloMulti = {{1,2},{4,3}};
+
+arreglMulti[0][0] primer elemento.
+
+Los arreglos tienen la propiedad length con su tamaño, de esa manera se pueden recorrer con bucles.
+
+Argumentos de longitud variable: se indica el tipo y se pone un nombre seguido de tres puntos.
+O se indica el tipo seguido de tres puntos y se indica el nombre, las dos formas son válidas.
+Solo puede haber un argumento de longitud variable y debe ser el último.
+
+Se recorren con for int numero:numeros, son tratados como un arreglo.
+
+Para compilar una clase java: javac HolaMundo.java
+y para ejecutarlo java HolaMundo arg1 arg2 ... (->seguido de la lista de parámetros).
+En Netbeans: dentro del proyecto, properties, Run, y dentro de run rellenamos en el modal el campo Arguments.
+
+
+
+

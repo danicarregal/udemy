@@ -1,0 +1,25 @@
+{
+  "groups": [{
+    "name": "basic",
+    "type": "com.in28minutes.springboot.configuration.BasicConfiguration",
+    "sourceType": "com.in28minutes.springboot.configuration.BasicConfiguration"
+  }],
+  "properties": [
+    {
+      "name": "basic.message",
+      "type": "java.lang.String",
+      "sourceType": "com.in28minutes.springboot.configuration.BasicConfiguration"
+    },
+    {
+      "name": "basic.number",
+      "type": "java.lang.Integer",
+      "sourceType": "com.in28minutes.springboot.configuration.BasicConfiguration"
+    },
+    {
+      "name": "basic.value",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.in28minutes.springboot.configuration.BasicConfiguration"
+    }
+  ],
+  "hints": []
+}

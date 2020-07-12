@@ -1,0 +1,1183 @@
+Spring Boot Microservices and Spring Cloud
+
+www.appsdeveloperblog.com/restful-web-services
+
+Eureka: service discovery.
+Users, Account Manager->password, email verification.
+
+Los servicios se registran en Eureka al levantarse. 
+
+API Gateway: Zuul. Sirve como entry point para las http requests. Zuul puede hacer de load balancer y levantar instancias de los microservicios si crece la demanda de peticiones.
+
+H2, MySql.
+
+Step 4
+
+Spring Data Jpa, User Resgistration en el userv de Users. Spring Security. Podemos entonces permitir peticiones http en este microservicio que solamente vengan a través del api gateway. 
+User Login -> Users userv. Posteriormente crearemos un userv especifico para el registro y para el login. JWT --> token. Json Web Token.
+El token se utiliza después en cada petición http enviada al servicio que requiera user auth. Esta faceta del sistema la realiza el api gateway, ya que es el punto central por el que pasa tod.
+Hasta aquí habríamos definido una arquitectura de microservicios sencilla. El siguiente concepto que se puede adoptar es del de centralizar la configuración y habilitar un servicio de configuración.
+Como crear un spring cloud config server? Va contra un Git Repo.  Spring Cloud Bus.
+ 
+What is a MicroService. Software Development technique variuante de SOA arquitecture que estructura una aplicación como una colección de servicios poc acoplados.
+En una arquitectura de userv, los servicios son pequeños y con propósitos muy definidos. Esto mejora la modularidad, hace la aplicación más fácil de entender, desarrollar, testar y más resistente a la erosión.
+Paraleliza el desarrollo permitiendo que distintos equipos trabajen sobre distintos userv.
+
+Los userv son web services con responsibilidad reducida y definida, configurado en cloud y es fácilmente scalable.
+
+Monoliticas: muchos controllers que hacen uso de logica de negocio. Microserv: tenemos muchos userv pequeños, cada uno tiene un unico dominio: Users, Addresses, Search... pueden estar en distintos lenguajes y tecnologías. Desacoplo entre proyectos. Independientemente desplegables y en máquinas distintas. HAy que proveer una forma de comunicación entre los userv, discovery, registration... HTTP.
+Stand alone application. Load Balancer, Config Server, Service Discovery... son stand alone. Luego están los userv de Usuarios, PRoductos, etc. Se comunican entre ellos con http. El concepto de microservicio va ligado a que se configuran para trabajar en Cloud.
+
+step 5: Sample userv arquitecture
+
+Veremos una arquitectura sample que es buena para proyectos pequeños y de tamaño medio.
+Como se aprecia en la imagen, el sistema está compuesto por un numero de microservicios con propósitos muy definidos, procesando cada uno un solo dominio, o incluso una tarea.
+UserUserv-> dominio User. Recupera un UserDetails, o registra un nuevo User. Tiene incluso su propia base de datos dedicada solo a eso. En las monolith suele haber una base de datos para todo.
+
+PhotosService: setear fotos que el usuarios sube y después devolver metadata sobre la foto. PhotProcessingUserv, escala la foto original a un conjunto de tamaños menores (preview, thumbnail, etc) y después las guarda en Amazon Storage S3.
+AlbumsUserv, OrdersUServ, NotificationsUServ, que coge de una cola los eventos. Los userv se comunican entre ellos mediante http. Esto es lógico si pensamos que son servicios web de arquitectura REST.
+O, para una arquitectura más escalable (con mejor capacidad para crecer), los servicios pueden poner sus peticiones en una cola MQ, de modo que el NotificationsUserv los procese cogiéndolos de la cola.
+De esta forma, las distintas instancias de NotificationUserv, irian consumiendo de la cola. De la misma manera, el usuario que quiere ver su lista de fotos produce que el userv de usuarios envíe una petición al userv de fotos, que tiene su propia base de datos.
+
+El siguiente elemento de la arquitectura de microservicios es el discovery service. Cuando el cliente quiere enviar una petición al users userv tiene que conocer el socket del servicio, además de que puede haber múltiples instancias en distintos puertos. Cuando los userv hacen el startup, se registran en el discovery service, y entonces el cliente puede enviar una petición al serv de usuarios a través del API gateway. Este conoce la ubicación de todos ellos a través del discovery service. En el diagrama, aunque no se incluye para no ser demasiado profuso, debería haber una flecha más entre cada userv y el discovery userv.
+El Gateway es el single entry point. Con el load balancer las peticiones irán a alguna de las instancias levantadas, repartiendo la carga. Finalmente está el config server. Centraliza la configuación de todos los userv y propicia que cuando se hace push de algún cambio de algún parámetro de configuración se reinicien todos los userv asociados para coger el cambio. De otra forma sería un ejercicio tedioso ir uno por uno parando y levantando.
+
+Step 7: postman overview
+Collections vale para guargar peticiones por nombre etc. Si usas postman con una cuenta puedes tener guardadas peticiones en colecciones. Postman echo vienen con el postman. En una determinada petición en postman, existe una ventana al pulsar un enlace que dice 'Code'. Se ve un comando de línea de comandos de curl, php, y otros lenguajes, jQuery, Node...!!!. LA PERA LIMONERA!!!
+Lo de curl vale para ejecutar desde un terminal.
+En una petición post puedes mandar parámetros con valores, puedes mandar json, puedes mandar texto plano...
+Postman Console: más información sobre el proceso de la petición y la respuesta. Es parecido a la pestaña de developer en chrome, puedes ver una entry para la petición y si clicas puedes ver las cabeceras de la petición y la respuesta, el body, 
+
+Step 8: URLs & URIs
+Le llama URL a la parte con el protocolo, las ws y el nombre de dominio, URI al recurso y query string a lo que va despues de ?
+http://www.yourWebSiteAddress.com/api/users/?start=1&limit=50
+Se explica el estilo REST para las URIs, que no contiene nombres de acciones sino nombres de recurso, como /users en vez de /RegisterUser.
+Para una petición GET, tradicionalmente los parámetros iban en query string, mientras que en Restful style van como path variable. Ejemplo:
+GET /GetUserDetailsServlet?userId=1 vs GET /users/1
+Otra diferencia es usar el verbo http adecuado  GET /DeleteUserServlet... vs DELETE /users/1
+POST /UpdateUserDetailsSerlvet {id:1, name:X} vs PUT /users/1 {name:X}
+
+Collections:
+traditional: GET /GetAllUsersServlet | GET /GetUserDetailsServlet?userId=1 //no se parecen
+REST: GET /users | GET /users/1 //es la misma
+
+Longer
+traditional: /GetMessageComments?userId=1&messageId=5
+Restful: GET /users/1/messages/5 // mas legible
+
+RESTful es más fácil y más legible.
+
+Nombres en vez de acciones, plurales, más predecible.
+
+Step 9: HTTP Methods
+
+Traditional: 
+POST: Create User /RegisterUserServlet            
+GET: read user details /GetUserDetailsServlet?userId=1
+POST: update user details /UpdateUserDetailsServlet
+GET: delete user details /DeleteUserDetails?userId=1
+
+Restful: la operación la marca el método HTTP
+POST /users 
+GET /users/1 
+PUT  /users/1 
+DELETE  /users/1
+
+Step 10: content negotiation, headers Accept & Content type
+Si hacemos un POST y en el body ponemos raw json ya crea él la cabecera Content type: application/json. De todas maneras, no está de más saber que es necesaria en la petición para que en la parte servidora se conozca que hay que hacer la transformación de json (en este caso) a un objeto java.
+Podría ser xml. Tab headers: content-type tiene autocomplete. Después, la respuesta del service también puede ser expresada por distintas representaciones: json, text, xml, html... Esto se especifica en la cabecera Accept, de modo que el servicio sabe así el formato requerido. Puede haber que incluir dependencias al proyecto, por ejemplo en caso de spring boot el xml no viene OOTB. En caso de solicitar un formato no soportado se obtendría una respuesta con status 406 not acceptable.
+
+Step 11: java installation
+from oracle, nothing fancy here.
+
+Section: RESTful web services with SpringBoot
+
+group: reverse domain name
+artifact: project name
+dependencias: web, jta (!)
+Crearemos @RestController @RequestMapping("/users") esta será la parte comunicación
+
+Crearemos 4 métodos para soportar peticiones
+@GetMapping, @PutMapping, @DeleteMapping
+
+Lectura de path variables, en el mapping van entre corchetes
+
+@GetMapping("/{id}")
+public String getUser(@PathVariable String id){
+ return "hello " +id;
+}
+
+@RequestParam(value="page") int page
+
+@RequestParam(value="limit" defaultValue="50") int limit //Esto hace que sea opcional, pues ya hay un valor por defecto. Si no se configura un valor por defecto y no se recibe el parámetro se produce un error. Realmente también existe el atributo required en la anotación @RequestParam, de modo que si se establece a false ya no serían parámetros requeridos.
+Lo de required No funciona bien con primitivos, pues tienen que recibir un valor asignado y no puede ser null o fallaría "it cannot be translated into null". Error 500. Con Strings está bien lo de required solo.
+
+Para devolver un objeto desde el servicio, por ejemplo un UserDetails (nombre, apellidos, etc.)
+Creamos una clase de dominio que representa un usuario. Paquete model:
+firstName
+lastName
+email
+userId
+
+Ponemos en vez de retornar un String que devuelva un objeto de esa clase en el @GetMapping. En json es inmediato, pero para xml hay que añadir dependencia xml. Default is json.
+Para probar a recibir xml, en la petición usamos la cabecera Accept: application/xml. Falla: 406 not acceptable.
+Hace falta poner en la anotación del mapping @GetMapping(path="/{userId}" produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+pom: maven repository, buscar jackson data format xml 2.9.6 (no ponemos el numero de versión, ya lo escoge el parent pom). Así ya va.
+
+Step 24: Para responder con un http status concreto. 
+
+Devolver una ResponseEntity en lugar de un bean de dominio. Tiene distintos contructoress y puede coger distintos parámetros, como http status, cabeceras, etc.
+
+public ResponseEntity<UserDetails> getUser(@PathVariable String userId){
+		
+		return new ResponseEntity<UserDetails>(HttpStatus.OK);
+}
+
+Viendo el código de la clase ResponseEntity podemos ver las posibilidades que ofrece para la respuesta del servicio, por ejemplo:
+
+/**
+ * Create a new {@code ResponseEntity} with the given status code, and no body nor headers.
+ * @param statusCode the status code
+ */
+public ResponseEntity(HttpStatus statusCode) {
+	super();
+	this.statusCode = statusCode;
+}
+
+/**
+ * Create a new {@code ResponseEntity} with the given body and status code, and no headers.
+ * @param body the entity body
+ * @param statusCode the status code
+ */
+public ResponseEntity(T body, HttpStatus statusCode) {
+	super(body);
+	this.statusCode = statusCode;
+}
+
+/**
+ * Create a new {@code HttpEntity} with the given headers and status code, and no body.
+ * @param headers the entity headers
+ * @param statusCode the status code
+ */
+public ResponseEntity(MultiValueMap<String, String> headers, HttpStatus statusCode) {
+	super(headers);
+	this.statusCode = statusCode;
+}
+
+Buscando en la wiki sobre los http status podemos ver que exite un número de ellos, y que están agrupados por centena, porque tienen su propio significado.
+Por ejemplo, que una petición no pase la politica de validación que se establezca hará pensar a priori en un 400 Bad request, pero puede haber un código más concreto o más específico.
+O si hace falta auth, se puede devolver 401 unauthorized. En ese caso no mandamos el UserDetail, o sea que hacemos uso de otro constructor.
+
+Step 25: recuperar el body de la petición post como un bean.
+@RequestBody User user <-- así. json payload
+
+Se crea una clase específica para la recepción del objeto de la request, como un ModelAttribute que venga de un formulario. Le gustan los nombres de paquete como ui.controller o ui.model.request. Todo lo que venga de peticiones lo pone en este paquete.
+UserDetailModelRequest le llama a la clase: firstname, lastname, email, password. Aunque json por defecto funciona sin especificar el mediaType en el @PostMapping, si por ejemplo queremos ser capaces de recibir json o xml tenemos que usar el atributo consumes={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE} en la anotación @PostMapping.
+
+Step 26: validation
+Bean validation constraints, hibernate validation. Esta incluido con la dependencia starter-web.
+-Usar @Valid antes de @RequestBody javx.validation
+
+Y en el bean model que viene de la request, sobre cada atributo que se quiera validar, hacemos uso de alguna de las anotaciones de validación que provee hibernate validation.
+@NotNull @Email... etc. En cada anotación se puede poner un atributo (de la anotación) para retornar un custom message en caso de error. 
+
+@NotNull(message="first name cannot be empty")
+
+Para password usamos otra, @Size(min=8, max=16, message="password size must be between 8 and 16")
+@Email
+private String email;
+
+Si tenemos un servicio que devuelve un ResponseEntity, en caso de producirse errores de validación estos se pueden ver listados en la colección 'errors' de la ResponseEntity, con sus custom messages si fueron definidos.
+
+Step 27: store users temporarily: java map.
+Aunque esto está mil veces visto, alguna cosa nueva siempre se aprende :)
+
+UUID.randomUUID().toString() para generar una clave String aleatoria. Se crea un hashmap y se modifican los métodos get y create para trabajar sobre el hashmap.
+Se devuelve NO_CONTENT cuando se quiere recuperar un elemento por clave pero no existe.
+
+Step 28: handle PUT request
+Se amplía el servicio para manejar la petición PUT de actualización de un usuario. Solo se permitirá cambiar el nombre y el apellido,y para cambiar password o email se crearán otros endpoints.
+Enviar json al que le fate la información de password y email haría fallar la validación establecida en el punto anterior mediante anotaciones en los atributos de la clase UserDetailsModelRequest. Para seguir usando validación se define, pues, otra clase ModelRequest distinta: UpdateUserDetailsModelRequest.
+Se coge del map por userId (path variable), se actualizan sus campos de nombre y apellido por el json recibido, y se asigna de nuevo al mapa (yo diría que no es necesario este paso). Aunque podría devolver un ResponseEntity, devuelve un bean UserRest.
+
+Step 29: handle delete request.
+Tras hacer remove del map por la clave userId, retorna un new ResponseEntity().noContent().build(); //patrón builder que devuelve un ResponseEntity<Void>
+
+Step 30: handle exception
+Si elevamos una excepcion en algun metodo del controller spring boot devuelve un ResponseEntity bien formado pero con un mensaje de error 500 genérico. Podemos elegir la estructura de la información devuelta por nuestro servicio creando un pojo al efecto.
+Luego creamos una clase:
+
+-creamos paquete Exceptions
+-extiende ResponseEntityExceptionHandler
+-anotación @ControllerAdvice en la clase para que esta clase capte los eventos de exception que se produzcan en cualquier @RestController del servicio. Si no tiene la anotación esta clase no será capaz de escuchar las excepciones de los controllers.
+-métodos anotados con @ExceptionHandler(value={Exception.class, ...}) que devuelven un new ResponseEntity<ClaseAdhoc.class> (excep (body), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+@ExceptionHandler(value={Exception.class})
+public ResponseEntity<Object> handleAnyException(Exception ex, WebRequest request){
+	return new ResponseEntity<>(ex, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR); 
+}
+	
+Al devolver la exception como body del ResponseEntity tenemos toda la información sobre la exception, el stacktrace. Esto no es lo que habitualmente querremos, de ahi que se cree un pojo con la información relevante nada más.
+
+Step 31: pojo para exception
+Creamos la custom error class. Paquete ui.model.response (ya teníamos el ui.model.request).
+public class ErrorMessage{
+ private Date timestamp;
+ private String message;
+}
+Entonces, en el @ExceptionHandler, en vez de colocar como body de la ResponseEntity la exception, colocamos una instancia de nuestro ErrorMessage.class.
+
+En este caso crea un constructor con los dos atributos, y para el de message lo hace con ex.getLocalizedMessage() para que vaya traducido al locale de la petición.
+El localized message podría ser null, o sea que mejor lo comprobamos antes y si no existe asignamos un mensaje default, como ex.getMessage()
+
+Step 32: handle a specific exception
+Sería crear métodos para todas las excepciones que se quieran procesar por separado teniendo en cuenta que hay que cambiar la anotación @ExceptionHandler poniendo en su atributo value la colección de excepciones que vamos a procesar en el método.
+Puede haber distintos niveles de exception, por ejemplo NullPointerException extiende de RuntimeException. Tenerlo en cuenta a la hora de definir @ExceptionHandlers.
+
+Step 33: custom exceptions
+Creamos una UserServiceException que extienda de RuntimeException. Creamos constructor con mensaje. Para probar, la elevamos en un método del controller. Para recogerla, creamos método @ExceptionHandler en el @ControllerAdvice.
+Podemos tener una lógica de negocio para ese caso concreto, y no tiene porque ser igual al de otras excepciones. Podemos coger más de un tipo de excepcion en un solo método.
+
+Step 35: Dependency Injection, service layer class
+bajo acoplamiento, orientación a interfaces, @Component, @Service, @Bean, @Repository, @Bean, @Autowired.
+
+Step 36: constructor based Discovery
+
+Step 37: Run Service As Standalone
+ejecutar la apliación desde la línea de comandos sin la ayuda del IDE.
+Tenemos que buscar la localización en el sistema de archivos de nuestro proyecto. Desde el terminal vamos al directorio del proyecto. 
+mvn install -> hace la compilación y genera un ejecutable. Dentro de la carpeta del proyecto habrá una carpeta 'target' que contiene el jar ejecutable. Va a tener el nombre que hayamos asignado al proyecto seguido de la versión, y con extensión jar.
+java -jar nombre_del_jar
+Esto arranca el tomcat que levanta el servicio. Para pararlo, en el mismo terminal hacemos control+c. Esto para el tomcat.
+Si listamos el contenido del directorio 'target' hay dos archivos. Si hacemos mvn clean, borra el target directory. Podemos volver a hacer mvn install y regenera el directorio con los dos archivos dentro.
+
+Step 38: Eureka Discovery Server (tambien llamado Spring Cloud Netflix Eureka).
+Supongamos que tenemos una aplicación móvil que es la aplicación cliente, y que quiere consumir el userv de Usuarios. Podría pensarse en hardcodear la dirección del userv en el cliente, pero eso no escala bien. Si se tienen varias instancias levantadas del userv de usuarios, al arrancar se registran en Eureka, de modo que luego Eureka conoce los puertos en los que están disponibles las instancias.
+Puede haber un repartidor de carga entre la aplicación cliente y los userv. En este caso LB conoce el socket de todas las instancias para redirigir el flujo repartiendo la carga entre ellas.
+
+Step 39: levantar Eureka Discovery Service
+Creamos proyecto SpringBoot, con name PhotoDiscoveryService. Dependencias: Eureka Discovery y Server.
+En el pom las vemos: eureka client y eureka server. En la clase principal, o sea la que tiene la anotación @SpringBootApplication, tenemos que añadir a mayores la anotación @EnableEurekaServer.
+Abrimos application properties, ponemos las siguientes:
+
+server.port=8010
+spring.applicacion.name=discoveryservice
+eureka.client.registerWithEureka=false
+eureka.client.fetchRegistry=false
+eureka.client.serviceUrl.defaultZone = http://localhost:8010/eureka
+
+Step 40: Users Userv
+En las siguientes secciones se verá como conformar el servicio de usuarios siguiendo la arquitectura mostrada en el siguiente gráfico.
+
+Step 41: Creando el user de users
+springboot starter project con dependencias Eureka Discovery, DevTools y Web (es un rest)
+Para que este user sea cliente de Eureka hay que hacer algunas configuraciones. En la @SpringBootApplication hay que usar @EnableDiscoveryClient.
+En application properties tenemos que configurar las siguientes propiedades:
+
+server.port=0 //para que sea aleatorio y podamos tener muchas instancias si fuera necesario
+spring.application.name=users-ws
+eureka.client.serviceUrl.defaultZone= http://localhost:8010/eureka //la dirección del servidor discovery
+spring-devtools.restart.enabled= true //habilita el restart automático cuando se produce algún cambio de código
+
+Cremos un @RestController con un endpoint @GetMapping("/users/status/check"). Ahora ya podemos levantar primero el servicio eureka discovery, y después el servicio de usuarios. Tiene que se en ese orden, para que el servicio de usuarios se pueda registrar en el arranque con el servicio de discovery.
+
+Después de arrancar el discovery service, arrancamos el usersservice y vemos en el log:
+Discovery Client initialized at timestamp 1593213154784 with initial instances count: 0
+Registering application USERS-WS with eureka with status UP
+Saw local status change event StatusChangeEvent [timestamp=1593213154787, current=UP, previous=STARTING]
+DiscoveryClient_USERS-WS/localhost:users-ws:0: registering service...
+DiscoveryClient_USERS-WS/localhost:users-ws:0 - registration status: 204
+Cannot determine local hostname
+Started PhotoAppApiUsersApplicat
+
+Vemos en el eureka dash el servicio registrado. Tiene un enlace esa entrada hacia el actuator de ese servicio /actuator/info. Hay que haberlo habilitado para ver algo.
+Pero al acceder a /users/status/check (endpoint que sí hemos creado) obtenemos http://localhost:51092/users/status/check --> working
+
+Step 46: account manager microservice
+
+Se crea un nuevo microservicio de gestion de cuentas, que servirá para password reset y email verification. Podrían hacerse dos servicios pero de momento lo vemos en uno. Además, lo primero será simplemente crear el microservicio y meterlo en la arquitectura que hemos venido definiendo, a ver como se comporta en presencia del userv de usuarios y con respecto al discovery service.
+
+Step 49: Zuul Api Gateway
+En base a la carga se levantan una o más instancias de cada miscroserv, que al arrancar se registran en Eureka. Cuando un cliente quiere hacer una petición al servicio de usuarios puede haber varias instancias en distintos puertos, y eso lo conoce Eureka, que los tiene en una tabla. Las peticiones se balancean entre las instancias por un balanceador, que gracias a Eureka puede saber donde encontrar las instancias.
+Ribbon load balancer, ditribuye las peticiones. Con esta arquitectura necesitamos tener un punto único de acceso (para no tener multiples direcciónes al servicio de usuarios), un gateway llamado Zuul por el que pasan todas las peticiones.
+
+Zuul API Gateway tiene Ribbon incluido (built-in). Hay que añadir este elemento a la arquitectura, y será el punto de entrada al sistema. Zuul consulta con Eureka las direcciones de los demás elementos.
+En Zuul podemos habilitar la segurada con spring security. Routing + auth. Se hace auth con tokens (JWT Json Web Token, Oauth).
+
+Step 50: creando proyecto para Zuul Gateway en el sistema de PhotosApp.
+Se crea un userv con las dependencias vistas hasta ahora: Eureka client, DevTools, Web y Zuul.
+Como en los casos anteriores, hay que usar @EnableEurekaClient y además @EnableZuulProxy. Cuando tenemos los 4 userv y queremos arrancar el sistema, Zuul es el último, pues deben estar registrados los otros en Eureka.
+Si accedemos al dash de eureka vemos una tabla con todos los servicios activos: users, accounts y zuul, que lo hemos configurado en el puerto 8011.
+Para acceder a un servicio a través de Zuul, hay que apuntar a la URL de Zuul más el nombre del servicio y la path al recurso: http://localhost:8011/users-ws/status/check (por ejemplo)
+
+Step 52: load Balancer
+
+Se puede definir Zuul como un router y un load balancer al mismo tiempo. Si tuvieramos más de una instancia del mismo userv, al recibirse múltiples peticiones al servicio Zuul con Ribbon las repartiría de forma equitativa.
+Se puede hacer una prueba sencilla, levantar varias instancias de un userv configurado para recibir un puerto aleatorio, y hacer varias peticiones al userv por nombre a través de Zuul.
+Para tener varias instancias levantadas del userv es necesario cambiar la configuración un poco, para que no se pise el identificador de la instancia, pues si no siempre estará registrada en Eureka solo la última instancia.
+Para solucionar esto hay que configurar una propiedad más en application.properties: 
+
+eureka.instance.instance-id:${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+La segunda parte: ${spring.application.instance_id:${random.value}} <--OR (parámetro por línea de comandos, id aleatorio generado)
+
+nos permite o bien recibir un 'palabro' aleatorio para concatenar al nombre del servicio, o bien coge lo que se haya puesto por línea de comandos al invocar el startup de una nueva instancia.
+
+Con el portnumer tambien podemos hacer algo parecido, pasar el parámetro por línea de comandos al arranque o tener un valor por defecto.
+server.port=${PORT:0} <-o parámetro PORT con -Dspring-boot.run.arguments=--PORT=8999 
+
+Para arrancar desde linea de comandos lo hacemos con 
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance_id=daniel,--server.port=8999
+
+Step 54: trying how load balancer works
+Cambiamos el controller para que pinte en qué puerto se está recibiendo la petición :)
+
+http://desktop-8p307gs:8011/users-ws/users/status/check
+
+working in port 49949
+working in port 49950
+working in port 49946
+
+@GetMapping("/status/check")
+public String status(HttpServletRequest request) {
+	return "working in port " + request.getRemotePort();
+}
+
+El instructor lo hace de otra forma, lo coge del environment.
+
+@Autowired
+private Environment env --> en el @GetMapping -método: env.getProperty("local.server.port");
+
+
+Step 55: H2
+usuario sa
+jdbc url jdbc:h2:mem:test:testdb
+
+localhost:8888/mobile-app-ws/h2-console/login.jsp
+te permite conectarte a la base de datos que quieras, poniendo url, usuario y password. Puede ser una herrmienta util. La H2 embedded es solo una de las muchas opciones.
+
+configuración 
+
+spring.h2.console.enabled=true //permite acceder a la consola h2 desde el browser. El H2 tiene un pequeño firewall integrado. Para permitir peticiones a la base de datos solo a traves de Zuul, vamos a configurarlo:
+spring.h2.console.web-allow-others=true
+
+accediendo a la consola h2 del servicio de usuarios a través de Zuul:
+http://desktop-8p307gs:52912/h2-console/login.jsp?jsessionid=c47d6965bdd4fe2efa0fb313a456224a
+
+En saved settings podemos tener multiples bases de datos desde las que elegir.
+
+Step 60: Creando el user usuarios
+
+-Creamos el CreateUserRequestModel
+-Ponemos validaciones a los campos con hibernate.validation
+-Creamos @PostMapping para registrar un usuario
+-El @RequestBody de tipo CreateUserRequestModel se anota con @Valid
+
+Step 62: capas de la aplicación
+
+Vemos capa presentación (controller) que recibe objetos de tipo XXRequestModel: CreateUserRequestModel.
+El controller hace uso de logica de negocio (capa de servicio) e intercambia con esta capa la información en forma de DTO para los que habrá un converter o mapper desde los objetos de la capa de presentacion.
+La capa de servicio con la capa de persistencia (o de datos) también intercambia la información en forma de DTO que pueden ser mapeados a Entities. Y esta capa habla con la BD mediante un ORM o JDBC.
+DTO es Data Transfer Object.
+
+El instructor dice que para grandes monolitos la arquitectura en varias capas puede ser conveniente, pero que para userv pequeños no siempre lo es, y que se permite que la capa de presentación haga uso de los objetos de la capa de datos directamente.
+
+Step 63: service layer
+
+Empieza por crear la interface UsersService:
+
+public UserDTO createUser(UserDTO user);
+
+Se crea una clase con la implementación (para el userService) en el mismo paquete que la interfaz, lo justifica en que se trata de un microservicio.
+En cuanto al DTO, creamos un paquete shared y dentro la clase DTO. Tiene que tener los mismos campos que el requestModel.
+
+Incluimos en el DTO un campo para el encripted password, pues para Spring Security es útil. Si seguimos el patrón DTO entonces tenemos que hacer la clase implement Serializable
+
+Step 65: UUID
+Vamos a trabajar con un id alfanumérico además del que genera la bd, para identificar unívocamente a los usuarios. No es un buen patrón usar el id numérico para operaciones CRUD, pues por ejemplo si podemos borrar el 1 podemos borrar el 2 etc.
+Si tenemos un alfanumérico aleatorio es más seguro para operaciones como por ejemplo delete. ¿Como lo generamos?
+--> UUID.randonUUID().toString(); // lo usamos en el setter de id al crear nuevo usuario.
+
+Step 66: Spring JPA
+Para persistir los userDetails debemos proteger la contraseña, y no guardarla en texto plano. 
+Añadimos el starter-data-jpa
+
+Step 67: creando la entity
+Creamos el paquete data. Creamos una clase UserEntity que implementa serializable. cogemos los atributos del DTO, serán los mismos y además el id autoincremental de la base de datos.
+Hay que anotar la clase como @Entity, y el campo id con @Id. Le ponemos @Table(name="users"), aunque si el nombre es el mismo no haría falta. Vemos el resto de anotaciones directamente en el codigo de la clase.
+
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "users")
+public class UserEntity implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.AUTO)
+private Integer id;
+
+@Column(nullable = false, unique = true)
+private String uid;
+
+@Column(nullable = false, length = 50)
+private String firstName;
+
+@Column(nullable = false, length = 50)
+private String lastName;
+
+@Column(nullable = false, unique = true)
+private String encPassword;
+
+@Column(nullable = false, length = 120, unique = true)
+private String email;
+
+
+Step 68: Spring Data Jpa Repository
+
+En el mismo package que la entity creamos el repo interface (la implementación la pone el fw, no la tenemos que hacer nosotros). Simplemente declarando esta interfaz ya la podemos inyectar donde queramos con @Autowired.
+
+public interface UsersRepository extends CrudRepository<Integer, UserEntity> {
+//con esto nos evitamos todo el código de hibernate o de jdbc
+}
+
+En vez de crear un DataAccessObject creamos esta interface. 
+
+Step 69 Save user details in db
+
+Vamos a usar una librería que se llama model mapper para pasar de entity a dto y viceversa. En maven repo la buscamos y cogemos el xml para el pom.
+<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+<dependency>
+    <groupId>org.modelmapper</groupId>
+    <artifactId>modelmapper</artifactId>
+    <version>2.3.8</version>
+</dependency>
+
+En el método del serviceimpl para crear usuario
+
+ModelMapper modelMapper = new ModelMapper();
+modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+UserEntity userEntity = modelMapper.map(user, UserEntity.class); //es lo que se pasa a la capa de datos
+
+Mapea campos el objeto fuente al objeto de destino. Para que funcione de manera sencilla los nombres de campos entre las dos clases deben coincidir, si no habría que establecer los mapeos. Matching strategy strict.
+Para persistir el usuario en bd haremos uso del repositorio, y para eso hay que inyectarlo. Lo haremos por constructor, de modo que definimos el atributo para el repo y definimos un constructor que acepta un repositorio como parametro.
+
+@Service
+public class UsersServiceImpl implements UsersService {
+
+	private UsersRepository usersRepo;
+
+	@Autowired
+	public UsersServiceImpl(UsersRepository usersRepo) {
+
+		this.usersRepo = usersRepo;
+	}...
+	
+
+Y el método del servicio para crear el usuario iria tomando forma, como vemos
+@Override
+public UserDto createUser(UserDto user) {
+
+	user.setUid(UUID.randomUUID().toString());
+	ModelMapper modelMapper = new ModelMapper();
+	modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+	usersRepo.save(userEntity);
+	return null;
+}
+
+Pero todavía no funcionaría porque no tenemos la encrypted password aún. De momento lo asignamos a una cadena "test" para poder hacer funcionar al repo.
+
+userEntity.setEncPassword("test");
+
+Modificamos el controlador del api de usuarios para que haga uso de esta logica de negocio, para poder probar lo que llevamos hecho.
+
+Tenemos que inyectar el servicio en el controlador y usar un mapper para pasar del objeto model request al users dto. Hacemos como en el ejemplo anterior.
+Vamos a hacer la petición POST desde PostMan contra Zuul, o sea, a través del API Gateway. La prueba resulta exitosa.
+
+Step 70: Return Http Status Code
+hay que devolver ResponseEntity. Hay que decir que la petición fue successful y que un recurso ha sido creado.
+
+@PostMapping
+public ResponseEntity<String> createUser(@RequestBody @Valid CreateUserRequestModel user) {
+
+	ModelMapper modelMapper = new ModelMapper();
+	modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	UserDto userDto = modelMapper.map(user, UserDto.class);
+	usersService.createUser(userDto);
+
+	return new ResponseEntity<String>(HttpStatus.CREATED);
+}
+
+Probamos levantando discovery, servicio, y gateway. Bien, 201 Created The request has been fulfilled and resulted in a new resource being created.
+
+Step 71: Create User Response ModelAttribute
+Queremos devolver un objeto que represente el recurso creado pero que tal vez no tenga todos los campos, por ejemplo que no tenga el password encriptado. Creamos un objeto response model que tenga solo lo que queremos devolver. Y de nuevo haremos uso de ModelMapper.
+Lo creamos en el paquete users.ui.model, donde ya residia el CreateUserRequestModel. Solo tendra los campos que yo quiera: nombre apellido email userId
+
+Entonces lo que haremos será devolver una ReponseEntity pero en lugar de sobre una String, sobre un CreateUserResponseModel. Ya no usamos el constructor de la clase ResponseEntity, sino que devolvemos una instancia mediante el patron builder con build():
+
+En el servicio:
+
+@Override
+public UserDto createUser(UserDto user) {
+
+	user.setUid(UUID.randomUUID().toString());
+	ModelMapper modelMapper = new ModelMapper();
+	modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+	userEntity.setEncPassword("test");
+	usersRepo.save(userEntity);
+	
+	return modelMapper.map(userEntity, UserDto.class);
+}
+
+En el controller:
+
+@PostMapping
+public ResponseEntity<CreateUserResponseModel> createUser(@RequestBody @Valid CreateUserRequestModel user) {
+
+	ModelMapper modelMapper = new ModelMapper();
+	modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	UserDto userDto = modelMapper.map(user, UserDto.class);
+	UserDto createdUser = usersService.createUser(userDto);
+	CreateUserResponseModel userResponseModel = modelMapper.map(createdUser, CreateUserResponseModel.class);
+
+	return ResponseEntity.status(HttpStatus.CREATED).body(userResponseModel);
+}
+
+Step 72: Spring Security
+
+Primero vamos a comenzar poniendo spring-security en el userv de usuarios, pero más tarde entiendo que tiene que ir en el gateway, porque es por donde pasan todas las peticiones.
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+Step 73: Add web security configuration
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurity extends WebSecurityConfigurerAdapter {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+	
+		http.authorizeRequests().antMatchers("/users/**").permitAll();
+		http.csrf().disable(); 
+		http.headers().frameOptions().disable(); //tambien hay que tocar algo para que se vea la H2 console, frame options
+	}
+	
+Como vamos a utilizar JWToken para la auth, deshabilitamos la csrf.
+
+Step 74: Encriptar el password.
+
+Tenemos que hacer autowire de BCryptPasswordEncoder en el ServiceImpl, y encriptar el password recibido en el Dto.
+En el método createUser, antes de hacer uso del repository para persistir el objeto DTO en bd, seteamos el campo encPassword a encoder.encode(userDto.getPassword()):
+
+Para que se pueda hacer autowired del BCryptPasswordEncoder, debe declararse el @Bean. Lo declaramos en la @SpringBootApplication.
+
+@Bean
+public BCryptPasswordEncoder getBCryptPasswordEncoder(){
+	
+	return new BCryptPasswordEncoder();
+
+}
+
+@Override
+public UserDto createUser(UserDto user) {
+
+	user.setUid(UUID.randomUUID().toString());
+	user.setEncPassword(encoder.encode(user.getPassword()));
+	ModelMapper modelMapper = new ModelMapper();
+	modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+	usersRepo.save(userEntity);
+
+	return modelMapper.map(userEntity, UserDto.class);
+}
+
+
+Step 75: permitir conexiones solo a través de Zuul
+
+Creamos en application.properties una property que tenga la IP del servidor Gateway. Se puede hacer asi porque solo va a haber uno.
+Despues, ese valor lo añadimos a la configuración del metodo configure del WebSecurityConfiguration.
+
+gateway.ip=localhost
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurity extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private Environment environment;
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.csrf().disable(); //
+		http.headers().frameOptions().disable();
+		http.authorizeRequests().antMatchers("/**").hasIpAddress(environment.getProperty("gateway.ip"));
+	}
+
+}
+
+Step 76: soporte para aceptar/producir info en json y xml
+
+Ya funciona y responde con json , pero para que lo haga con xml hace falta añadir una dependencia y algunas anotaciones (produces, consumes en los metodos del controller).
+Dependencia jackson data format xml
+
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+    <version>2.11.1</version>
+</dependency>
+
+Ahora viene la parte de modificar el @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, produces = {...})
+Con esto configurado, dependerá de las cabeceras que llegan en la petición: Accept para la respuesta, y Content Type para la petición. Si todo cuadra bien, funcionará de la forma esperada.
+
+
+Step 78: Implementing LoginRequestModel
+Crea una clase de este tipo, que tiene los atributos email y password, en el mismo paquete que las anteriores ui.model
+
+Step 79: configurar el filtro interceptor authentication filter
+Creamos nueva clase en el paquete de seguridad: AuthenticationFilter que extiende de una clase, UsernamePasswordAuthenticationFilter , que ya provee de un filtro que habilita la auth por username y password.
+
+@Override
+public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+		throws AuthenticationException {
+
+	try {
+
+		LoginRequestModel creds = new ObjectMapper().readValue(request.getInputStream(), LoginRequestModel.class);
+		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),
+				creds.getPassword(), new ArrayList<>()));
+
+	} catch (IOException e) {
+		throw new RuntimeException(e);
+	}
+
+}
+
+Definiendo esta clase que extiende del filtro de auth de username y pass, hacemos override de su metodo 'de intento de autenticación', que será invocado por el fw cuando se produzca una petición http si es que está configurado este filtro en la cadena de filtros por los que pasa la petición.
+Obtiene el AuthenticationManager object de spring security y ejecuta authenticate sobre él.
+Si la auth es exitosa se llama a otro método (el fw lo llama)--> successAuthentication, que también vamos a sobrescribir en la siguiente Step.
+
+@Override
+protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+		Authentication auth) throws IOException, ServletException {
+
+}
+
+
+Para que todo esto entre en juego, tenemos que incluirlo, dentro del método configure del WebSecurityConfigurerAdapter (el de los antMatchers), con el metodo addFilter. Es como sigue:
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+
+	http.csrf().disable(); //
+	http.headers().frameOptions().disable();
+	http.authorizeRequests().antMatchers("/**").hasIpAddress(environment.getProperty("gateway.ip")).and()
+			.addFilter(getAuthenticationFilter());
+}
+
+private AuthenticationFilter getAuthenticationFilter() throws Exception {
+
+	AuthenticationFilter authenticationFilter = new AuthenticationFilter();
+	authenticationFilter.setAuthenticationManager(authenticationManager());
+	return authenticationFilter;
+}
+
+
+Ahora, como es lógico, para saber si el intento de authenticación es successful tenemos que comparar con algún almacén si el usuario existe y la password coincide. Puede ser en memoria, puede ser contra bd....
+
+Step 80: Implementing loadUserByUsername
+Tenemos que definir, como era esperado, un nuevo método en WebSecurity. 
+
+Inyección por constructor:
+
+private Environment environment;
+
+//manejado por el fw como @Service
+private UsersService usersService;
+
+//definido como @Bean en la @SpringBootApplication
+private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+@Autowired
+public WebSecurity(Environment env, UsersService usersService, BCryptPasswordEncoder encoder) {
+
+	this.environment = env;
+	this.usersService = usersService;
+	this.bCryptPasswordEncoder = encoder;
+}
+
+Para que esto funcione, UsersService (I) tiene que extender una Interfaz del fw relacionada con seguridad
+-->UserDetailsService. Al hacerla extender de esa interfaz, la implementación del servicio nos pide que implementemos el método 
+loadUserByUsername. Cuando spring security está intentando authenticar un usuario va a buscar este método, que devuelve un UserDetails.
+
+Hay que modificar la interfaz UsersRepository para incluir un método que busque por el campo email.
+
+public interface UsersRepository extends CrudRepository<UserEntity, Integer> {
+
+	public UserEntity findByEmail();
+}
+
+Así que ahora, en la implementación del serivio usamos esto.
+
+loadUserByUsername devuelve un UserDetails (I):
+
+org.springframework.security.core.userdetails.UserDetails
+
+Provides core user information. 
+Implementations are not used directly by Spring Security for security purposes. Theysimply store user information which is later encapsulated into Authenticationobjects. This allows non-security related user information (such as email addresses,telephone numbers etc) to be stored in a convenient location. 
+Concrete implementations must take particular care to ensure the non-null contractdetailed for each method is enforced. See org.springframework.security.core.userdetails.User for a referenceimplementation (which you might like to extend or use in your code).
+
+Hay una clase de org.springframework, User, que implementa UserDetails. La usamos. Tiene diferentes constructores, cogemos el que nos sirva.
+
+org.springframework.security.core.userdetails.User
+
+Models core user information retrieved by a UserDetailsService. 
+Developers may use this class directly, subclass it, or write their own UserDetails implementation from scratch. 
+equals and hashcode implementations are based on the usernameproperty only, as the intention is that lookups of the same user principal object (in auser registry, for example) will match where the objects represent the same user, notjust when all the properties (authorities, password for example) are the same. 
+Note that this implementation is not immutable. It implements the CredentialsContainer interface, in order to allow the password to be erasedafter authentication. This may cause side-effects if you are storing instancesin-memory and reusing them. If so, make sure you return a copy from your UserDetailsService each time it is invoked.
+
+El constructor que usamos es (del código de User):
+
+/**
+ * Construct the <code>User</code> with the details required by
+ * {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}.
+ *
+ * @param username the username presented to the
+ * <code>DaoAuthenticationProvider</code>
+ * @param password the password that should be presented to the
+ * <code>DaoAuthenticationProvider</code>
+ * @param enabled set to <code>true</code> if the user is enabled
+ * @param accountNonExpired set to <code>true</code> if the account has not expired
+ * @param credentialsNonExpired set to <code>true</code> if the credentials have not
+ * expired
+ * @param accountNonLocked set to <code>true</code> if the account is not locked
+ * @param authorities the authorities that should be granted to the caller if they
+ * presented the correct username and password and the user is enabled. Not null.
+ *
+ * @throws IllegalArgumentException if a <code>null</code> value was passed either as
+ * a parameter or as an element in the <code>GrantedAuthority</code> collection
+ */
+public User(String username, String password, boolean enabled,
+		boolean accountNonExpired, boolean credentialsNonExpired,
+		boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+
+	if (((username == null) || "".equals(username)) || (password == null)) {
+		throw new IllegalArgumentException(
+				"Cannot pass null or empty values to constructor");
+	}
+
+	this.username = username;
+	this.password = password;
+	this.enabled = enabled;
+	this.accountNonExpired = accountNonExpired;
+	this.credentialsNonExpired = credentialsNonExpired;
+	this.accountNonLocked = accountNonLocked;
+	this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
+}
+
+
+En cuanto a que una cuenta de usuario esta habilitada, puede servir para que solo se habilite una vez creada cuando a su vez el usuario verifique su dirección de email (desde su bandeja de entrada, siguiendo un enlace en el cuerpo del email).
+El resto de parametros booleanos los ponemos a true pues aun no tenemos esas funcionalidades habilitadas (no se hace caso de esos parametros). El último es la coleccion de authorities (permisos)-> colección vacía ArrayList.
+
+Levantamos discovery, después el servicio de usuarios y por ultimo zuul. 
+
+properties de users referente a H2:
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.h2.console.settings.web-allow-others=true
+gateway.ip=localhost
+
+Esto ha sido necesario porque no estaba funcionando la url que marca por defecto el navegador para acceder a H2.
+
+
+org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+
+Processes an authentication form submission. Called AuthenticationProcessingFilter prior to Spring Security 3.0. 
+Login forms must present two parameters to this filter: a username and password. Thedefault parameter names to use are contained in the static fields SPRING_SECURITY_FORM_USERNAME_KEY and SPRING_SECURITY_FORM_PASSWORD_KEY. The parameter names can also be changed bysetting the usernameParameter and passwordParameter properties. 
+This filter by default responds to the URL /login.
+Since:3.0Author:Ben AlexColin SampaleanuLuke Taylor
+
+-----
+
+
+package com.carregal.cloud.users.security;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.carregal.cloud.users.ui.model.LoginRequestModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+			throws AuthenticationException {
+
+		try {
+
+			LoginRequestModel creds = new ObjectMapper().readValue(request.getInputStream(), LoginRequestModel.class);
+			return getAuthenticationManager().authenticate(
+					new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	@Override
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+			Authentication auth) throws IOException, ServletException {
+
+	}
+}
+
+Aquí está la clave, la clase de la que extendemos escucha en el mapeo /login y lee de la petición un cuerpo json que ha de corresponderse con la clase que hemos declarado al efecto, que sería empleada por ejemplo para validar un formulario de login.
+O sea, que valida un objeto json con email y password. Hecha la prueba en postman, si pongo una password mal:
+
+{
+ "email":"dani_carregal@hotmail.com",
+ "password":"12345678299"
+}
+
+{
+    "timestamp": "2020-06-28T18:46:07.436+00:00",
+    "status": 401,
+    "error": "Unauthorized",
+    "message": "Unauthorized",
+    "path": "/login"
+}
+
+Step 81: authentication filter: implementing successfulAuthentication.
+
+Una vez spring ha terminado de hacer la autenticacion, y en caso de no producirse un error, llama al método successful auth del filtro.
+No lo llamamos nosotros, es llamado por el fw. Coger los user details y generar un JWToken y meterlo en una cabecera de la response. Entonces la aplicación cliente podrá leer este token y utilizarlo en las siguientes peticiones como una authorization header.
+1.- leer los userDetails
+2.- usar esos datos para generar el token 
+3.- añadir el token a una cabecera de la respuesta.
+
+1.- Del objeto Authentication auth podemos extraer los datos del usuario que se ha logueado.
+
+String username=((User)auth.getPrincipal()).getUsername();
+
+Sabemos que con el username podemos obtener el usuario entero. Necesitamos una instancia del servicio, así que lo inyectamos en el filtro para usarlo en el successfulAthentication.
+También vamos a querer manejar una instancia de Environment, para tener el token privado con el que cifrar el token jwt para mandarlo a la aplicación cliente en una cabecera de la respuesta.
+
+Hacemos algunos cambios, creamos un constructor para AuthenticationFilter que acepte: usersService, Environment y AuthenticationManager.
+Así podemos tener acceso a la property con el token privado, podemos acceder a los userDetails por nombre, y podemos obtener el principal, que contiene al usuario logeado.
+Estamos ya en el punto de poder obtener los user details. Hay que modificar en WebSecurity el metodo getAuthenticationFilter para que no setee el AuthenticationManager en el AuthenticationFilter, y que se lo pase en el constructor.
+
+private UsersService usersService;
+private Environment environment;
+
+@Autowired
+public AuthenticationFilter(UsersService usersService, Environment environment,
+		AuthenticationManager authenticationManager) {
+	this.usersService = usersService;
+	this.environment = environment;
+	super.setAuthenticationManager(authenticationManager);
+}
+
+Realmente loadUserByUsername no nos vale porque para generar el token vamos a necesitar el id del usuario, y ese dato no esta en el UserDetails.
+Entonces, declaramos un metodo nuevo en la interfaz: UserDto getUserDetailsByEmail(String email)
+
+Añadimos la dependencia para JWT de Apache:
+<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.9.1</version>
+</dependency>
+
+el token es una String. Se genera mediante el patron builder.
+
+
+	String token = Jwts.builder().setSubject(userDto.getUserId())
+			.setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(environment.getProperty("token.expirationMillis"))))
+			.signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret")).compact();
+				
+
+El método completo. Se incluye como cabecera el userId también para poder validar que se trata del token de ese usuario:
+
+@Override
+protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+		Authentication auth) throws IOException, ServletException {
+
+	String username = ((User) auth.getPrincipal()).getUsername();
+
+	UserDto userDto = usersService.getUserDetailsByEmail(username);
+
+	// ahora hay que generar el token. Añadimo JWT a las dependencias.
+	String token = Jwts.builder().setSubject(userDto.getUserId())
+			.setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(environment.getProperty("token.expiration_time"))))
+			.signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret")).compact();
+	//ahora tenemos que poner el token en una cabecera de la respuesta.
+	res.addHeader("token", token);
+	res.addHeader("userId", userDto.getUserId());
+}
+
+Works like a charm!!
+
+Step 83: customize user authentication URL
+
+En la clase WebSecurity tenemos un método que crea la instancia del Filtro para luego añadirla en configure.
+
+private AuthenticationFilter getAuthenticationFilter() throws Exception {
+
+	AuthenticationFilter authenticationFilter = new AuthenticationFilter(usersService, environment,
+			authenticationManager());
+	authenticationFilter.setFilterProcessesUrl(environment.getProperty("login.url.path"));
+	return authenticationFilter;
+}
+
+De esta forma se cambia la url para crear el token.
+
+
+Step 84: configurar la seguridad en Zuul
+
+Zuul es el punto de entrada al sistema, así que se puede configurar la seguridad en él. Si una petición, por ejemplo, al servicio de account management no viene con un token jwt válido la rechaza. 
+En las siguientes secciones vamos a ver como habilitar la segurad en ciertos end-points, y como deshabilitarla en otros. Por ejemplo, el endpoint para registrar un usuario debería ser público. 
+
+Step 85: Adding support for spring security en Zuul
+Abrimos el pom. Copiamos las dependencias: spring-security y jwt.
+Luego tenemos que habilitar la seguridad. Cremos una clase WebSecurity @Configuration. Esto es como el caso que vimos ya.
+
+@EnableWebSecurity
+
+Tenemos que hacer override de configure(HttpSecurity http). Entra en juego un nuevo concepto, de session STATELESS. Se hace uso de SessionManagement():
+
+Allows configuring of Session Management. 
+Example Configuration
+The following configuration demonstrates how to enforce that only a single instanceof a user is authenticated at a time. If a user authenticates with the username"user" without logging out and an attempt to authenticate with "user" is made thefirst session will be forcibly terminated and sent to the "/login?expired" URL.  @Configuration
+ @EnableWebSecurity
+ public class SessionManagementSecurityConfig extends WebSecurityConfigurerAdapter {
+
+ 	@Override
+ 	protected void configure(HttpSecurity http) throws Exception {
+ 		http.authorizeRequests().anyRequest().hasRole("USER").and().formLogin()
+ 				.permitAll().and().sessionManagement().maximumSessions(1)
+ 				.expiredUrl("/login?expired");
+ 	}
+
+ 	@Override
+ 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+ 		auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+ 	}
+ }
+
+
+org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+
+Spring Security will never create an HttpSession and it will never use itto obtain the SecurityContext
+
+Creamos la session stateless. El que tiene experiencia escribiendo scripts del lado del servidor, sabe que cuando la aplicación cliente empieza a comunicarse con la aplicación del lado del servidor, hay una session que se crea, y que identifica a la aplicación cliente. O sea que si hay multiples aplicaciones clietne comunicandose con el API, tendremos muchas sessiones creadas, y muchas cookies, que cachean cuestiones relativas a las peticiones, y hasta el token puede ser cacheado, y entonces aun si no mandamos la cabecera de authorizacion en las sucesivas peticiones, las peticiones podrían ser authorizadas, y no queremos eso.,
+En las REST API queremos que todas las peticiones lleven esa cabecera de authorization, salvo en aquellos casos que nosotros habilitemos, como el registro de usuarios.
+
+Si creamos nuestra REST API STATELESS, no se crean sessiones, y no se cachean las auth headers. STATELESS es la session Creation Policy más restrictiva que hay.
+
+Step 87: habilitar rutas sin seguridad, como users sign up
+
+O por ejemplo para hacer el login. Hay algunas rutas que no son susceptibles de tener que ser seguras. Estamos, logicamente, hablando de modificar el método configure del WebSecurity.
+
+En application.properties:
+
+api.login.url.path=/users-ws/users/login
+api.registration.url.path=/users-ws/users
+api.h2console.url.path=/users-ws/h2-console/**
+
+En WebSecurity
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+
+	http.csrf().disable();
+	http.headers().frameOptions().disable();
+	http.authorizeRequests().antMatchers(HttpMethod.POST, environment.getProperty("api.login.url.path")).permitAll()
+			.antMatchers(HttpMethod.POST, environment.getProperty("api.registration.url.path")).permitAll()
+			.antMatchers(environment.getProperty("api.h2console.url.path")).permitAll()
+			.anyRequest().authenticated();
+
+	http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+} 
+
+Step 88: configurando AuthorizationFilter
+
+Configuraremos un filtro para que valide un JWT token. En el paquete security creamos una nueva clase: AuthorizationFilter extends BasicAuthenticationFilter.
+
+org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+
+Processes a HTTP request's BASIC authorization headers, putting the result into the SecurityContextHolder. 
+For a detailed background on what this filter is designed to process, refer to RFC 1945, Section 11.1. Any realmname presented in the HTTP request is ignored. 
+In summary, this filter is responsible for processing any request that has a HTTPrequest header of Authorization with an authentication scheme of Basic and a Base64-encoded username:password token. Forexample, to authenticate user "Aladdin" with password "open sesame" the followingheader would be presented: 
+
+ Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+ 
+
+This filter can be used to provide BASIC authentication services to both remotingprotocol clients (such as Hessian and SOAP) as well as standard user agents (such asInternet Explorer and Netscape). 
+If authentication is successful, the resulting Authentication object will beplaced into the SecurityContextHolder. 
+If authentication fails and ignoreFailure is false (thedefault), an AuthenticationEntryPoint implementation is called (unless the ignoreFailure property is set to true). Usually this should be BasicAuthenticationEntryPoint, which will prompt the user to authenticate againvia BASIC authentication. 
+Basic authentication is an attractive protocol because it is simple and widelydeployed. However, it still transmits a password in clear text and as such isundesirable in many situations. Digest authentication is also provided by SpringSecurity and should be used instead of Basic authentication wherever possible. See org.springframework.security.web.authentication.www.DigestAuthenticationFilter. 
+Note that if a RememberMeServices is set, this filter will automatically sendback remember-me details to the client. Therefore, subsequent requests will not need topresent a BASIC authentication header as they will be authenticated using theremember-me mechanism.
+
+Vamos a necesitar un constructor con parámetros:
+Environment
+AuthenticationManager
+El parámetro AuthenticationManager se obtiene en WebSecurity extends WebSecurityConfigurerAdapter mediante el método authorizationManager(): es el que llama a successfulAuthorization del filtro (¿patrón visitor?).
+Incluimos en environment para poder tener acceso a properties files.
+
+Sobrescribimos un metodo en la clase del filtro, doFilterInternal, al que llama Spring.
+
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+		throws IOException, ServletException {
+
+	String authorizationHeader = request.getHeader(environment.getProperty("authorization.token.header.name"));
+	if (authorizationHeader == null
+			|| !authorizationHeader.start * sWith(environment.getProperty("authorization.token.header"))) {
+
+		chain.doFilter(request, response);
+		return;
+	}
+	UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+	SecurityContextHolder.getContext().setAuthentication(authentication);
+	chain.doFilter(request, response);
+}
+
+private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) {
+	String authorizationHeader = req.getHeader(environment.getProperty("authorization.token.header.name"));
+	if(authorizationHeader==null) {
+		
+		return null;
+	}
+	String token = authorizationHeader.replace(environment.getProperty("authorization.token.header.prefix"), "");
+	String userId = Jwts.parser()
+			.setSigningKey(environment.getProperty("token.secret"))
+			.parseClaimsJwt(token)
+			.getBody()
+			.getSubject();
+	if(userId==null) {
+		return null;
+	}
+	return new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
+}
+
+Usamos JWT para validar el token, y obtenemos el userId que esta codificado en ese token.
+Hay que usar la misma signing key, el secret que copiamos del que pusimos en usuarios.
+
+Y en WebSecurity añadimos el filtro:
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+
+	http.csrf().disable();
+	http.headers().frameOptions().disable();
+	http.authorizeRequests().antMatchers(HttpMethod.POST, environment.getProperty("api.login.url.path")).permitAll()
+			.antMatchers(HttpMethod.POST, environment.getProperty("api.registration.url.path")).permitAll()
+			.antMatchers(environment.getProperty("api.h2console.url.path")).permitAll().anyRequest().authenticated()
+			.and().addFilter(new AuthorizationFilter(authenticationManager(), environment));
+
+	http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+}
+
+Step 90: Configuration Server
+
+Cuando hay muchos microservicios conformando un sistema, tener un properties file en cada uno puede ser un problema.
+Uso de un servidor de configuración facilita las cosas. Van contra un repositorio Git y tienen centralizada la faceta de configuración.
+
+Spring Cloud Config Server: tenemos tres alternativas para tener las properties en el servidor de config, que son: Secure File Storage, Secure Vault y Private Git Repository. Hacerlo con Git tiene la principal ventaja de que podemos disponer del historico de cambios en la configuracion de la aplicacion.
+Otra de las ventajas es que no tenemos que hacer ningun cambio en nuestro codigo java para que los servicios cojan la configuración del servidor de configuración. Solo hay que configurarlo en el proyecto.
+Los userv se conectarn por http al servidor de configuracion. Los valores que recibe un userv desde el servidor de configuración tienen más prioridad, y sobrescriben los que haya en application.properties, que también se leen pero tienen menor precedencia.
+
+
+Step 91: creando un config server.
+
+Nuevo proyecto Springboot con dependencias:
+PhotoAppAPIConfigServer
+dependencia Cloud Config - config server
+
+En la clase @SpringBootApplication añadimos otra anotación: @EnableConfigServer
+En las application.properties
+
+spring.application.name=PhotoAppAPIconfigServer
+server.port=8012
+
+Step 93: renombrando properties files servidos por el servidor de configuración
+
+Si tenemos varios userv todos ellos leen el properties file en el arranque, parte de cada uno de los servicios. Cada uno tiene su application.properties local
+Si lo tenemos en un servidor de config, entonces los userv van a leer el del servidor de config, y su properties local. Más prioritario es del serv config.
+Si queremos una configuracion más especifica de alguno de los userv, entonces tendremos un archivo properties adicional para ese userv, siguiendo un convenio de nombres. Este properties sería todavía más prioritario.
+Podemos hacerlo aún más concreto asociando los properties files a un entorno concreto, o profile, incluyendo el nombre del entorno o profile en el nombre del properties file.
+Entonces, si el profile activo tiene un properties file concreto, la propiedad leida desde ese archivo es la de mayor prioridad.
+
+Step 94: configurar el servidor de configuracion
+
+Para conectar con github.
+Vamos a application.properties y:
+-----
+spring.cloud.config.server.git.uri=https://github.com/danicarregal/cloudconfig.git
+spring.cloud.config.server.git.username=danicarregal
+spring.cloud.config.server.git.password=dv310917242942
+
+spring.cloud.config.server.git.clone-on-start=true
+-----
+spring.cloud.config.server.git.clone-on-start
+java.lang.Boolean
+Default: false
+Flag to indicate that the repository should be cloned on startup (not on demand). Generally leads to slower startup but faster first query.
+
+Step 95: incluyendo propiedades en el servidor de configuración
+
+Copiaremos algunas properties
+
+Añadimos el starter de cliente de configuración al users userv
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		
+Necesitamos crear un properties file adicional bootstrap.properties
+Este file se carga antes de applications.properties, e incluso antes de que todos los @Bean sean creados. En él tenemos que poner 
+spring.cloud.condig.uri=localhost:8012
+spring.cloud.config.name=PhotoAppAPIConfigServer
+
+Probamos pues...
+
+
+
+
+
+
+
+

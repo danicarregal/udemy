@@ -1,0 +1,13 @@
+1.-GIT
+2.-DB2
+3.-REST in28m
+4.-JAVAFX chica
+5.-Java8 de Java en profundidad
+6.-uServ in28m
+7.-uServ Guzman
+8.-userv JohnT
+------------------ verano
+9.-docker, kubernetes, openshift
+10.-jenkins, bamboo, grafana, 
+11.-Oracle db
+12.-linux

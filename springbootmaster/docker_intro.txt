@@ -1,0 +1,11 @@
+Introducción a Docker
+
+DockerFile Spotify Maven Plugin
+
+docker install: About Docker CEDocker Desktop for Windows -> installer. Es un servicio, se ve en el tray.
+
+docker --version en cmd.
+
+deployer - staging and production. Developers quieren instalar una version de la aplicacion. Como lo hacemos con Docker?
+
+Docker hub es como un repositorio central, como lo podría ser github respecto a Git. Allí podemos tener una cuenta y las imágenes de nuestras aplicaciones. Entonces, con Docker instalado en nuestra máquina, podemos correr una de esas imágenes. La primera vez, el comando run de docker comprobará que no dispone de la imagen en el sistema de archivos local y se lo descargará de docker hub.

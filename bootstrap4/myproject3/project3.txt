@@ -1,0 +1,190 @@
+nav lo copia de ejemplos. Le quita el form. y el dropdown., le quita el fixed-top.
+bg-danger, font-weight-bold, text-white, cambiar los textos.
+Añade el logo. Mete el navbar en un tag header. El resultado visual es el mismo, pero puede ser util si en la cabecera se quieren meter mas cosas. 
+
+v2 jumbotron: despues del header. 
+section.jumbotron .text-center .bg-dark, .text-white
+quitarle el borde redondeado .rounded-0
+h1 display-3
+p.lead copiar y pegar el texto.
+botones pegados: dentro de un div.btn-group 
+button.btn.btn.primary
+button.btn.btn.success
+Espaciado: le da my-2 a los botones.
+
+v3 news section:
+div.container
+row
+col-md-6
+similar a la seccion con el watermelon y las grapes (tenia ordering)
+img title text 
+ahora diferente. media layout media object
+dentro de la col un div.media y dentro un img, un div.media-body
+copiar el texto-> h5 y p Para el control+espacio meterlos dentro de un tab kbd
+Espacio a la izq del texto .mr-3 en la img. img-thumnail para el border
+al media div .shadow border-top border-dark p-3
+copiamos el primer div.
+Cambiamos el texto. pegar la imagen despues del media-body.
+Hay que centrar la imagen verticalmente img.align-self-center
+
+v4 div.container-fluid bg-light 
+row
+col-md-6
+los headings son h4.display-4
+content tables doc
+bajo el h4 una table.table (una tabla de bootstrap siempre tiene que tener la clase table)
+y otras se pueden usar para estilos, pero table siempre.
+table-stripped table-responsive-lg
+Es responsive por debajo de lg
+thead tr th # first-name last-name more-info 
+tbody tr th 1 Donal Duck N/A N/A N/A N/A
+quitarle el border top a la tabla lo hace en cada columna, probar en la fila .border-top-0
+La sección está dentro de un container-fluid, pero dentro de otro container (boxed)
+mt-5 al container-fluid para el spacing con la section anterior.
+Tambien necesita padding  pt-3
+
+La tabla tiene scroll en virtud de responsive 
+Siguiente elemento es una lista
+div.col-md-6
+h4 display-4
+Components list
+ul.list-group <- en bootstrap van asi las listas.
+li.list-group-item
+tienen una interrogación con icono. Espacio bajo el h4 pb-3
+badges components span.badge.badge-danger
+tooltip docs-> inicializado con js (ver doc bootrsap)
+y ver el html en la doc dentro del html del span con los attr adicionales:
+data-toggle="tooltip" data-placement="right" title="Tooltop on right"
+
+v5
+otra columna 
+col-md-6. Si sabes lo que haces puedes meter más de 12 cols en una fila, vaya que puedes ir apilando sin tener que codificar nuevas div.row.
+mete un div.w-100 para separar con py-3
+despues col-md-6 con un acordeón
+components - collapse (doc)
+copiamos uno de la pagina de bt
+div.accordion tiene dentro div-card con div.card-header y dentro varios div.collapse con .show o no y attr data-parent="#id"
+Se va a quitar la cabecera y sustituye el h por un boton.
+ese boton tendra los data-toggle y demás atributos necesarios.
+
+v6
+h display-4
+para los tabs vamos a components navs
+ul.nav.nav-tabs role="tablist"
+Hay un ul para las tabs y el div para el contenido, que cambia conforme a la tab en la que estas.
+El de contenido tiene tantos div dentro como tabs. Están ligados por el id.
+ul li.nav-item a.nav-link.active data-toggle="tab" href="#id_div_contenido" role="tab"
+texto de los tab blue bold 
+
+v7
+container-fluid
+row
+col-md-6
+heading h3 display-4 Contact Us
+Dentro del form, por cada elemento del formulario hay un div.form-group
+los input son .form-control y tienen placeholder
+para que estén en una línea los tres primeros elementos del form los mete dentro 
+de un div.row
+Hace form-group para cada conjunto de elementos que quiere que se muestren juntos
+si cada control esta en un form-group sale uno en cada linea, sino salen una linea 
+por form-group.
+Despues, para poder ajustarlos a tamaños de columna, los mete en una row y en cols
+Para tener un form-group con un checkbox tiene que tener .form-check
+y dentro un input type="checkbox" y su label.form-check-label for="exampleCheck1"
+Le damos padding px-5 a la col-md-6 y pb-5
+Para poner el icono de email
+es un div.input-group-prepend que tiene dentro un div.input-group-text
+entonces hay que crear un input-group y meter dentro 
+el input-group-prepend y el input que ya teniamos:
+<div class="input-group">
+	<div class="input-group-prepend">
+	  <span class="input-group-text">@</span>
+	</div>
+	<input type="text" class="form-control" id="username" placeholder="Username" required="">
+	<div class="invalid-feedback" style="width: 100%;">
+	  Your username is required.
+	</div>
+</div>
+
+v8 Contact information section
+col-md-6 bg-dark text-white
+heading h1 class="font-weight-normal" reduce el bold del h1
+table.table
+tbody tr td
+p-5
+
+v9
+footer
+elemento footer de html
+footer.container-fluid
+row
+div.col-md-4 copiamos navbar brand.
+text-light lo hace gris, no blanco. Para el enlace en el navbar del footer.
+
+Para el menu de la derecha del footer
+div.col-md-8
+components navs ul.nav con li's y a formatear.
+text-light
+padding top 2 y float-right a la lista
+pone el primero a active.
+
+v10
+cookies notificacion
+componenets alerts.
+copiamos un alert dismissable
+pegamos despues del footer. color warning
+quitamos el margen inferior mb-0 fixed-bottom aunque hagamos scroll para arriba se ve en el bottom
+
+v11 responsive1
+Al header solo cambiarle el mod. de tamaño para convertirse en menu mobile: md -> sm
+Los botones, que estaban en un button-group le damos flex-wrap (al button-group), 
+y para centrarlos mx-auto. Los botones ya tenían my-2 cada uno.
+
+Para los media objects, a los que solo les habíamos dejado media-body e img, 
+hay que hacer la técnica de tener más de una imagen y esconderla con d-none y b-block 
+en función el tamaño de la pantalla. Por debajo de md tienen que estar a todo ancho.
+Al 2º div mt-4 pero para cierto ancho mt-lg-0
+Para la imagen del media tambien aplica mx-auto para centrarla. 
+En el segundo media hace lo mismo.
+
+v12 responsive 2
+Our reporters y Mort popular news. Ajustar el responsive de la tabla para que se ajuste al 
+modelo. Cambio a una en md. 
+Recent Events mas o menos bien, pero Useful (tabs) mal.
+Meter margen encima de useful info pt-4 pt-md-0
+ul flex-column flex-sm-row
+
+Form
+Debajo de lg debe ser una col col-lg-6.
+Por debajo de sm tiene que ser un campo por linea.
+sm-3 para el genero, todos los md deben ser sm.
+Esta mal en la primera linea first name y last name.
+Para hacerlos de todo el ancho por debajo de sm: col-12 col-sm
+Hay que darles algo de espacio cuando estan en una linea mt-3 mt-sm-0
+
+Menos espacio, ya no es px-5 por debajo de sm
+boton float-sm-right para que esté a la izq en pequeño
+col-12 y col-sm para checkbox y boton
+El boton tiene espacio a la izq porque la col tiene padding. 
+Se elimina con pl-0 + mt-2 mt-sm-0
+
+Siguiente contact info
+quitar el padding en mejor sm p-sm-5 pt-3 
+
+footer
+below sm las col cogen todo el ancho
+md por sm
+el float-sm-right
+flex-column flex-sm-row para que se pongan uno encima de otro los enlaces por debajo de sm.
+
+
+
+
+
+
+
+
+
+
+
+

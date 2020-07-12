@@ -1,0 +1,559 @@
+Section 3:
+Git Quick Start
+13. Quick Start, Part 2: Configuration, Clone, and Git Basic Workflow
+1:22
+<br> 
+Configurar git con: git config --global user.name y user.email
+1:41
+<br> 
+Se puede ver qué cosas se han configurado mediante git config --global --list
+2:47
+<br> 
+El primer paso es clonar el repositorio creado en Github con: git clone https://url
+3:27
+<br> 
+En la carpeta que estuvieramos al hacer el clone se va a crear una carpeta con el nombre del repositorio. Entrando en ella estamos En Repo
+3:47
+<br> 
+Con git status obtenemos el estado de nuestro repositorio, y nos indica que estamos en la rama principal: master
+4:30
+<br> 
+Recordemos que hay: working directory, staging area, y repository. Todo lo que estemos haciendo en el working directory ha de ser commiteado
+4:33
+<br> 
+Al commitear pasa a ser contenido gestionado por el repositorio, si no, pues no.
+5:28
+<br> 
+Si creamos un archivo nuevo dentro de la carpeta en la que trabajamos, gestionada por el repo, ese archivo primero está untracked
+5:33
+<br> 
+Es un archivo en nuestro working directory que no ha sido añadido al repo.
+6:03
+<br> 
+Con git add start.txt pasamos el archivo de untracked a staged, de modo que el repo ya es consciente de su existencia
+6:16
+<br> 
+Despues de git add starting.txt el repo nos dice que ese archivo no se ha commiteado, de modo que hay cambios sin entregar
+6:16
+<br> 
+Despues de git add starting.txt el repo nos dice que ese archivo no se ha commiteado, de modo que hay cambios sin entregar
+6:16
+<br> 
+Despues de git add starting.txt el repo nos dice que ese archivo no se ha commiteado, de modo que hay cambios sin entregar
+6:49
+<br> 
+Para commitear el archivo se hace: git commit -m "Commiting a new file to the repository"
+8:03
+<br> 
+Para subir lo commiteado en local a la rama remota: git push origin master
+Section 4:
+Text Editor Installation
+16. Windows Text Editor: Notepad++ Installation
+2:06
+<br> 
+Se puede configurar git para reconocer notepad++ y que trabajen juntos
+5:07
+<br> 
+No es mas que añadir a la variable de entorno path la ruta al ejecutable de notepad++
+5:07
+<br> 
+No es mas que añadir a la variable de entorno path la ruta al ejecutable de notepad++
+17. Configure Notepad++ with Git (Windows Only)
+1:44
+<br> 
+Para crear un alias de linea de comandos, crear en Users un .bash_profile y una linea con: alias npp='notepad++ -multiInst -nosession'
+3:00
+<br> 
+Se puede configurar un programa como editor por defecto de git
+4:06
+<br> 
+con git config --global -e podemos editar la configuracion global, para lo que abre el editor por defecto, asi podemos probar q todo esta OK
+Section 5:
+Basic Git Commands
+22. Starting with a Fresh Project (git init)
+1:26
+<br> 
+git init repoName: crea una carpeta y un repo local
+1:49
+<br> 
+ls con git bash: para ver los archivos ocultos es con ls -la o ls -al
+2:37
+<br> 
+si entramos en la carpeta .git, vemos mas carpetas, y es donde reside el repositorio en disco. Son carpetas ocultas
+4:34
+<br> 
+git status nos muestra los untracked files
+5:29
+<br> 
+lo contrario a git add, sacarlo de la lista de tracked files, seria git rm --cached hipster.txt
+23. Adding Git to an Existing Project (git init)
+0:02
+<br> 
+rm -rf en gitbash borra una carpeta con todo lo que tenga dentro, sin preguntar
+4:10
+<br> 
+git add . -&gt; añade de forma recursiva todo lo que se encuentra en la carpeta actual
+6:15
+<br> 
+si se quiere eliminar la naturaleza git (repositorio) de una carpeta donde reside un proyecto, simplemente se borra la carpeta oculta .git
+24. Starting on GitHub by Joining an Existing Project (git clone)
+2:14
+<br> 
+puedes ir a cualquier repositorio publico y hacer un fork, eso crea una copia del repo en tu cuenta de github
+3:46
+<br> 
+despues de hacer el fork en tu cuenta de github, para tener la copia local del repo hay que hacer un git clone de la url del repo forkeado
+25. Basic Git Workflow (add, commit, pull & push)
+8:20
+<br> 
+antes de hacer un push, se recomienta hacer git pull origin master &lt;- o la rama en la que estemos trabajando
+9:24
+<br> 
+git push origin master
+26. Tracked Files
+3:39
+<br> 
+Parece que si modificas un fichero trackeado (previamente addeado), en el commit aun asi tienes que hacer add con -am (no se por que)
+3:59
+<br> 
+git ls-files lista todo lo que tiene tracked
+28. Recursive Add
+1:05
+<br> 
+Se puede crear una hilera de carpetas anidadas con mkdir -p level1/level2.../leveln
+3:05
+<br> 
+si haces git status te muestra el primer nivel, o sea, en una estr de carpetas anidadas muestra la de fuera
+3:15
+<br> 
+Se puede, por suerte, hacer un git add recursivo para incluir todo lo que haya dentro.
+29. Backing Out Changes
+2:32
+<br> 
+Al hacer git status, nos da indicacion de como unstagear cambios de ficheros addeados
+3:34
+<br> 
+Para volver a una version del ultimo commit y descartar los ultimos cambios en un archivo: git checkout --
+30. Renaming and Moving Files
+1:38
+<br> 
+git mv nombre1 nombre2 para renombar archivos a nivel filesystem y repository
+1:54
+<br> 
+git este cambio lo stagea, pero no lo comitea, de modo que se puede revocar
+2:48
+<br> 
+recomienda cambiar el nombre y comprobar si se ha hecho antes de hacer mas cambios, para no liarla mas tarde
+3:56
+<br> 
+git add -A se da cuenta de si ha habido cambios en el SO que no se han hecho con git, como el cambio de nombre, o borrado
+4:18
+<br> 
+Si se hace el renombrado en el so, al hacer git status vera como un borrado y como un nuevo file.
+31. Deleting Files
+2:40
+<br> 
+git rm borrara del repo el file
+3:16
+<br> 
+esto borra el archivo fisicamente, y pone en staged el cambio, pero no lo commitea
+5:34
+<br> 
+haciendo git reset head se puede unstagear el borrado con git rm , pero eso no restaura el archivo
+6:10
+<br> 
+Para restaurarlo hace falta git checkout --
+32. History
+0:28
+<br> 
+Para la history, se usa git log
+2:25
+<br> 
+git log te saca los commits en orden temporal decr, pero se puede sacar abreviado (sha1) con git log --abbrev-commit
+3:07
+<br> 
+git log --decorate --oneline --graph? se ve diferente
+4:08
+<br> 
+Se puede listar un rango de commits poniendo el primero y el ultimo
+4:18
+<br> 
+4:33
+<br> 
+git log --since="3 days ago"
+5:18
+<br> 
+git log --follow --
+5:44
+<br> 
+con --follow sige los renombramientos, sin el NO
+6:05
+<br> 
+git show muestra info sobre un commit concreto
+33. Git Alias
+2:41
+<br> 
+Para crear versiones cortas de comandos: git config --global alias. "linea de comando larga de git, con parametros, sin git"
+Section 6:
+Visual Merge/Diff Tool Installation
+40. P4Merge for Windows Git Configuration
+1:03
+<br> 
+Instalacion de p4merge para que git lo use como herramienta standard para la resolucion de conflictos de codigo
+1:12
+<br> 
+git config --glogal merge.tool p4merge, how awesome is that :D
+1:51
+<br> 
+Tambien hay que ejecutar git config --global mergetool.p4merge.path "C:/Program Files/Perforce/p4merge.exe"
+2:28
+<br> 
+ponemos tambien mergetool.prompt false, para que no se ejecute automaticamente siempre que haya que resolver un conflicto
+2:48
+<br> 
+Hacemos la misma config pero en vez de merge.tool, con diff.tool
+Section 7:
+Comparisons
+44. Git Repository Setup (for comparing examples)
+2:01
+<br> 
+git remote add origin URL para crearle una url al remote de un repo
+2:30
+<br> 
+git remote set-url "https://github.com/danicarregal/blahblah" para setear la url si ya la hubiese seteado antes
+45. Comparing Working Directory and the Staging Area
+0:02
+<br> 
+Ahora vamos a comarar el working dir con la staging Area
+0:50
+<br> 
+Git status no dice qué se ha modidicado en el archivo, aunque avise de que tiene cambios. Para revisar esos cambios --&gt; git diff
+0:55
+<br> 
+1:15
+<br> 
+si se hace sin parametros, git diff compara la staged area con el working dir
+1:41
+<br> 
+si haces git difftool y tienes una herramienta configurada, se abren las versiones y se muestra la comparacion en esa herramienta, p4merge
+1:55
+<br> 
+lo dicho, sin parametros adicionales, compara la staging (izq) con el working dir (der)
+46. Comparing Working Directory and Git Repository (Last Commit)
+0:17
+<br> 
+Comparar el staging area con el ultimo commit? Tambien se puede, claro
+1:15
+<br> 
+Usando el parametro HEAD se compara el working directory con el HEAD del repo, o sea, lo ultimo commiteado
+1:17
+<br> 
+En las comparaciones, el working directory siempre sale en la parte derecha cuando se usa la difftool
+47. Comparing between the Staging Area and the Git Repository (Last Commit)
+0:42
+<br> 
+git diff --staged HEAD para comparar lo que esta stageado con el ultimo commit
+48. Limiting Comparsons to one File (or path)
+0:15
+<br> 
+En el caso generico, un diff tiene varios archivos, y a veces tan solo nos interesa checkar los cambios de uno
+1:29
+<br> 
+Para limitar a un solo archivo el checkeo de diferencias, git diff -- Readme.md
+1:32
+<br> 
+Si haces git difftool y son varios archivos, p4merge abre la comparativa uno a uno, o sea, cuando cierras uno automaticamente abre el next
+1:52
+<br> 
+git difftool -- Readme.md, solo examina las diferencias de un archivo
+49. Comparing Between Commits
+1:23
+<br> 
+git diff ref1 ref2 siendo las refs hashes de commits, o en caso del ultimo, podemos poner HEAD
+2:00
+<br> 
+Para comparar HEAD con el commit anterior al actual, se usa HEAD HEAD^
+4:36
+<br> 
+Cuando se hace git diff ref1 ref2, se muestra una lista de diferencias entre archivos concretos, par a par. Se ponen primero los de ref1
+50. Comparing Between Local and Remote Master Branches
+0:38
+<br> 
+git diff para comparar ramas funciona como con commits, right side compare vs lefts side
+Section 8:
+Branching and Merging
+52. Branching Basics
+0:06
+<br> 
+Conocemos el camino, pero nos empeñamos en salirnos, y despues nos quejamos de habernos perdido
+1:24
+<br> 
+git branch -a lista las ramas, locales y remotas
+1:53
+<br> 
+se pueden crear branches con git branch nombrerama
+2:34
+<br> 
+el historico de commits es el log, accesible como git log --oneline --decorate
+3:23
+<br> 
+branches are labels, just pointers. En el caso de crear una rama nueva con git branch nombre y hacer un log, el ultimo contiene labels ramas
+3:54
+<br> 
+git branch -m sirve para renombrar, por ejemplo: git branch -m dev develop renombraria la rama dev a nombre develop
+4:31
+<br> 
+git branch -d para borrar una rama, pero no puedes estar en ella
+53. Happy Path / Fast Forward Merges
+0:37
+<br> 
+git branch lista las ramas locales, git branch -a lista las locales y las remotas
+1:21
+<br> 
+git checkout -b nombreRama crea una rama nueva de nombre nombreRama y hace checkout a esa rama, todo happy path claro
+2:41
+<br> 
+Para pasar un cambio commiteado en una rama a otra rama, hay que hacer un merge de la segunda en la primera
+3:14
+<br> 
+antes de hacer un merge es bueno checkear las diferencias con git diff o difftool ref1 ref2
+4:11
+<br> 
+git merge sourceBranch: o sea se mezcla la sourcebranch a la actual
+5:10
+<br> 
+fast forward merge (poner todos los commits de la rama source en la rama tree) solo es posible cuando en la rama tree no hay otros commits
+5:28
+<br> 
+git log --oneline --graph; se ven los commits de forma grafica, y las ramas con sus rutas. Se ven los mensajes de commit
+6:00
+<br> 
+Una vez hemos mergeado la rama develop en la master, ya podemos borrar la rama develop
+54. Happy Path / Disable Fast Forward Merges
+0:46
+<br> 
+git checkout -b nuevaRama, la crea y nos pasamos a ella
+3:12
+<br> 
+en el git merge podemos decir que no lo haga fast forward con --no-ff : git merge copyright --no-ff
+4:12
+<br> 
+Si luego borramos la rama, en el git log simplemente no aparecera mas el label de la rama borrada, solo eso
+55. Automatic Merges
+0:18
+<br> 
+Si abrimos una rama, hacemos un commit, volvemos a master, hacemos otro commit y luego hacemos un merge, se hace un commit de la mezcla ".."
+0:33
+<br> 
+merge commit, se llama
+0:44
+<br> 
+automatic merge que resulta en automatic commit
+5:19
+<br> 
+efectivamente se hace un commit automatico tras el mergeo, con el mensaje -m, y dice merge recursive
+56. Conflicting Merges and Resolution
+0:36
+<br> 
+A veces al hacer merges se producen conflictos. Son de utilidad git diff o difftool
+1:24
+<br> 
+Vamos a forzar un conflicto creando una rama, haciendo un cambio, commiteandolo, cambiando a master y haciendo un cambio en el mismo punto.
+6:06
+<br> 
+Cuando intentamos hacer el merge, no lo hace y se queja de que hay cambios conflictivos, hay que arreglarlos antes.
+6:41
+<br> 
+En este caso no estamos con el working directory en un clean stage, sino que estamos en un estado intermedio. si abrimos el archivo con conf
+6:59
+<br> 
+Las zonas del archivo que tienen conflicto lo tendran marcado con &lt;&lt;&gt;&gt;&gt;&gt;&gt;RAMA2, para que lo edites y elijas
+7:46
+<br> 
+Se pueden modificar esos archivos manualmente, pero antes hemos hablado de mergetools :)
+8:02
+<br> 
+git mergetool es la solucion, esto abre la herramienta configurada para ese fin, en nuestro caso p4merge
+9:13
+<br> 
+Una vez resuelto de que version te quedas cada cosa, hay que hacer save y cerrar el p4merge y entonces hacer commit de los cambios
+9:41
+<br> 
+La rama vuelve a ser MASTER, en vez de MASTER|MERGING
+10:11
+<br> 
+Git en estos casos crea un fichero con el archivo original y los conflictos, por si fuese necesario revocar los cambios. Hay que untrackearl
+10:29
+<br> 
+añadir al repo un .gitignore, y dentro los nombres de archivos o bien las expresiones con comodines para excluir los archivos o extensiones
+Section 9:
+Rebasing
+58. Simple Rebase Example
+1:17
+3 months ago
+<p>Un rebase se entiende en el siguiente contexto: Se crea una rama para una nueva característica, pero antes de terminar el desarrollo surge la necesidad de cambios menores en la rama principal, que se hacen y se commitean. Luego se va a buscar que la rama de la nueva característica contenga también esos cambios. Llevar a la rama nueva los cambios de la rama principal, que se hicieron a posteriori de la creación de la rama, es lo que se llama rebase. Tiene sentido: re-establecer la base o punto de partida.</p>
+1:17
+<br> 
+2:56
+<br> 
+Para exponer lo que es rebasing hemos creado una rama nueva y hecho un commit de un cambio en un archivo
+3:00
+<br> 
+Despues volvemos a master
+3:45
+<br> 
+rebase es como hacer un merge en la rama nueva de los nuevos cambios de master :)
+3:50
+<br> 
+Hacer rebase de master en nuestra myfeature branch... aplicar los cambios de master en la rama nueva posteriores a la creacion de la rama
+4:24
+<br> 
+Se hace como git rebase master, en la rama myfeature (la nueva)
+5:19
+<br> 
+En realidad no, en realidad sí. Seria como aplicar todos los commits nuevos antes de la creacion de la nueva rama
+5:26
+<br> 
+El instructor dice que con esto se aplana el grafico y que facilita un merge fast forward en master una vez terminada myfeature
+5:29
+3 months ago
+<p>Hacer un rebase en la rama de la nueva caracteristica facilita hacer un merge fast forward una vez terminado el desarrollo, que es como aplicar todos los commit de la nueva rama sobre el punto de partida de la rama principal.</p>
+6:10
+<br> 
+Si hacemos un nuevo cambio en un fichero en la rama nueva y commiteamos...
+6:30
+<br> 
+Asi, HEAD esta en myfeature, que esta algunos commit por delante de master
+6:36
+<br> 
+Momento de volver a master y traerse lo de la rama nueva
+7:39
+<br> 
+gracias a haber hecho el rebase podemos terminar con un merge de tipo fast forward
+59. Setup for rebasing conflict
+1:06
+<br> 
+Y qué pasa si al hacer un rebase tenemos conflictos?
+60. Abort a Rebase
+1:27
+<br> 
+Probando a hacer el rebase se obtiene un mensajej de error informando de los conflictos. El mensaje indica que se puede ABORTAR el rebase
+1:39
+<br> 
+git rebase --abort Con esto estamos fuera del rebase completamente
+1:39
+<br> 
+git rebase --abort Con esto estamos fuera del rebase completamente
+2:05
+<br> 
+haciendo git log --oneline --decorate --all --graph para ver el historial vemos que tras el abort nos hemos quedado como estabamos antes
+61. Rebase Conflict and Resolution
+1:03
+<br> 
+Cuando se hace un rebase con conflicto, nos quedamos en un est intermedio como cuando falla un merge. En este caso se llama RAMA|REBASE 1/1
+1:10
+<br> 
+Podemos hacer uso de la mergetool
+1:59
+3 months ago
+<p>A las operaciones de mergeo con mergetool durante un rebase hay que hacerles un git add antes de 'continuar' con el rebase</p>
+2:01
+<br> 
+Si hemos resuelto los conflictos hay que hacer git rebase --continue
+3:35
+<br> 
+Ahora hacemos un cambio mas en la rama nueva y volvemos a master, si hacemos un merge, sera de tipo ff
+62. Pull with Rebase (GitHub)
+0:42
+<br> 
+Ahora haremos la prueba con el repo remoto. Primero hacemos push de todo lo nuevo, pero antes pull para las buenas practicas
+0:53
+<br> 
+Como rebasear cualquier conjunto de cambios del remoto en el repo local? Lo vemos en este ejemplo
+1:22
+<br> 
+Primero hacemos un commit en local de un cambio que hagamos.
+1:51
+3 months ago
+<p>Tenemos un commit en local, y ahora vamos a github y hacemos un cambio alli, en el mismo archivo</p>
+1:58
+<br> 
+Luego podemos modificar otro archivo pero directamente en github, y despues commitearlo alli
+2:31
+<br> 
+2:56
+3 months ago
+<p>como hay un commit del que no somos conscientes en github, necesitamos hacer git fetch para renovar las referencias. Haciendolo se lee: Your branch and 'origin/master' have diverged, and have 1 and 1 different commits each, respectively.&nbsp; &nbsp;(use "git pull" to merge the remote branch into yours). Git fetch no hace ningun cambio en los archivos del repo, pero actualiza las referencias</p><p><br></p>
+3:51
+3 months ago
+<p>Existe la opcion de pull con rebase, de modo que los cambios que vienen del repo se ponen por delante de los que tenemos nosotros sin pushear. Se consigue pasando un parametro adicional al comando pull: git pull --rebase origin master. Con esto se aplican primero los commits que hubiera en master y luego los que tuvieramos nosotros sin subir al repo.</p>
+Section 10:
+Stashing
+64. Simple Stash Example
+0:53
+3 months ago
+<p>Para ver qué es un stash, vamos a modificar unos cuantos archivos en el proyecto starter-web. Modificamos simple.html. Pero no lo hemos addeado. Sin embargo ahora necesitamos cambiar otro archivo... Y lo de simple.html es un work in progress, asi que no lo queremos commitear. Podemos hacer un git stash para guardar esos cambios 'para luego'. Después de hacer git stash, git status nos dice que estamos up-to-date con la rama. Si abrimos el archivo que hemos stasheado, veremos que está igual que antes de la modificacacion que 'hemos guardado para luego'.</p><p>Si modificamos el README y lo commiteamos, estaremos up-to-date con la rama. Pero ¿cómo recuperamos el archivo stasheado de antes? git stash apply, trae todos los cambios stashed. Podemos seguir con los cambios :)</p><p>El stash hecho sigue guardado, solo lo hemos aplicado. Para eliminarlo, hacemos git stash drop.</p>
+65. Stashing Untracked Files and Using Pop
+0:28
+3 months ago
+<p>Git stash solo hace su operacion sobre archivos de los que tiene pista git, lo que se dice tracked files. Para saber la lista de tracked files: git ls-files. Este es el comportamiento por defecto. Lo podemos comprobar modificando un fichero tracked y luego creando uno nuevo. Si hacemos git stash, y luego git status, el fichero nuevo sigue apareciendo como untracked y el status no es el de up-to-date, o sea que NO lo stasheo. Para hacer esto podemos recurrir a hacer ADD, pero igual tampoco queremos, entonces lo que hay que hacer es: git stash -u (incluye los untracked). Después de hacer lo que necesitemos y commitearlo, podemos hacer en una sola operacion el apply y el drop: git stash pop</p>
+2:41
+3 months ago
+<p>Siguiente prueba, hacer un numero de stashes distintos. Para tener varios stash hay que hacer: git stash save "mensaje del stash". Hemos hemos 3 stash y al listarlos, los indices estan en orden reverso: el primero {0} es el mas reciente.</p><p>Para ver una simulación de la aplicación de un stash concreto, ver qué archivos se verían afectados, podemos hacer: git stash show stash@{x} siendo x el indice elegido. Esa referencia se usa luego para los apply o drop, o pop. Despues de aplicar un stash lo podemos sacar de la lista con drop o con pop. Para borrar todos los stash de la lista se puede hacer: git stash clear.</p>
+67. Stashing into a Branch
+1:41
+3 months ago
+<p>Para la siguiente prueba, que se trata de hacer stash a una rama, hemos visto que tenemos un cambio sin add. Hacemos dos cambios mas y hacemos add de uno de los tres cambios, de modo que con git status vemos que tenemos dos cambios no staged para commit, y uno que sí. Creamos un archivo nuevo. Asi tenemos archivos en tres buckets de git distintos: cambios para commit, cambios no declarados para commit, y archivo no trackeado. </p><p>Podemos pasar todo esto, incluyendo el archivo recien creado pero no trackeado, a una nueva rama que crearemos sobre la marcha: primero hacemos el stash de todo incluyendo el archivo nuevo con: git stash -u. Luego pasamos ese stash a la creacion de una rama nueva: git stash branch newBranch. Esta ultima linea hace tres cosas: crea la rama, aplica el stash y finalmente lo borra.</p>
+Section 11:
+Tagging
+70. Simple Tag Example / Lightweight Tags
+1:13
+3 months ago
+<p>Cuando hacemos git log podemos var tags en el gráfico: HEAD, origin/master, master... HEAD es un puntero, los otros son nombres de ramas. Se pueden marcar puntos relevantes en la historia de un repositorio mediante etiquetas. Hay una forma de crear etiquetas light, para un particular commit: </p><p>git tag myTag. </p><p>En ese caso en el git log aparecen las etiquetas habituales y otra marcada como tag:myTag. Se asocia al ultimo commit, de modo que se puede usar para ver los cambios de ese commit con: git show myTag. Para eliminar una etiqueta se puede hacer con git tag --delete myTag.</p><p><br></p>
+71. Annotated Tags
+1:05
+3 months ago
+<p>Existen los tag anotados: lo tag anotados tienen un mensaje como en el caso de un commit, y se suelen utilizar para vincularlos a versiones: git tag -a v-1.0 mjor milestones or version numbers in source code. Al hacer esto sale el editor por defecto para añadir mensaje al tag. git tag --list para verlos.</p><p>Si hacemos git show con un tag anotado tenemos una info algo distinta al caso del light tag. Por ejemplo, vemos el mensaje introducido en la creacion del tag. Sale el creador del tag, la fecha de creacion del tag tambien. Luego el id del commit y el resto de info.</p><p><br></p>
+72. Comparing Tags
+2:26
+3 months ago
+<p>Con git commit --amend te deja modificar el mensaje del commit. Se abre el editor por defecto y puedes modificar el mensaje.</p><p>Se puede crear un tag anotado con la siguiente sintaxis tambien: git tag v-1.2 -m "Creando la release 1.2"</p><p>git diff v-1.0 v-1.1 para comparar commits por tags :)</p><p>Si mirando atras vemos que hubo algo que debimos taggear y lo queremos taggear ahora: los commit tienen un hash asociado, entonces se puede usar para ese fin.</p><p>git tag -a v-0.9beta 324dsfd23scxc23233</p>
+74. Updating Tags
+0:05
+3 months ago
+<p>A veces pones un tag en el commit equivocado, este es el enunciado de la lección. Cómo actualizar tags. Tenemos la opcion de borrar el tag y volver a crearlo, o hacerlo todo de una vez: git tag -a v-0.8-alpha --f 'hashCommit'</p><p><br></p>
+75. Using Tags with GitHub
+0:13
+3 months ago
+<p>Creando tags en el repositorio remoto. Es sencillo haciendo push a origin del tag. Esto crea en github un .zip y un .tar con todo el código de ese commit.</p><p>git push origin v-1.1: </p><p>Para subir todas las tag locales al repositorio de una vez, hay que ejecutar:</p><p>git push origin master --tags</p><p>En github, las releases se organizan por tags. Haciendo click en los puntos suspensivos podemos ver el mensaje asociado al tag.</p><p>Para eliminar la subida de una release o tag a github, tenemos que ejecutar localmente el comando: </p><p>git push origin :v-0.9beta con esto se dice sube 'nada' asociado a ese tag. Lo que produce es un borrado remoto de ese tag (de esa release, que desaparece de la lista de releases en github)</p><p><br></p>
+Section 12:
+Bonus: Office Hour Sessions
+77. Reset and Reflog (Office Hours, Session 1)
+3:42
+3 months ago
+<p>git log muestra la historia del repositorio, pero git reflog muestra los comandos que hemos ejecutado. </p><p>Podemos mover el HEAD del repo haciendo git reset HEAD^, o git reset HEAD^2 para ir moviendo el puntero de la cabeza del repo, a qué commit apunta. Podemos comprobar que se mueve haciendo git log --decorate --oneline --grap --all, viendo dónde se situa el tag HEAD.</p><p>En esta sección vemos como recorrer la rama temporalmente moviendo el HEAD, para lo que usamos git reset HEAD^ o git reset HEAD^^. Con el primero movemos la cabeza una posición hacia el commit anterior, con doble carat lo movemos dos veces. En caso de no existir suficientes commits para los movimientos que queremos realizar, se produce un error.</p><p>Para mover HEAD hacia delante la tecnica es otra. Se hace git reset 'hashCommit'. Por que uno se mueva alante o atrás no se pierda nada de la historia, aunque lo pueda parecer.</p><p><br></p><p><br></p>
+8:02
+3 months ago
+<p>Tipos de git reset, hay 3. Local changes (working directory), Staging area and commit history. Si se usa el mixed reseteará lo que hay en la staging area y pondrá la cabeza donde le digamos. Otra opcion es llamada 'dura' y es más extrema y destructiva. Si no tienes las cosas 'subidas' y te mueves de commit, se pierden. Resetea la wrking directory y la staging area. Y el soft solo mueve el puntero, pero no afecta a la stating area ni al working directory.</p>
+78. Compare Branches via GitHub (Office Hours, Session 1)
+1:14
+3 months ago
+<p>Antes de hacer un pull puedes comparar en github. Una forma de mergear ramas es en github crear una pull request. Esto te lleva a una pantalla en la que puedes ver las diferencias entre las ramas elegidas para la pull request (hacer pull de una rama en otra segunda, como si en la segunda estuvieramos haciendo merge de la primera). <br>Antes de hacer, por ejemplo, un merge en master, parece más recomendable hacer una pull request en github para ver los cambios antes de aplicarlos sin más. Muchas veces incluso puede usarse solo para comparar.</p>
+79. Compare Branches via Command Line (Office Hours, Session 1)
+1:05
+3 months ago
+<p>Hacer <strong>git pull </strong>(estando en la rama X) es por defecto hacer <strong>git pull origin X.</strong></p>
+2:05
+3 months ago
+<ol><li><p>Si conocemos la existencia de una rama en origin de la que no tenemos referencia en local al hacer git branch -a, podemos actualizar esas referencias haciento <strong>git fetch origin nuevarama</strong>. De esta forma, al repetir <strong>git branch -a </strong>podremos ver la rama en la lista de ramas remotas.</p></li></ol>
+3:43
+3 months ago
+<p>Para comparar una rama remota con una local, podemos crear una local con <strong>git branch nombreLocal origin/nombreRemoto</strong>, y luego hacer un <strong>git diff master nombreLocal.</strong> </p><p>$ git branch test-branch origin/test-fetch</p><p>Branch test-branch set up to track remote branch test-fetch from origin.</p><p>Podemos hacer un merge a master o descartar los cambios y borrar la rama creada en local.</p>
+81. Gitting Help (Office Hours, Session 1)
+1:05
+3 months ago
+<p>Siempre podemos ver la documentacion en linea de git sobre un comando cualquiera. Por ejemplo: <strong>git help stash</strong></p>
+82. Cherry Pick (Office Hours, Session 1)
+0:36
+3 months ago
+<p>Imaginamos que tenemos dos ramas, master y una featureBranch, y que en un momento dado tenemos que aplicar un hotfix en master. Despues vamos a querer aplicar ese hotfix tambien en la rama extra. Se trata pues de coger un commit especifico para aplicarlo. Pueden producirse conflictos, claro, pero para eso tenemos la mergetool.</p><p><strong>git cherry-pick hashcommit</strong></p>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetCourseDetailsRequest xmlns="http://carregal.com/courses" 
+xsi:schemaLocation="http://carregal.com/courses course-details.xsd"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<id>1231</id>
+</GetCourseDetailsRequest>

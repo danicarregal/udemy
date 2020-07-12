@@ -1,0 +1,1464 @@
+
+21 Jsp Fragments
+
+Barra superior de navegación haciendo uso de JSP fragments. Tenemos que eliminar la duplicidad de código de las areas comunes de la aplicación:
+head, body, footer, javascripts que añadimos cada vez y que son iguales...
+
+Cogemos el snippet de la página del curso para la cabecera:
+
+<nav role="navigation" class="navbar navbar-default">
+	<div class="">
+		<a href="http://www.in28minutes.com" class="navbar-brand">in28Minutes</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			<li class="active"><a href="/login">Home</a></li>
+			<li><a href="/list-todos">Todos</a></li>
+
+		</ul>
+	</div>
+</nav>
+
+Se lo ponemos en principio a listTodos
+
+Carpeta common para header.jspf (la es de fragment), footer y navigation. Todo hasta la etiqueta <body> incluida lo metemos en header.jspf
+Todo desde la etiqueta </body> lo metemos en footer
+
+<%@ include file="common/header.jspf"%>
+<%@ include file="common/navigation.jspf"%>
+y al final
+<%@ include file="common/footer.jspf"%>
+
+Ejercicios:
+Align the login and welcome page (con los fragmentos).
+Realza el elemento correcto en el menú de la cabecera.
+
+
+Step 22 Preparing for Spring Security
+
+Eliminamos la parte de login como la teníamos, de modo que cuando tengamos un formulario de login será el de Spring Security.
+Ahora la pagina Home no es login, sino la de welcome. Establecemos de momento en sessión en usuario de forma hardcode.
+
+Sacamos a un método esta línea, porque se usa mucho. Servirá para después refactorizar a Spring Security.
+
+private String getLoggedInUserName(ModelMap model){
+	
+	return (String) model.get("");
+}
+
+Step 23: Setup for Spring Security
+
+Añadimos el starter spring-boot-starter-security. Esto provoca que se añada algo de auto-configuración relacionada.
+Y todas las páginas de la aplicación tienen el interceptor de seguridad de spring security.
+
+Ldap o base de datos para tener user id y password. Creamos un package. security y la clase SecurityConfiguration.
+Usamos la anotación @Configuration: más @Beans.
+Clase WebSecurityConfgurerAdapter, de esa vamos a extender para override algún método de interés:
+
+Queremos crear usuarios.
+Queremos definir a qué página redirigir a nuestra propia pagina de login.
+
+Cuando definimos un método en una clase de @Configuration que ha de recibir parámetros inyectados mediante DI por el framework, los métodos se anotan con @Autowired.
+
+Copiamos snippet de github in28minutes: 
+
+@Autowired
+public void configureGlobalSecurity(AuthenticationManagerBuilder auth)
+		throws Exception {
+	auth.inMemoryAuthentication().withUser("daniel").password("dani01")
+			.roles("USER", "ADMIN");
+}
+
+Con este fragmento sobrescribimos el user por defecto que genera spring. Ahora queremos habilitar nuestra propia página de login.
+
+Recetita 2. Copiamos otro snippet para eso:
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+	
+	http.authorizeRequests().antMatchers("/login").permitAll()
+			.antMatchers("/", "/*todo*/**").access("hasRole('USER')").and()
+			.formLogin();
+}
+
+Este fragmento permite acceder a todos al path /login. Solo permite acceder a los otros paths (antMatchers) a usuarios con el rol de USER, y si no lo tienen los manda al formulario de login.
+
+Esta formula ha funcionado de una manera irregular. Ha funcionado bien cuando he incluido un @Bean 
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+	return new BCryptPasswordEncoder();
+}
+
+y he cambiado a 
+
+@Autowired
+public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+
+	auth.inMemoryAuthentication().withUser("daniel").password(passwordEncoder().encode("dani01")).roles("USER",
+			"ADMIN");
+
+}
+
+Además, he configurado las rutas, de momento, así:
+
+@Override
+protected void configure(final HttpSecurity http) throws Exception {
+	http.csrf().disable().authorizeRequests().antMatchers("/").hasRole("USER").antMatchers("/login*").permitAll()
+			.anyRequest().authenticated().and().formLogin().defaultSuccessUrl("/", true);
+}
+
+
+Es interesante la página de Baeldung al respecto de spring security y login:
+
+https://www.baeldung.com/spring-security-login
+
+
+Step 24: Añadir logoff functionality. Quitar el hardcode del username, o sea, coger el usuario logueado con Spring Security.
+
+En Spring Security, un intento de usuario logeado se llama principal. 
+
+SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+Puede ser un UserDetails cuando ha encontrado un usuario que se corresponde con el.
+
+Creamos el método en el controller. SecurityContextHolder es la clase importante.
+
+En los metodos del controller puedo hacer uso de HttpServletRequest y HttpServletResponse.
+Para hacer logout tengo que hacer uso de la clase SecurityContextLogoutHandler
+
+El método logout(request, response, auth) necesita tres parametros que son los que vemos en el siguiente codigo:
+
+@GetMapping("/logouch")
+public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	if (auth != null) {
+
+		new SecurityContextLogoutHandler().logout(request, response, auth);
+	}
+
+	return "redirect:/";
+}
+
+He creado un mapping algo distinto porque /logout ya tiene automagicamente la funcionalidad de deslogado.
+
+Resumen: principal es un intento de login, se obtiene de SecurityContextHolder.getContext().getAuthentication.getPrincipal()
+
+Es un método estático.
+
+Para desloguear hace falta una INSTANCIA de SecurityContextLogoutHandler y de su método logout.
+
+Step 25: Exception Handling
+
+La gestión de excepciones es lo que se llama un cross-cutting concern.
+
+Tener un montón de try catch blocks no es una buena idea y hoy en dia hay soluciones mejores.
+
+Se puede crear un controller con el el path "error" y luego métodos anotados con 
+@ExceptionHandler(RuntimeException.class)
+public ModelAndView handlerError() //se pueden pasar los típicos parámetro que le pasarías a cualquier método de controller.
+
+vamos a poblar el hasErrors y devolver una vista, ese es el objetivo.
+
+En un objeto de la clase ModelAndView podemos tener detalles del model y de la vista.
+
+Creamos una instancia. Tiene métodos como addObject, setViewName. Es una forma alternativa a la que hemos usado hasta ahora, en la que solo devolvíamos un nombre de vista.
+
+Creamos error.jsp con un simple mensaje.
+
+@Controller("error")
+public class ErrorController {
+
+	@ExceptionHandler(RuntimeException.class)
+	public ModelAndView handleError(HttpServletRequest request, HttpServletResponse response, Exception e) {
+
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("exception", e.getStackTrace());
+		mv.addObject("url", request.getRequestURL());
+		mv.setViewName("errorpage");
+		return mv;
+	}
+
+}
+
+No funciona. Supuestamente poniendo "error" como path en en Controller se informa al framework que es un controlador para 
+manejar los errores, cada uno con @ExceptionHandler
+
+Moviendo el código al controlador concreto que produce la excepcion SI que ha funcionado como esperaba.
+
+
+************************************************+
+************************************************+
+************************************************+
+************************************************+
+
+* Springboot Advanced, deep dive. 
+
+Step 1:
+Set up an Maven Project with Eclipse.
+Intellij Link : https://www.jetbrains.com/help/idea/2016.2/getting-started-with-maven.html#create_maven_project
+Copy Two Files pom.xml and Application.java
+Launch Your First Spring Boot Application.
+You will be introduced to Maven
+Dependency Management
+Cool thing to note!
+Without a lot of configuration, we are up and running with a web application
+Refer https://github.com/in28minutes/SpringMvcStepByStep/blob/master/Step15.md to understand the sort of stuff - web.xml, dispatcher servlet configuration, maven dependency management and plugins - that are need to launch a typical web application without Spring Boot!
+What You Will NOT Learn during this Step:
+Spring Boot does a lot of magic. This magic is called Auto Configuration. We will discuss about different terms related to Spring Boot - Starter Parent, Starter projects, Auto configuration - in depth during our first 10 steps.
+As far as this step is concerned, we will focus on getting up and running with Spring Boot. We will understand all the magic a little later.
+We will copy a lot of code in this step - just to avoid typos
+Exercises
+If you are comfortable with Spring, try to create a few dependencies and see if are automatically auto-wired!
+
+Hay un plugin en el pom de los proyectos spring boot que es el que habilita a correrlo con maven. Run as.
+
+Springboot-starter-web incluye tomcat e hibernate-validator, jackson databind, ...
+
+El pom de springboot parent 
+
+<parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>1.4.0.RELEASE</version>
+</parent>
+
+tiene properties definidas que podemos sobrescrbir en la sección properties de nuestro propio pom. Por ejemplo: java.version, hibernate-validator.version, plugins y cosas así.
+Reescribiendo versión de java:
+
+<properties>
+	<java.version>1.8</java.version>
+</properties>
+	
+El parent.pom define las versiones de los starter projects que se incluyan en las dependencias. Curated dependencies.
+
+Step2:
+Lets add a RestController with a dependency and see Spring Boot Magic live
+Theory Break : Quick Spring and Spring MVC Primer
+What is dependency?
+@Component
+@Autowired
+@RestController
+
+Step3:
+First installment of revealing how magic happens with Spring Boot. As a Spring Boot developer, you need to understand what's happening beneath the hood of Spring Boot!
+spring-boot-starter-web : starter for building applications with Spring MVC. Tomcat is default embedded container.
+We already added this starter in the first step! Now we will explore the features it provides
+We will enable logging in DEBUG mode to understand further
+##spring-boot-starter-web
+
+Spring Boot Starter Web brings all dependencies needed to build normal and RESTful web applications. Look at the dependency tree.
+All the dependencies are added in because of spring-boot-starter-web
+Also look at /META-INF/spring.provides inside the spring-boot-starter-web.jar
+Spring Boot Starter Web auto configures things needed to startup a web application. Look at the log
+Mapping servlet: 'dispatcherServlet' to [/]
+Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+Look at package org.springframework.boot.autoconfigure.web in spring-boot-autoconfigure-*.jar
+Go to url http://localhost:8080/some-non-existing-url
+Useful Snippets
+/src/main/resources/application.properties
+logging.level.org.springframework: DEBUG
+
+Step4:
+Understand Starter Parent
+How to override things defined in Starter Parent
+Other starter projects
+Starter Parent
+Dependency Versions
+Java Versions
+Default Plugins
+Other Starter Projects
+spring-boot-starter-web-services
+spring-boot-starter-test
+spring-boot-starter-jdbc
+spring-boot-starter-security
+spring-boot-starter-data-jpa
+spring-boot-starter-data-rest
+More at https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#using-boot-starter
+
+Step5:
+
+Spring Boot vs Spring
+
+Spring: Spring is just a dependency injection framework. Spring focuses on the "plumbing" of enterprise applications so that teams can focus on application-level business logic, without unnecessary ties to specific deployment environments.
+First half of the 2000 decade! EJBs
+EJBs were NOT easy to develop.
+Write a lot of xml and plumbing code to get EJBs running
+Impossible to Unit Test
+Alternative - Writing simple JDBC Code involved a lot of plumbing
+Spring framework started with aim of making Java EE development simpler.
+Goals
+Make applications testable. i.e. easier to write unit tests
+Reduce plumbing code of JDBC and JMS
+Simple architecture. Minus EJB.
+Integrates well with other popular frameworks.
+
+Applications with Spring Framework:
+Over the next few years, a number of applications were developed with Spring Framework
+Testable but
+Lot of configuration (XML and Java)
+Developing Spring Based application need configuration of a lot of beans!
+Integration with other frameworks need configuration as well!
+In the last few years, focus is moving from monolith applications to microservices. We need to be able to start project quickly. Minimum or Zero start up time
+Framework Setup
+Deployment - Configurability
+Logging, Transaction Management
+Monitoring
+Web Server Configuration
+
+Spring Boot: Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can “just run”.
+We take an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss.
+Example Problem Statements
+You want to add Hibernate to your project. You dont worry about configuring a data source and a session factory. I will do if for you!
+Goals
+Provide quick start for projects with Spring.
+Be opinionated but provide options.
+Provide a range of non-functional features that are common to large classes of projects (e.g. embedded servers, security, metrics, health checks, externalized configuration).
+What Spring Boot is NOT?
+It’s not an app or a web server
+Does not implement any specific framework - for example, JPA or JMS
+Does not generate code
+
+Message converters: ¿como se convierte la lista de objetos devuelta en un json? Si Jackson está en la lista de dependencias, se autoconfiguran estos
+messageConverters. Jackson2HttpMessageConverter
+
+json -> object y viceversa
+xml -> object y viceversa
+
+Se producen por los messageConverters, que son autoconfigurados por jackson-data-bind (que es una dependencia transitiva de starter-web).
+
+REST: cliente-servidor. Pueden ser tecnologías completamente independientes y evolucionar por separado. Siempre es una ventaja tener sistemas poco acoplados.
+
+Otra de las características de los servicios REST es que deberían poder dar resultados cacheables en la lista de routers que hay entre el cliente y el servidor final.
+
+El cliente no debe asumir una conexión directa con el service provider, es una de las constraints de la arquitectura REST. Y la última es que un recurso puede tener multiples representaciones.
+
+Existe un verbo http que es PATCH que se usa para updates muy parciales, como de un campo o asi.
+
+Devtools
+Se pueden configurar EXCLUSIONES:
+spring.devtools.restart.exclude=static/,public/
+Se pueden configurar nuevas rutas:
+spring.devtools.resart.additional-paths
+
+Repasando, cuando se crea un recurso, la respuesta debe contener la URI del nuevo recurso creado, y 
+además tener el status 201 Created, y no el 200 OK genérico.
+Queremos la URI del recurso, para lo que hace falta el Id generado al crearlo, pero no queremos tener que hardcodear esa URI.
+
+Se devuelve un ResponseEntity<?> (Java generics) mediante un metodo estático
+
+return ResponseEntity.created(location).build(); o en caso de no crear el recurso:
+return ResponseEntity.noContent().build();
+
+ResponseEntity es la clase que nos permite devolver una respuesta con el http status que queremos.
+ Y para obtener URI de nuestro servicio se hace con ServletUriComponentsBuilder.
+
+URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExppand(createdTodo.getId()).toUri();
+
+En el ejemplo se trata de un servicio de encuestas y preguntas. Si se invoca un POST para 
+crear el recurso de una pregunta nueva en una encuesta que no existe:
+
+POST localhost:8080/surveys/{surveyId}/questions
+
+la respuesta más adecuada sería 204 Not Created en luegar de 500 Internal Server Error.
+
+Esto se hace así: return ResponseEntity.noContent().build();
+
+Claves: @RequestBody, ServletUriComponentsBuilder, ResponseEntity.
+
+Content Negotiation: accept Header Accept:application/xml. Por defecto, springboot con spring-starter-web no responde con xml.
+Hay que añadir una dependencia más. En caso de no hacerlo la respuesta es 406 Not Acceptable.
+
+<dependency>
+	<groupId>com.fasterxml.jackson.dataformat</groupId>
+	<artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+Actuator: 
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-hal-browser</artifactId>
+        </dependency>
+		
+Metadata Services. Hal browser es una UI para actuator.
+Beans: se pueden ver todos los bean configurados en la aplicación. localhost:8080/beans.
+
+heapdump para problemas, trazas de error.
+
+configprops: propiedades que están configuradas, pudiendo estar sobrescritas en application.properties.
+
+Por ejemplo, propiedades de spring.mvc: default local, staticPathPattern, localeResolver...
+
+/autoconfig muestra caracteristicas que han sido habilitadas por autoconfig por los starters, etc.
+
+/trace: muestra las últimas peticiones (request, response, headers, etc).
+
+/heatlh: disco libre, memoria libre, etc.
+
+/mappings: paths ligadas a metodos de controladores.
+
+/env: java, classpath, profiles
+
+/metrics: memoria disponible, libre, threads, urls invocadas, uso de cpu
+
+counter status: estado de respuesta http 415, 12 veces. Etc.
+
+Step 14: embedded servers. 
+Servlet containers. Tomcat se usa por defecto, esta en el pom que genera Initializr. Se puede cambiar, por supuesto.
+(Pero está en el parent de starter-web, por lo que si se quiere configurar otro, lo que hay que hacer es meter una exclusión en el pom en la sección de starter-web)
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
+
+Se puede cambiar el puerto en el que arranca la aplicación en application.properties con 
+server.port=x
+
+Step 15: configuracion dinamica para la aplicación.
+
+opciones para configurar por entorno. Configuracion con yml.
+
+application-properties-> logging.level.org.springframework: INFO
+igualmente podemos definir propiedades nosotros:
+welcome.message=Welcome message from properties file!
+Para coger un valor de los definidos en las aplicacion properties, lo hacemos mediante la anotacion
+
+@Value("welcome.message")
+private String message
+
+No está bien, se debe usar EL --> @Value("${welcome.message}")
+
+Otra forma de configurar propiedades es pasarlas como argumentos de programa:
+
+--welcome.message="Welcome message from arguments". Estos parámetros de programa obviamente pueden ser distintos en los diferentes entornos de ejecución de la aplicación, con lo que podrían usarse parámetros distintos en producción y en desarrollo, por ejemplo.
+Los parámetros de propgrama tienen mayor prioridad que los definidos en application.properties.
+En actuator, si vamos a /env podemos ver las CommandLine Arguments,y ver el que acabamos de crear.
+De la misma forma podemos ver las propiedades configuradas por archivo de properties.
+
+Una forma distinta es configurar el path hacia el archivo de propiedades por parámetro de programa:
+--spring.config.location=classpath:/default.properties.
+
+Profiles es otra forma.
+
+Placeholders: se pueden usar los valores de una propiedad para definir los valores de otras.
+Ejemplo
+
+application.name=in28Minutes
+welcome.message=Welcome to ${application.name}
+
+En actuator, si vemos las propiedades definidas podríamos esperar ver la propiedad de dos formas, traducida (evaluada) o tal como la hemos definido. En la realidad se comprueba que no se muestra evaluada, sino planteada.
+
+Configuracion en yaml, es mejor legible.
+
+ejemplo:
+
+logging:
+ level:
+  org.springframewrok: INFO
+  org.springframework.web.servlet: DEBUG
+ 
+Step 16: Profiles
+La forma más fácil de establecer un profile es en applicacion.properties poner 
+
+spring.profiles.active=prod (por ejemplo)
+Otra forma de pasar el env es como parámetro de la VM (máquina virtual) de la siguiente forma en Run Configurations:
+VM Arguments
+-Dspring.profiles.active=prod
+
+Entonces, si tenemos en el classpath un properties llamado application-prod.properties, las propiedades definidas allí serán las que se apliquen.
+
+Podemos tener cosas como la seguridad habilitada en un entorno pero no en otros, por ejemplo.
+
+Si no se encuentra un application.properties de un profile, se hace uso de los valores por defecto para las properties, que son los definidos en applicacion.properties.
+
+Forma dinámica. Creación de beans:
+
+@Profile("dev")
+@Bean
+public String dummy(){
+return 'dummy';
+}
+
+El bean NO se crea en otros profiles activos. De esta manera, puedes por ejemplo tener un env para test unitarios que usen implementaciones distintas de las empleadas en otros entornos.
+Por ejemplo, la base de datos. O cache distribuida para produccion, cache de menos nivel para pre, y nada de cache para dev.
+
+Step 17: advanced configuration.
+
+type safe configuration properties. Vamos a ver una alternativa que puede evitar tener que definir un atributo por cada propiedad, anotado con @Value.
+Se trata de definir un bean que contenga esos atributos, claro. Una clase BasicConfiguration.
+Se declara como @Component para que sea escaneado. 
+@Component
+@ConfigurationProperties("basic")
+public class BasiConfiguration{
+
+private String message;
+private int number;
+private boolean value;
+
+}
+
+De esta forma, podemos acceder a la las properties basic.message, basic.number, basic.value.
+
+Hay que tener un @Autowired en la clase de servicio donde queremos hacer uso de las properties, y hacer uso de ellas accediendo a sus atributos.
+La alternativa sería tener de definir un value por cada property, lo cual no es demasiado practico si son muchas propiedades.
+
+Se dice que es type safe, pues la aplicación no arranca en absoluto si no se puede convertir la propiedad al tipo de dato del atributo que la ha de transportar.
+
+/confogprops en actuator, allí podemos ver el bean definido para contener datos de configuracion.
+
+Step 18: Spring Data Jpa.
+
+Creando un ejemplo sencillo de Repositorio. Incluye el starter spring-data-jpa. Hace falta además una base de datos, que puede ser por ejemplo H2.
+En un primer intento, al no incluir ninguna, el contexto no se levanta. 
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+</dependency>
+
+Tipicamente se utilizan en test unitarios las bases de datos en memoria.
+En el step actual ha creado una Entity y un Repository para crear y persistir algunos datos en un CommandLineRunner.
+
+El Repo lo hace implementando CrudRepository<User, Long> Bien, esta afirmación es incorrecta.
+Se define una Interface que EXTIENDE de CrudRepository<User, Long>. La implementación es obra del framework, y no tenemos ese codigo de forma explícita.
+Qué métodos ofrece la interfaz Crudrepository?
+
+save, exists, findOne, findById, findAll, delete, deleteById...
+Todo esto OOTB
+
+@Component
+public class UserCommandLineRunner implements CommandLineRunner{
+	
+	@Override
+	public void run(String... args){
+		
+		sysout("hola from command line runner");
+	}
+
+}
+
+spring-data-jpa incluye spring-jdbc, hibernate-jpa, hibernate-core...
+La autoconfiguración al incluir spring-data-jpa crea beans como jdbcTemplate, dataSource, entityManagerFactory,
+
+/autoconfig en actuator se ve mucha información relativa a todo lo que se autoconfigura.
+
+Sobre la base de datos H2, se puede configurar la url para acceder a ella en las properties:
+
+spring.datasource.url=jdbc:h2:mem:testdb
+
+También hay que habilitar el acceso a la consola, en algunas versiones de springboot al menos.
+
+Step 19:
+
+http://localhost:8080/h2-console
+
+Para cambiar H2 por mysql, en las properties definimos los valores necesarios:
+
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.url=jdbc:mysql//localhost:3306/test
+spring.datasource.username=root
+spring.datasource.password=admin
+spring.datasource.initialize=true
+spring-jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+
+Para los crudRepository de SpringDataJpa, necesitamos exponer en la interfaz todos los métodos que queremos que estén en la implementación.
+Existe un convenio de nombres para eso, pero como decimos, para que el framework lo proporcione HAY QUE DECLARAR EL METODO EN LA INTERFAZ
+Ver la documentación para conocer la nomenclatura de los query methods.
+(incluir copia de la tabla en el word)
+
+findByRole, por ejemplo.
+
+
+
+Step 20: Spring data Rest
+
+Ofrecer servicios REST directamente desde los repositorios, este sería el objetivo de la dependencia spring-data-rest.
+
+Es bueno para prototyping, pero no para grandes aplicaciones, por lo visto.
+La forma tradicional de exponer servicios web es otra, crear metodos en el componente controller que hagan uso de componenetes servicios que hagan uso de componentes repositorios.
+Esta (spring-data-rest) es una forma para saltarse eso. 
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-rest</artifactId>
+</dependency>
+
+El objetivo es exponer rest services sobre los metodos del UserRepository
+Se hace una copia de la interfaz creada antes UserRepository, y la llama UserRestRepository.
+En lugar de extender de Crudrepository ahora extendemos de PagingAndSortingRepository
+(tiene paginado y ordenacion ademas de lo expuesto por CrudRepository). En esta es donde vamos a experimentar con el DataRest.
+
+Se anota la clase con 
+@RepositoryRestResource(path="users", collectionResourceRel="users")
+
+Funciona para peticiones GET pero también para peticiones POST para crear un nuevo ususario. 
+Es necesario incluir la cabecera Content-type: application/json si se enviará la información en este formato, pero por lo demás funciona como se espera.
+En caso de get, la cabecera necesaria es Accept: application/json (o lo que corrsponda)
+Es más, configura correctamente la devolución de enlace al recurso creado y devuelve la entity creada.
+
+Asombroso. En este punto uno se pregunta porqué hacerlo de la otra forma, con @RestController. El instructor recomienda usar esta técnica solo en fase prototyping.
+
+collectionResourceRel="usuarios" : así es como se llama la colección con los resultados de la query en el json de respuesta.
+
+{
+  "_embedded": {
+    "usuarios": [
+      {
+        "name": "Ranga",
+        "role": "Admin",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/users/1"
+          },
+          "user": {
+            "href": "http://localhost:8080/users/1"
+          }
+        }
+      },
+      {
+        "name": "Ravi",
+        "role": "User",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/users/2"
+          },
+          "user": {
+            "href": "http://localhost:8080/users/2"
+          }
+        }
+      },
+      {
+        "name": "Satish",
+        "role": "Admin",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/users/3"
+          },
+          "user": {
+            "href": "http://localhost:8080/users/3"
+          }
+        }
+      },
+      {
+        "name": "Raghu",
+        "role": "User",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/users/4"
+          },
+          "user": {
+            "href": "http://localhost:8080/users/4"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/users"
+    },
+    "profile": {
+      "href": "http://localhost:8080/profile/users"
+    },
+    "search": {
+      "href": "http://localhost:8080/users/search"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 4,
+    "totalPages": 1,
+    "number": 0
+  }
+}
+
+RepositoryRestResource tambien expones otras url como:
+
+http://localhost:8080/users/1 : Obtiene el elemento por su Id
+
+http://localhost:8080/users/?size=1 : Cuantos elementos queremos obtener. También da enlaces a las páginas de la paginación
+HATEOAS viene automáticamente, enlaces a los otros elementos, a la lista completa, a documentación del API (profile)
+Por ejemplo, que proporcione enlaces a la siguiente página, a la primera página, a la página anterior. Son enlaces super útiles para cualquier consumidor de ese servicio.
+
+
+{
+  "_embedded": {
+    "usuarios": [
+      {
+        "name": "Ranga",
+        "role": "Admin",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/users/1"
+          },
+          "user": {
+            "href": "http://localhost:8080/users/1"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "first": {
+      "href": "http://localhost:8080/users?page=0&size=1"
+    },
+    "self": {
+      "href": "http://localhost:8080/users"
+    },
+    "next": {
+      "href": "http://localhost:8080/users?page=1&size=1"
+    },
+    "last": {
+      "href": "http://localhost:8080/users?page=3&size=1"
+    },
+    "profile": {
+      "href": "http://localhost:8080/profile/users"
+    },
+    "search": {
+      "href": "http://localhost:8080/users/search"
+    }
+  },
+  "page": {
+    "size": 1,
+    "totalElements": 4,
+    "totalPages": 4,
+    "number": 0
+  }
+}
+
+
+http://localhost:8080/users/?sort=name,desc
+Otra de las funcionalidades que expones es ordenación, a este respecto habría que saber cómo configurar el locale para esa ordenación, pues suponemos que influye.
+Documentación de Spring Data Rest:
+https://docs.spring.io/spring-data/rest/docs/current/reference/html/#reference
+
+En el repositorio definido en el step anterior, que era una interface que extendía CrudRepository, teníamos definido un método findByRole.
+Para exponerlo como servicio REST tenemos que recibir como parámetro el id por el que buscamos. Así, en nuestra @RepositoryRestResource interface, definimos el método findByRole, pero en el parámetro del método usamos también una anotación
+@Param("role") y después, la url para la invocación es /users/search/findByRole/?role=Admin.
+
+@RepositoryRestResource(path = "users", collectionResourceRel = "usuarios")
+public interface UserRestRepository extends PagingAndSortingRepository<User, Long> {
+	List<User> findByRole(@Param("role") String role);
+}
+
+Todos los recursos que hemos visto y comentados han sido configurados automáticamente por SpringBoot.
+Lo recomienda el instructor para un rápido prototyping, pero a la vez advierte que expone tantas cosas de forma automática que para usarlo en una aplicación en producción hay que ser muy cauto, que puede ser más aconsejable tener más control sobre lo que se expone.
+
+
+
+Step 21: unit testing & integration testing
+
+Una de las palabras polisémicas que puede ser relevante aclarar es la palabra servicio o service. A la vez se usa en este documento para referirse a cualquiera de los componentes manejados por el framework anotados con @Service, y a la vez se usa para referirse a un endpoint de un servicio REST (de ahí el término servicio en este otro caso). En el segundo caso, como sabemos, el servicio es uno de los métodos de alguna de las clases anotadas como @RestController.
+
+Integration test: va a través de todas las capas de la aplicación: controller, service & persistence.
+En un unit test solo probamos una cosa, o el controlador, o el servicio, etc.
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-test</artifactId>
+	<scope>test</scope>
+</dependency>
+
+Importante NOTAR que en la dependencia ha añadido un scope, así que la dependencia solo estará disponible si el scope test está activo.
+No es buena práctica tener código de test desplegado en producción.
+
+Seguimos las convención de Junit para la creación de test, con lo que el paquete será el mismo que el de la clase que probamos, pero partiendo de src/test/paquete (otra source folder).
+Vamos a la clase del Controller SurveyController y copiamos el package. Creamos el pachage en src/test/
+
+New -> Junit Test Case. Se indica la clase a probar, que va a ser nuestro controller.
+
+Para hacer un test de integracion hay dos partes: inicialización de la aplicación e invocación de la lógica de negocio que queremos probar evaluando su resultado.
+
+Para correr el contexto de Spring en un test una herramienta es SpringRunner.class. Entonces, en la clase del test:
+Junit runners to start spring context: @RunWith(SpringRunner.class)
+
+SpringJUnit4ClassRunner es la clase, SpringRunner es un alias.
+
+@SpringBootTest ayuda a lanzar una aplicación SpringBoot en un test, que es la clase que tenemos anotada como SpringBootApplication.
+Tiene otras opciones, entre ellas una que nos permitirá levantar la aplicación en un puerto random, y después obtener esa propiedad y conocer su valor.
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class,
+		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class SurveyControllerIT {
+
+Se usa en conjunto con 
+@LocalServerPort
+private int port;
+para inyectar el puerto en el Test, necesario para conocer la url e invocarla. Necesitamos el puerto para la url, para llamar al controlador.
+
+String url = "http://localhost:" + port + "/surveys/Survey1/questions/Question1";
+
+
+Step 22:
+
+Para invocar la url hacemos uso de TestRestTemplate. import org.springframework.boot.test.web.client.TestRestTemplate;
+
+TestRestTemplate restTemplate = new TestRestTemplate();
+
+Primero ejecutamos el método getForObject: 
+String output = restTemplate.getForObject(url, String.class);
+
+Si queremos content negotiation necesitamos incluir cabeceras. Entonces no se puede hacer uso de getForObject y hay que usar exchange. Para la primera prueba creamos una requestEntity null, o sea, sin cabeceras ni body. Estamos en el mismo caso anterior.
+
+ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+
+PAra crear las cabeceras hacemos uso de HttpHeaders headers = new HttpHeaders();
+Aunque creo que se puede hacer asi: headers.add("Accept", "application/json"); la forma concreta de hacer esto es:
+
+headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+Entonces podemos crear un objeto HttpEntity y con él hacer uso del método exchange de la RestTemplate.
+
+HttpEntity<Object> requestEntity = new HttpEntity<Object>(null, headers);
+
+ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+
+String body = response.getBody();
+System.out.println("Response : " + body);
+
+// {"id":"Question1","description":"Largest Country in the
+// World","correctAnswer":"Russia","options":["India","Russia","United
+// States","China"]}
+
+assertTrue(body.contains("\"id\":\"Question1\""));
+assertTrue(body.contains("\"correctAnswer\":\"Russia\""));
+
+JSONAssert es una herramienta mucho mejor para hacer asserts cuando el resultado que se obtiene es una cadena JSON. No se fija en espacios o comillas en los nombres o valores de los atributos del objeto json.
+
+JSONAssert.assertEquals, puede ser estricta o laxa. Por ejemplo:
+
+JSONAssert.assertEquals("{date: 1}", "{\"date\": 1}", false);
+
+El primer valor es expected. El segundo valor es actual. Como el valor obtenido cumple con que contiene todos los atributos expected y los mismos valores, no falla por el hecho de que tenga información adicional.
+En modo estricto tienen que coincidir todos los atributos recibidos con los esperados. Por contra, no importan los espacios es blanco o las comillas.
+
+@Test
+public void testRetrieveSurveyQuestion() {
+
+	String url = createUrl("/surveys/Survey1/questions/Question1");
+	System.out.println(url);
+
+	HttpEntity<Object> requestEntity = new HttpEntity<Object>(null, headers);
+	ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+
+	String body = response.getBody();
+	System.out.println("Response : " + body);
+
+	// {"id":"Question1","description":"Largest Country in the
+	// World","correctAnswer":"Russia","options":["India","Russia","United
+	// States","China"]}
+
+	assertTrue(body.contains("\"id\":\"Question1\""));
+	assertTrue(body.contains("\"correctAnswer\":\"Russia\""));
+
+	String expected = "{id:Question1,description:Largest Country in the World,correctAnswer:Russia}";
+	JSONAssert.assertEquals("{date:1}", "{date: 1}", false);
+	JSONAssert.assertEquals(expected, response.getBody(), false);
+
+}
+
+Ahora para probar la petición de todas las Question de una Survey:
+
+
+@Test
+public void testRetrieveSurveyQuestions() {
+
+	String url = createUrl("/surveys/Survey1/questions/");
+	System.out.println(url);
+
+	HttpEntity<Object> requestEntity = new HttpEntity<Object>(null, headers);
+	@SuppressWarnings("rawtypes")
+	ResponseEntity<ArrayList> response = template.exchange(url, HttpMethod.GET, requestEntity, ArrayList.class);
+
+	@SuppressWarnings("unchecked")
+	ArrayList<Question> body = response.getBody();
+	System.out.println("Response : " + body);
+
+}
+
+El fragmento anterior sirve, pero el instructor utiliza:
+
+
+@Test
+public void testRetrieveSurveyQuestions2() {
+
+	String url = createUrl("/surveys/Survey1/questions/");
+	System.out.println(url);
+
+	HttpEntity<Object> requestEntity = new HttpEntity<Object>(null, headers);
+
+	ResponseEntity<List<Question>> response = template.exchange(url, HttpMethod.GET, requestEntity,
+			new ParameterizedTypeReference<List<Question>>() {
+			});
+
+	Question assertQuestion = new Question("Question1", "Largest Country in the World", "Russia",
+			Arrays.asList("India", "Russia", "United States", "China"));
+	assertTrue(response.getBody().contains(assertQuestion));
+}
+  
+---
+ParameterizedTypeReference: The purpose of this class is to enable capturing and passing a generic Type. In order to capture the generic type and retain it at runtime,you need to create a subclass as follows: 
+ ParameterizedTypeReference<List<String>> typeRef = new ParameterizedTypeReference<List<String>>() {};
+ 
+The resulting typeReference instance can then be used to obtain a Type instance that carries parameterized type information.For more information on "super type tokens" see the link to Neal Gafter's blog post
+---
+
+Probar el servicio POST de una nueva Question será la siguiente cuestión a estudio. Ahora en la HttpEntity no podemos enviar un body vacío, sino que precisamente ese cuerpo de la petición será la Question que vamos a postear, guardar o registrar.
+El siguiente fragmento ilustra la primera parte del test, el envío efectivo de la Question para que el controlador invoque la lógica de negocio que guarde un nuevo elemento.
+
+@Test
+public void testAddSurveyQuestions() {
+
+	String url = createUrl("/surveys/Survey1/questions");
+	System.out.println(url);
+
+	Question newQuestion = new Question("Question10", "Daniel penis size", "16",
+			Arrays.asList("13", "14", "15", "16"));
+
+	HttpEntity<Question> requestEntity = new HttpEntity<Question>(newQuestion, headers);
+
+	ResponseEntity<String> response = template.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+}
+
+Ahora la parte de aserción, necesaria para automatizar los test y ver de manera más gráfica el resultado. Sabemos que este servicio no devuelve el registro creado, sino que devuelve una cabecera y un status 201 created.
+La cabecera se llama location, y se puede obtener a partir de la response. Incluimos la comprobación también del status (201 created)
+
+@Test
+public void testAddSurveyQuestions() {
+
+	String url = createUrl("/surveys/Survey1/questions");
+	System.out.println(url);
+
+	Question newQuestion = new Question("Question10", "Daniel shoe size", "43",
+			Arrays.asList("43", "44", "45", "46"));
+
+	HttpEntity<Question> requestEntity = new HttpEntity<Question>(newQuestion, headers);
+
+	ResponseEntity<String> response = template.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+	List<String> headers = response.getHeaders().get(HttpHeaders.LOCATION);
+	String location = headers.get(0);
+
+	assertTrue(location.contains("/surveys/Survey1/questions/"));
+	assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+
+}
+
+
+Step 23: refactor para eliminar las duplicidades: cabeceras, template...
+
+Poner la creación de la url en un método. Creación de las cabeceras y del template en un método init() anotado con @Before (se ejecuta antes de cualquiera de los @Test)
+
+
+Step 24: unit testing
+
+Los test unitarios no son iguales que los de integración (pues se prueba uno solo de los componentes, y en los de integración la prueba incluye todas las capas de la aplicación). Hacen uso de mocking o stubs (rudimentario y desaconsejado el ultimo).
+Se hará a continuación un test para probar el obtener una Question específica de una de las Survey (solo tenemos una).
+
+Las clases de tests unitarios se suelen llamar por el nombre la clase que queremos probar + 'Test'. Es una convención. Hacemos una copia de la clase en la que tenemos los test de integración, pero borramos practicamente todo para quedarnos con lo único que nos hace falta de momento:
+
+package com.in28minutes.springboot.controller;
+
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+public class SurveyControllerTest {
+
+
+}
+
+Seguimos usando SpringRunner para correr el contexto (aunque a mi me da que para el concepto de test unitario no es necesario eso...) En un test de integración levantamos toda la aplicación. En la clase anterior esa parte era provista por la anotación @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+Solo queremos cargar una clase, y para eso vamos a mockear las dependencias que necesitemos. 
+
+Para crear un contexto solo con el controlador que queremos probar, en lugar de lo que teniamos antes @SpringBootTest, ahora tenemos @WebMvcTest(SurveyController.class).
+Necesitamos el service SurveyService, que de momento podemos mockear teniendo un atributo de este tipo y anotado con @MockBean, lo que inyectará una instancia mock del mismo.
+
+SpringRunner al ver la anotación @MockBean va a crear una instancia mock y la va a inyectar en la clase de @WebMvcTest(SurveyController.class).
+
+import org.springframework.test.context.junit4.SpringRunner;
+
+import com.in28minutes.springboot.service.SurveyService;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(SurveyController.class)
+public class SurveyControllerTest {
+
+	@MockBean
+	private SurveyService service;
+
+	@Test
+	public void firstTest() {
+		System.out.println("hello");
+	}
+
+}
+
+Vemos que al especificar @WebMvcTest un controlador concreto (no se hace ComponentScan, que es lento), solo se cargan sus mapeos (mucho más rápido de ejecutar) al iniciar ese mini-contexto:
+
+Mapped "{[/surveys/{surveyId}/questions],methods=[GET]}" 
+onto public java.util.List<com.in28minutes.springboot.model.Question> com.in28minutes.springboot.controller.SurveyController.retrieveQuestions(java.lang.String)
+
+Mapped "{[/surveys/{surveyId}/questions/{questionId}],methods=[GET]}" 
+onto public com.in28minutes.springboot.model.Question com.in28minutes.springboot.controller.SurveyController.retrieveDetailsForQuestion(java.lang.String,java.lang.String)
+
+Mapped "{[/surveys/{surveyId}/questions],methods=[POST]}" 
+onto public org.springframework.http.ResponseEntity<java.lang.Void> com.in28minutes.springboot.controller.SurveyController.addQuestionToSurvey(java.lang.String,com.in28minutes.springboot.model.Question)
+
+El primer test será sobre el método: retrieveDetailsForQuestion. Los test tienen 3 partes: setup, invocación y assert.
+El setup es montar el mock como queremos: para tal conjunto de parametros de entrada tienes que dar tal resultado dummy. Entonces llegará la parte de la prueba en sí, que en nuestro caso lo es del controller.
+PAra hacer llamadas al controller, @WevMvcTest provee de un bean llamado mockMvc que nos permite hacer llamadas web (como un restTemplate o parecido). Hay que declararlo e inyectarlo con @Autowired:
+
+@Autowired
+private MockMvc mockMvc;
+
+Tiene un método que se llama perform que necesita una request que montamos por medio del patrón Builder con la interfaz RequestBuilder. MockMvcRequestBuilders.get(url).accept(MediaType.APPLICATION_JSON);
+Queremos probar la path /surveys/{surveyId}/questions/{questionId}, y montamos una request a esa url. 
+
+Sobre mockMvc.perform añadimos una llamada a .andReturn() -- > Return the result of the executed request for direct access to the results (MvcResult)
+
+mvcResult.getResponse().getContentAsString() es el JSON del body de la respuesta obtenida. Obviamente para compararla con la cadena expected lo hacemos con JSONAssert.assertEquals y strict = false.
+
+En la consola se muestra información jugosa:
+
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /surveys/Survey1/questions/Question1
+       Parameters = {}
+          Headers = {Accept=[application/json]}
+
+Handler:
+             Type = com.in28minutes.springboot.controller.SurveyController
+           Method = public com.in28minutes.springboot.model.Question com.in28minutes.springboot.controller.SurveyController.retrieveDetailsForQuestion(java.lang.String,java.lang.String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {Content-Type=[application/json;charset=UTF-8]}
+     Content type = application/json;charset=UTF-8
+             Body = {"id":"Question1","description":"Largest Country in the World","correctAnswer":"Russia","options":["India","Russia","United States","China"]}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+		  
+Este es el código del test completo (que funciona OK):
+
+@Test
+public void retrieveDetailsForQuestionTest() throws Exception {
+
+	Question question1 = new Question("Question1", "Largest Country in the World", "Russia",
+			Arrays.asList("India", "Russia", "United States", "China"));
+
+	// ajustando el mock. Lo que probamos es el controller.
+	// when(service.retrieveQuestion("Survey1", "Question1")).thenReturn(question1);
+	when(service.retrieveQuestion(Mockito.anyString(), Mockito.anyString())).thenReturn(question1);
+
+	// tenemos que llamar con GET y ver los datos que recibimos. El controlador ya
+	// tiene inyectado el service.
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/surveys/Survey1/questions/Question1")
+			.accept(MediaType.APPLICATION_JSON);
+
+	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+	String expected = "{id:Question1,description:Largest Country in the World,correctAnswer:Russia}";
+	String contentAsString = result.getResponse().getContentAsString();
+
+	JSONAssert.assertEquals(expected, contentAsString, false);
+}
+
+
+Step 25: tests para POST y GET cuando se recupera una colección
+
+El siguiente test sirve para probar el caso de uso de obtener todas las Question de una Survey, por lo que se compara con un array expected. Además se introduce el uso de los ResultMatcher al poner la restricción de que la respuesta del servicio tiene que ser 200 OK.
+
+StatusResultMatchers org.springframework.test.web.servlet.result.MockMvcResultMatchers.status() : Access to response status assertions.
+Ejemplo:
+
+MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn(); //status() tiene el import static de org.springframework.test.web.servlet.result.MockMvcResultMatchers.status()
+
+El código completo del @Test es:
+
+@Test
+public void retrieveQuestionsTest() throws Exception {
+
+	Question question1 = new Question("Question1", "Largest Country in the World", "Russia",
+			Arrays.asList("India", "Russia", "United States", "China"));
+
+	Question question2 = new Question("Question2", "Smallest Country in the World", "San Marino",
+			Arrays.asList("San Marino", "Monaco", "Batican", "Andorra"));
+
+	when(service.retrieveQuestions(Mockito.anyString())).thenReturn(Arrays.asList(question1, question2));
+
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/surveys/SurveyDummyId/questions")
+			.accept(MediaType.APPLICATION_JSON);
+
+	MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
+
+	String expected = "[{id:Question1,description:Largest Country in the World,correctAnswer:Russia},{id:Question2,description:Smallest Country in the World,correctAnswer:San Marino}]";
+	String contentAsString = result.getResponse().getContentAsString();
+
+	JSONAssert.assertEquals(expected, contentAsString, false);
+}
+
+Un último test para esta sección será probar el servicio (endpoint del controller) de creación de una Question para una Survey. Hay que utilizar el método post de mockMvc y además hacer uso del método content(String content) para poner la String json con la Question que queremos postear. También especificar el ContentType con contentType(MediaType.APPLICATION_JSON). Vemos todo esto resumido en el código a continuación:
+
+@Test
+	public void addQuestionToSurveyTest() throws Exception {
+
+		Question mockQuestion = new Question("1", "Smallest Number", "1", Arrays.asList("1", "2", "3", "4"));
+
+		String questionJson = "{\"description\":\"Smallest Number\",\"correctAnswer\":\"1\",\"options\":[\"1\",\"2\",\"3\",\"4\"]}";
+
+		when(service.addQuestion(Mockito.anyString(), Mockito.any(Question.class))).thenReturn(mockQuestion);
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/surveys/SurveyDummyId/questions")
+				.content(questionJson).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andExpect(status().isCreated()).andReturn();
+
+		String contentAsString = result.getResponse().getContentAsString();
+
+		String location = result.getResponse().getHeader(HttpHeaders.LOCATION);
+		System.out.println(location);
+	}
+
+
+Step 26: Spring Security basics
+
+Aplicación de los conceptos de autenticación y autorización. Quien eres y a qué tienes acceso. Hay que añadir un starter al pom y ya se hace necesaria la autenticación para cualquier petición, en virtud de los jars presentes en el classpath y la autoconfiguración de spring-boot.
+Para acceder a actuator también se auto-habilita. Todo lo que está expuesto necesita auth básica ahora.
+
+Al arrancar el contexto de aplicación, se puede ver un mensaje en el log que muestra la password auto-generada en el arranque (el username es implicito y es siempre 'user')
+
+Using default security password: ea74c381-7383-461b-870f-e5a76560c35c
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+Las dependencias del parent pom de spring boot relacionadas con spring-boot-starter-security con web-security y security-config.
+
+Al intentar hacer una petición:
+
+{
+    "timestamp": 1591899066427,
+    "status": 401,
+    "error": "Unauthorized",
+    "message": "Full authentication is required to access this resource",
+    "path": "/surveys/Survey1/questions/Question1"
+}
+
+
+Step 26-2: Configurar roles y actualizar los test de intergración y unitarios
+
+Vamos a crear dos roles. User y Admin.
+Creamos clase de configuracion que extiende de WebSecurityConfigurerAdapter para override algunos métodos.
+
+Dando un vistazo a la clase WebSecurityConfigurerAdapter vemos que para habilitar algunos usuarios y tenerlos en memoria cargados tenemos que hacer override del método configure(AuthenticationManagerBuilder auth). Copiamos código de la propia clase para poner nuestros propios usuarios (linea 134):
+
+	 /*For example, the following configuration could be used to register in memory
+	 * authentication that exposes an in memory {@link UserDetailsService}:
+	 */	 
+	 @Override
+	 protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	  	
+	  	// enable in memory based authentication with a user named user and admin
+	  	auth.inMemoryAuthentication().withUser("user").password("password").roles("USER").and()
+	  			.withUser("admin").password("password").roles("USER", "ADMIN");
+	}
+
+Con esto tendríamos la primera parte que queremos abordar. Ahora hay que definir los accesos de cada uno de los roles. Se usan ant-matchers. Se copia también de la clase WebSecurityConfigurerAdapter:
+
+/**
+ * Override this method to configure the {@link HttpSecurity}. Typically subclasses
+ * should not invoke this method by calling super as it may override their
+ * configuration. The default configuration is:
+ *
+ * <pre>
+ * http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().httpBasic();
+ * </pre>
+ *
+ * @param http the {@link HttpSecurity} to modify
+ * @throws Exception if an error occurs
+ */
+// @formatter:off
+protected void configure(HttpSecurity http) throws Exception {
+	logger.debug("Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).");
+
+	http
+		.authorizeRequests()
+			.anyRequest().authenticated()
+			.and()
+		.formLogin().and()
+		.httpBasic();
+}
+
+	// 2.-autorizacion de los usuarios role --> accesss
+	//survey -> USER
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.httpBasic().and()
+		.authorizeRequests()
+		.antMatchers("/survey/**").hasRole("USER")
+		.antMatchers("/users/**").hasRole("USER")
+		.antMatchers("/**").hasRole("ADMIN")
+		.and().csrf().disable()
+		.headers().frameOptions().disable();
+	}
+
+Las dos últimas líneas se incluyen para que pueda funcionar hal-browser de actuator, pero son de una profundidad en la que de momento no entraremos en este documento.
+
+https://docs.spring.io/spring-security/site/docs/3.2.0.CI-SNAPSHOT/reference/html/csrf.html This section discusses Spring Security's Cross Site Request Forgery (CSRF) support.
+
+https://developer.mozilla.org/es/docs/Web/HTTP/Headers/X-Frame-Options : El encabezado de respuesta HTTP X-Frame-Options puede ser usado para indicar si debería permitírsele a un navegador renderizar una página en un <frame>, <iframe> o <object> . Las páginas webs pueden usarlo para evitar ataques de clickjacking , asegurándose que su contenido no es embebido en otros sitios.
+
+Tras probar actuator y hacer distintas peticiones con POSTMAN se ha comprobado que el sistema de roles funciona como era de esperar.
+
+------- NOTA:
+
+Disabling Security for 2.2.0.RELEASE in Unit Tests needs a small change
+Spring Boot 2.2.0.RELEASE+ 
+
+@WebMvcTest(value = SurveyController.class, secure = false)
+
+secure=false is deprecated.
+
+Instead, you would need to use @WithMockUser
+
+Add this to pom.xml
+
+ <dependency>    
+    <groupId>org.springframework.security</groupId>    
+    <artifactId>spring-security-test</artifactId>    
+    <scope>test</scope>
+</dependency>
+
+
+Use @WithMockUser to use a mock user as follow:
+
+@WithMockUser(username = "user1", password = "secret1")
+@Test
+public void yourTest() throws Exception {...}
+
+---------
+
+Step 27: modificar los test unitarios y de integración para que funcionen con spring-security-login
+
+Tal como están, los test fallan por no llevar autenticación. Es necesaria una dependencia y el uso de un par de anotaciones, como se expone en la nota anterior.
+
+Se debe establecer la cabecera "Authorization". Después se debe cifrar el usuario y la clave en Base64, y crear la cadena "Basic " + Base64Enconding(userId+":"+password)
+
+String auth = "user"+":"+"secret1";
+byte[] encondeAuth = Base64.encode(auth.getBytes(Charset.forName("US-ASCII")));
+String headerValue = "Basic " + new String(encondeAuth);
+headers.add("Authorization", headerValue);
+
+Este código lo ponemos en un método para que cree las cabeceras en todos los test de integración.
+
+@Before
+public void init() {
+	template = new TestRestTemplate();
+	headers = createHeaders("user", "secret1");
+}
+
+private HttpHeaders createHeaders(String userId, String password) {
+
+	HttpHeaders headers = new HttpHeaders();
+	headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+	String auth = "user" + ":" + "secret1";
+	byte[] encondeAuth = Base64.encode(auth.getBytes(Charset.forName("US-ASCII")));
+	String headerValue = "Basic " + new String(encondeAuth);
+	headers.add("Authorization", headerValue);
+
+	return headers;
+}
+
+Para los test unitarios queremos deshabilitar la seguridad, pues NO es lo que se está probando y hay que centrarse en probar aquello que es objeto de la prueba únicamente, en nuestro caso el controller de survey.
+Para deshabilitar la seguridad, @WebMvcTest tiene un parámetro "secure" que podemos establecer a false. En versiones posteriores a SpringBoot 2.2.0 esto no se hace así pues el parámetro estaría deprecado, y hay que proceder como indica la nota al respecto que ya hemos visto.
+
+/**
+ * If Spring Security's {@link MockMvc} support should be auto-configured when it is
+ * on the classpath. Defaults to {@code true}.
+ * @return if Spring Security's MockMvc support is auto-configured
+ */
+@AliasFor(annotation = AutoConfigureMockMvc.class, attribute = "secure")
+boolean secure() default true;
+
+
+Step 28: Deep dive into spring autoconfiguration.
+
+Al arrancar spring-boot, en función de las clases presentes en el classpath se configuran y se hacen disponibles un número de Beans. Todo esto sucede de forma automática y ahora veremos algunos detalles de qué sucede en el proceso.
+Ejemplos: JdbcTemplateAutoConfiguration, HttpMessageConvertersAutoConfiguration.
+
+¿Qué beans se configuran?
+¿Qué beans NO se configuran?
+
+Se puede obtener mucha información viendo el log en modo DEBUG.
+
+-------- configurados
+
+   DeviceResolverAutoConfiguration did not match
+      - required @ConditionalOnClass classes not found: org.springframework.mobile.device.DeviceResolverHandlerInterceptor,org.springframework.mobile.device.DeviceHandlerMethodArgumentResolver (OnClassCondition)
+
+   DispatcherServletAutoConfiguration.DispatcherServletConfiguration#multipartResolver did not match
+      - @ConditionalOnBean (types: org.springframework.web.multipart.MultipartResolver; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   EhCacheCacheConfiguration did not match
+      - required @ConditionalOnClass classes not found: net.sf.ehcache.Cache,org.springframework.cache.ehcache.EhCacheCacheManager (OnClassCondition)
+
+   JpaBaseConfiguration#entityManagerFactoryBuilder matched
+      - @ConditionalOnMissingBean (types: org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   JpaBaseConfiguration#jpaVendorAdapter matched
+      - @ConditionalOnMissingBean (types: org.springframework.orm.jpa.JpaVendorAdapter; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   JpaBaseConfiguration#transactionManager matched
+      - @ConditionalOnMissingBean (types: org.springframework.transaction.PlatformTransactionManager; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   WebMvcAutoConfiguration#httpPutFormContentFilter matched
+      - @ConditionalOnMissingBean (types: org.springframework.web.filter.HttpPutFormContentFilter; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter#defaultViewResolver matched
+      - @ConditionalOnMissingBean (types: org.springframework.web.servlet.view.InternalResourceViewResolver; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter#requestContextFilter matched
+      - @ConditionalOnMissingBean (types: org.springframework.web.context.request.RequestContextListener,org.springframework.web.filter.RequestContextFilter; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter#viewResolver matched
+      - @ConditionalOnBean (types: org.springframework.web.servlet.ViewResolver; SearchStrategy: all) found the following [defaultViewResolver, beanNameViewResolver, mvcViewResolver] @ConditionalOnMissingBean (names: viewResolver; types: org.springframework.web.servlet.view.ContentNegotiatingViewResolver; SearchStrategy: all) found no beans (OnBeanCondition)
+
+   WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter.FaviconConfiguration matched
+      - matched (OnPropertyCondition)
+
+   WebSocketAutoConfiguration matched
+      - @ConditionalOnClass classes found: javax.servlet.Servlet,javax.websocket.server.ServerContainer (OnClassCondition)
+      - found web application StandardServletEnvironment (OnWebApplicationCondition)
+
+   WebSocketAutoConfiguration.TomcatWebSocketConfiguration matched
+      - @ConditionalOnClass classes found: org.apache.catalina.startup.Tomcat,org.apache.tomcat.websocket.server.WsSci (OnClassCondition)
+
+   WebSocketAutoConfiguration.TomcatWebSocketConfiguration#websocketContainerCustomizer matched
+      - Required JVM version 1.7 or newer found 1.8 (OnJavaCondition)
+      - @ConditionalOnMissingBean (names: websocketContainerCustomizer; SearchStrategy: all) found no beans (OnBeanCondition)
+	  
+...
+
+ : Returning cached instance of singleton bean 'resourceHandlerMapping'
+ : Returning cached instance of singleton bean 'beanNameHandlerMapping'
+ : Returning cached instance of singleton bean 'faviconHandlerMapping'
+ : Returning cached instance of singleton bean 'requestMappingHandlerMapping'
+ : Returning cached instance of singleton bean 'endpointHandlerMapping'
+ : Returning cached instance of singleton bean 'beanNameHandlerMapping'
+ : Returning cached instance of singleton bean 'resourceHandlerMapping'
+ : Returning cached instance of singleton bean 'faviconHandlerMapping'
+ : Returning cached instance of singleton bean 'requestMappingHandlerMapping'
+
+
+En Actuator también podemos ver todos los beans que están configurados (HAL Browser).
+Autoconfig: se ven todos los positive matches. Toda la información del log está presente en actuator también, y de modo más manejable.
+
+Toda la lógica de autoconfiguración está en un jar: spring-boot-autoconfigure-1.4.0-RELEASE.jar. El jar tiene un monton de packages. Cassandra, Cloud, JMS, JDBC... Todas las clases de configuración están en el jar, no vienen del parent pom. En el jar hay también un archivo que se llama spring.factories en la carpeta META-INF.
+Tiene un listado de las clases de autoconfiguración con sus packages (full name). Initializers, Application Listeners, AutoConfigure...
+
+Una de esas clases es JDBCAutoConfiguration. ¿Qué clase de código tiene dentro?
+
+/**
+ * {@link EnableAutoConfiguration Auto-configuration} for {@link JdbcTemplate} and
+ * {@link NamedParameterJdbcTemplate}.
+ *
+ * @author Dave Syer
+ * @author Phillip Webb
+ * @author Stephane Nicoll
+ * @author Kazuki Shimizu
+ * @since 1.4.0
+ */
+@Configuration
+@ConditionalOnClass(DataSource.class)
+@ConditionalOnSingleCandidate(DataSource.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+public class JdbcTemplateAutoConfiguration {
+
+Vemos que es condicional a que haya otra clase en el classpath. Y además que solo haya un candidato.
+
+El otro ejemplo que comentamos es HttpMessageConvertersAutoConfiguration.
+
+/**
+ * {@link EnableAutoConfiguration Auto-configuration} for {@link HttpMessageConverter}s.
+ *
+ * @author Dave Syer
+ * @author Christian Dupuis
+ * @author Piotr Maj
+ * @author Oliver Gierke
+ * @author David Liu
+ * @author Andy Wilkinson
+ * @author Sebastien Deleuze
+ * @author Stephane Nicoll
+ * @author EddÃº MelÃ©ndez
+ */
+@Configuration
+@ConditionalOnClass(HttpMessageConverter.class)
+@AutoConfigureAfter({ GsonAutoConfiguration.class, JacksonAutoConfiguration.class,
+		JsonbAutoConfiguration.class })
+@Import({ JacksonHttpMessageConvertersConfiguration.class,
+		GsonHttpMessageConvertersConfiguration.class,
+		JsonbHttpMessageConvertersConfiguration.class })
+public class HttpMessageConvertersAutoConfiguration {
+
+	static final String PREFERRED_MAPPER_PROPERTY = "spring.http.converters.preferred-json-mapper";
+
+	private final List<HttpMessageConverter<?>> converters;
+
+	public HttpMessageConvertersAutoConfiguration(
+			ObjectProvider<HttpMessageConverter<?>> convertersProvider) {
+		this.converters = convertersProvider.orderedStream().collect(Collectors.toList());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public HttpMessageConverters messageConverters() {
+		return new HttpMessageConverters(this.converters);
+	}

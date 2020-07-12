@@ -1,0 +1,165 @@
+9. Step 01: Part 2 Pom.xml, Spring Boot Application and application properties
+2:57
+14 days ago
+<p> Aplicación web SpringBoot para cubrir todo lo más básico.</p><p> Spring Initializr. El groupId es como el package base del proyecto. ArtifactId es como un nombre para el proyecto.</p><p> Creamos un proyecto con starter Web y DevTools.&nbsp; Típicamente en proyectos web tendríamos un empaquetado war para ser desplegado en un servidor como Tomcat. Con SpringBoot el empaquetado es jar y ya incluye embebido un servidor Tomcat para ejecutar la aplicación.</p><p> Vemos que el proyecto creado con Initializr tiene su pom que hereda de spring-boot-starter-parent. En otros proyectos puede tenerse un pom padre distinto.</p>
+7:56
+14 days ago
+<p>SpringBoot starter web habilita tanto las aplicaciones web como los servicios RESTful.</p><p>Maven automáticamente descarga todas las dependencias incluidas en el pom. Además de estas, existen las dependencias transitivas, que son aquellas de las que dependen las dependencias declaradas explícitamente en el pom.</p><p>En la clase que contiene el método para arrancar el proyecto, observamos la anotación @SpringBootApplication. Esta anotación nos indica: <strong>@Configuration, @EnableAutoconfiguration, @ComponentScan</strong>.</p><p>Primero inicializa el Spring framework (Component Scan), y después inicializa SpringBoot (Auto Configuration). </p>
+9:27
+14 days ago
+<p>Ofrece el método :</p><pre class="prettyprint linenums">public static void main(String[] args){ SpringApplication.run(NombreDeLaClase.class, args); }</pre><p>SpringApplication.run(NombreDeLaClase.class, args) devuelve el context del que se pueden extraer todos los @Bean declarados y los @Component.</p><p>En <code>application.properties</code> podemos configurar cosas como el nivel de logging, el puerto en que queremos que corra la aplicación, etc.</p>
+10. Step 02: Part 1 First Spring MVC Controller, @ResponseBody, @Controller
+4:15
+14 days ago
+<p>Por defecto, los métodos de un @Controller retornan el nombre de una vista. Si un método va a devolver texto u otra cosa, se debe marcar el método como @<strong>ResponseBody</strong>, para que el ViewResolver no intente buscar una vista.</p><p>Con esta anotación, cualquier cosa que devuelve un metodo con mapeo la convierte a json o xml para devolverla en la respuesta HTTP (message converters).</p>
+9:52
+14 days ago
+<p>Solo si definimos la clase como @Controller Spring va a considerar los mappings declarados asignados a los métodos.</p><p>Para ver en el log información del flujo de peticiones web desde el navegador, habilitamos el nivel DEBUG pero no para todo, porque sería demasiado profuso. Solo para el paquete web de org.springframework:</p><p>En application.properties: <code>logging.level.org.springframework.web=DEBUG</code> </p><p>Por defecto, los métodos de un @Controller retornan el nombre de una vista. Si un método va a devolver texto u otra cosa, se debe anotar el método como @<strong>ResponseBody</strong>, para que el ViewResolver no intente buscar una vista.</p><p>Con esta anotación, cualquier cosa que devuelve un método con mapeo la convierte a json o xml para devolverla en la respuesta HTTP (message converters).</p>
+12. Step 02: Part 2 Understanding HTTP Request Flow
+0:01
+14 days ago
+<p>Guía de preguntas comunes relacionadas con Spring y SpringBoot. Recursos, recursos :)</p><p><br></p><p>https://github.com/in28minutes/in28minutes-initiatives/blob/master/The-in28Minutes-TroubleshootingGuide-And-FAQ/quick-start.md</p>
+13. Step 03: Demystifying some of the Spring Boot magic
+8:43
+13 days ago
+<p>Spring Boot Starter Parent tiene como parent pom spring-boot-dependencies. Una de las cosas llamativas e importantes de ese pom es que tiene todas los números de versión de las dependencias empleadas. Es un conjunto de versiones de cosas que están probadas para trabajar bien juntas. Eso en spring tiene un nombre: set of well curated dependencies.</p><p>Este pom tambien tiene configurados plugins, como maven integration para test de integración. Otro plugin de maven para crear jar files, otro para test-unitarios... Tiene la configuración de todos los plugin de maven importantes para una aplicación spring-boot.</p><p>Versión de Java tambien esta en el parent pom. Se puede sobrescribir en nuestro pom concreto.</p>
+9:03
+13 days ago
+<p><strong>Spring Boot Starter Web</strong> tiene las dependencias para web app: <strong>spring core, spring mvc, bean, validation, binding, hibernate validator, logging, jackson</strong>...todas las dependecians estan en starter web.</p><p><strong>Embedded Tomcat</strong>: lo recibimos también con spring starter web. Core, websocket, EL, ...</p><p><strong>Dev Tools</strong>: reinicio auto con los cambios. Busca cambios en las carpetas del proyecto, y cuando los detecta reinicia, pero solo recarga las partes dinámicas. Por ejemplo, no revisa las dependencias, pero recompila las clases con cambios. Es mucho más rápido que un reinicio completo de la aplicación.</p>
+14. Step 04: Redirect to Login JSP - @ResponseBody and View Resolver
+5:15
+13 days ago
+<p>Java es para la lógica de negocio, pero lo que se muestra pertenece a la vista (html): jsp, etc.</p><p>Para usar vistas y tenerlas en una carpeta determinada, y no tener que escribir el nombre de la carpeta, hay que configurar un prefijo para el nombre de la vista.</p><p>Para no tener que escribir la extensión del archivo (jsp en el ejemplo), tenemos que definir un sufijo.</p><p>Creamos la carpeta dentro de src/main/</p><p><code>webapp/WEB-INF/jsp/</code></p><p>La carpeta webapp es como un nombre por defecto para aplicaciones web, y Tomcat lo reconoce y no necesita que se le especifique en la parte de prefijo.</p><pre class="prettyprint linenums">spring.mvc.view.prefix=/WEB-INF/jsp/ spring.mvc.view.sufix=.jsp</pre>
+5:47
+13 days ago
+<p>Además hace falta una dependencia más para que Tomcat embebido soporte jsp: <strong>tomcat-embed-jasper</strong></p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt; &lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt; &lt;version&gt;9.0.16&lt;/version&gt; &lt;/dependency&gt;</pre><p>Resultado de lanzar la petición GET /server/loginpage:</p><pre class="prettyprint linenums">o.s.web.servlet.DispatcherServlet : GET "/loginpage", parameters={} s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.carregal.springbootlockdown.controller.LoginController#getLogin() o.s.w.servlet.view.InternalResourceView : View name 'login', model {} o.s.w.servlet.view.InternalResourceView : Forwarding to [/WEB-INF/jsp/login.jsp] o.s.web.servlet.DispatcherServlet : Completed 200 OK</pre>
+15. Step 05: Show userid and password on welcome page - ModelMap and @RequestParam
+5:30
+13 days ago
+<p>El siguiente objetivo es crear una vista con algo de contenido dinámico. Un ejemplo sencillo es mostrar un parámetro que se mande con la petición. Se recoge en el controller como parámetro, y se adjunta al modelo (se pasa como objeto accesible por el modelo, para la renderización del resultado).</p><p>En el método del controller, en su firma, se incluye @RequestParam String nombreParam. También se incluye el Model, que es como un contenedor de información al que se pueden añadir atributos de forma dinámica para que finalmente se renderice la vista haciendo uso de toda esa información.</p><p>El controller controla el flow, el flujo. El modelo va a contener la información generada por la lógica de negocio, y es el conductor de esa información para que pueda generarse la vista. Estos son los componentes del patrón MVC.</p>
+5:48
+13 days ago
+<p>Para obtener el Model en SpringMVC ponemos como segundo parámetro del método del controlador ModelMap model, y de esa manera el framework inyecta el model en el controller.</p><p>En la vista tenemos que hacer uso del EL (expression language). Un primer ejemplo, en el jsp de prueba, es: ${name}</p><pre class="prettyprint linenums">@RequestMapping("/loginpage") public String getLogin(@RequestParam(required = false) String name, ModelMap model) { model.put("name", name); return "login"; }</pre>
+16. Step 06: DispatcherServlet and Spring MVC Flow
+4:11
+13 days ago
+<p>DispatcherServlet recibe la petición http e identifica el controlador adecuado en base a la url solicitada. El controlador ejecuta la lógica de negocio. Después el controlador le devuelve el Model y el nombre de una vista al DispatcherServlet, que identifica la vista mediante el ViewResolver, hace el Model disponible para la vista y finalmente la ejecuta. El DispatcherServlet entonces emite la respuesta HTTP.</p><p>FRONT CONTROLLER es el DispatcherServlet, configurado automaticamente por el framework.</p>
+17. Step 07: Your First HTML form
+5:29
+13 days ago
+<p>Formularios: por defecto el submit va contra la misma página. Se cambia con el atributo action del elemento form. Por defecto el método http de submit es GET, con lo que los parámetros se envían en la url, de forma abierta. Se cambia por post usando el atributo method del form.</p><pre class="prettyprint linenums">&lt;form method="post" action="loginpage"&gt; Name: &lt;input name="name" type="text"/&gt; &lt;input type="submit"/&gt; &lt;/form&gt;</pre>
+6:10
+13 days ago
+<p>Para la petición GET habilitamos este método del controller:</p><pre class="prettyprint linenums">@RequestMapping(value="/login", method = RequestMethod.GET) public String getLogin(@RequestParam(required = false) String name, ModelMap model){ return "login"; }</pre><p>Y para la petición POST que se ejecuta con sl Submit desde el form, habilitamos otra entrada en el controller, que es la que recibirá los parámetros enviados por el formulario.</p><pre class="prettyprint linenums">@PostMapping("/login") public String login(@RequestParam String name, @RequestParam String password, ModelMap model) { model.put("name", name); model.put("password", password); return "welcome"; }</pre><p>Adicionalmente, creamos un jsp llamado "welcome.jsp" que se renderiza con los datos recibidos.</p>
+18. Step 08: Add hard-coded validation of userid and password
+4:13
+12 days ago
+<p>Crear un @Service dummy para que devuelva true si el user y pwd es un par determinado. Todo para dirigir la petición de login.</p><pre class="prettyprint linenums">@PostMapping("/login") public String login(@RequestParam String name, @RequestParam String password, ModelMap model) { if (loginService.validUser(name, password)) { model.put("name", name); model.put("password", password); return "welcome"; } else { model.put("error", "Usuario o passwod incorrectos"); return "login"; } }</pre><p><br></p>
+5:43
+12 days ago
+<p>Al usar un framweork de inyección de dependencias, no necesitamos crear instancias de servicios, repositorios, componentes, o beans en general.</p><p>Los gestiona el framework, muchos de ellos serán singleton y algun otro prototype.</p>
+19. Step 09: Magic of Spring
+5:32
+12 days ago
+<p>Spring ha facilitado mucho el testing de aplicaciones por su facilidad para mockear elementos y crear test unitarios. Antes todo había que probarlo desplegando en un servidor y ejecutando.</p><p>@Component,@Service, @Repository, @Controller, @Bean</p><p>Con todas estas anotaciones le decimos al framework que gestione esas clases y que tenga al menos una instancia disponible en el contexto.</p><p>@Controller es una especializacion de Component para clases de implementación para que sean autodetectadas a la hora de buscar mapeos entre url y metodos.</p><p>@Service se emplean para contener la logica de negocio.</p><p>@Repository, data store, guardar datos etc.</p>
+5:46
+12 days ago
+<p>@Autowired: solicitar la inyección del bean en el atributo de la clase.</p><p>@ComponentScan: paquete en el que se buscan los bean. Por defecto se buscar en el paquete donde está la @SpringBootApplication.</p><pre class="prettyprint linenums">@SpringBootApplication @ComponentScan(value={"com.carregal.springbootlockdown", "com.carregal.other" }) public class SpringbootlockdownApplication { ... }</pre>
+20. Step 10: Create TodoController and list-todos view. Make TodoService a @Service
+9:47
+10 days ago
+<p>Definimos un pojo Todo y un Dao service al que anotamos como @Service, que maneja una colección en memoria (no bd). La colección se inicia con un bloque estático de código.</p><p>Creamos un método de controller para procesar la petición de la lista de todos.</p><pre class="prettyprint linenums">@GetMapping("/list") public String manageTodosList(ModelMap model) { List&lt;Todo&gt; todos = todoService.findAllTodos("daniel"); model.put("todos", todos); return "todos"; }</pre><p>Todavía echamos a falta las variables de session, de modo que&nbsp; el usuario para mostrar los todo todavía está hardcodeado.</p><p>Creamos una página para mostrar la lista de Todos, todavía sin ningún formato (mediante EL ${todos}).</p><p>Cosas por hacer: </p><p>-Dar formato a la lista de TODOS con Bootstrap.</p><p>-no se debe poder acceder a la lista de todos sin estar logueado, y al logearse acceder a tu propia lista de todos.</p><p>-quitar los hardcode como el de usuario para obtener los todos.</p>
+11:07
+10 days ago
+<p>Capas en una aplicacion JEE: </p><p>Web: tanto la exposición de servicios como la interacción con UIs web. La V y la C del patrón MVC están en la capa C casi siempre. Spring MVC, Struts</p><p>View Tech: JSP/EL/JSTL, Freemarker, Velocity, JSF o... exponer RESTServices y consumirlos con un frontend AngularJs</p><p>Model 1: Directamewnte hacia varios JSP, que acceden al model. La UI apunta a distintos JSP. En esta aproximación los JSP tenían la lógica de controlador y la de vista. Muy complicado.</p><p>Model 2: El navegador apunta contra servlets, que acceden al modelo y crean la vista con los datos. Existen distintos servlets a los que hacer peticiones distintas. Esta es la arquitectura que emplea Struts.</p><p>Model 2 front controller: Desde el browser siempre se envía la petición a un único FrontController (un servlet), que redirige la petición a uno de entre todos los Controllers de la aplicación.</p>
+21. Step 11: Architecture of Web Applications
+6:36
+10 days ago
+<p>En SpringMVC el frontController se llama DispatcherServlet. Este esquema es el más popular porque permite hacer más sencillo cosas como la seguridad, que va a través del frontcontroller. Toda la lógica centralizada se puede añadir a través del FC.</p><p>Business: logica del negocio. </p><p>Data: persistencia </p><p>Integration: comunicación con otras aplicaciones o APIs</p>
+22. Step 12: Session vs Model vs Request - @SessionAttributes
+3:45
+10 days ago
+<p>Scopes: session, request, y como se relacionan con el model.</p><p>Los parámetros de una request sólo están disponibles durante el ciclo de vida de esa petición en concreto, y no en las sucesivas.</p><p>Como ejemplo, en el flujo que tenemos: login page, welcome page, list todos, si entre login y welcome se pasa name y password en el model, provenientes de la petición, en list-todo ya no están disponibles esos datos, pues la petición http ya no es la misma.</p><p>Session es la forma en la que puedes guardar datos para que estén disponibles en multiples peticiones. </p>
+6:01
+10 days ago
+<p>Los datos del model también son válidos durante una sola petición, de modo que la forma para solventar esto es la session.</p><p>Para poner un valor en la session desde un @Controller hay que anotar la clase del controlador con <code>@SessionAttributes({"lista","atributos","mantener","en","session"})</code></p><p>Para acceder a esos valores guardados en session en los métodos del controller, se hace un get por nombre sobre el modelo ModelMap, dando por hecho que existe. Para que exista, debe haberlo puesto "alguien" antes allí.</p><p>A esto se le llama conversational storage: valores persistidos a través de varias peticiones.</p><pre class="prettyprint linenums">@Controller @SessionAttributes("name") public class LoginController {</pre>
+7:15
+10 days ago
+<p>Los datos del model también son válidos durante una sola petición, de modo que la forma para solventar esto es la session.</p><p>Para poner un valor en la session desde un @Controller hay que anotar la clase del controlador con <code>@SessionAttributes({"lista","atributos","mantener","en","session"})</code></p><p>Para acceder a esos valores guardados en session en los métodos del controller, se hace un get por nombre sobre el modelo ModelMap, dando por hecho que existe. Para que exista, debe haberlo puesto "alguien" antes allí.</p>
+7:34
+10 days ago
+<p>A esto se le llama conversational storage: valores persistidos a través de varias peticiones.</p><pre class="prettyprint linenums">@Controller @SessionAttributes("name") public class LoginController {</pre><p>Hay que tener mucho cuidado con lo que se guarda en session, porque imaginemos que tenemos una aplicación con millones de usuarios. Eso sería equivalente a tener en memoria millones de usernames. Algo de conversational state está bien, pero se debe limitar a lo imprescindible únicamente.</p>
+23. Step 13: Add new todo
+3:29
+10 days ago
+<p>Añadimos un enlace en la página de listado de todos para crear un nuevo todo, así que:</p><p>-Creamos el método en el controller que dirige a la vista adecuada</p><p>-Creamos el jsp add-todo.jsp que se retornará cuando se reciba una petición en /add-todo: tiene un form con method POST y sin action, por lo que va a la misma url, pero por POST. Si no existe mapping en el controller encontraremos un error de método no soportado.</p><p><code>Request method 'POST' not supported</code></p><p><code>org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' not supported</code> </p>
+4:34
+10 days ago
+<p>Podemos acceder al nombre de usuario desde el propio controller asumiendo que está en session:</p><pre class="prettyprint linenums">@PostMapping("/post-todo") public String postTodo(ModelMap model, @RequestParam String desc) { Todo todo = new Todo(0, (String)model.get("name"), desc, new Date(), false); todoService.saveTodo(todo); return "redirect:/list"; }</pre><p>Hay que hacer redirect: para que se vuelva a producir una petición a través del controller al método adecuado, que pondrá en el Model la ionformación necesaria para renderizar, la página. En caso contrario, se muestra el JSP pero no tiene los TODOS.</p>
+24. Step 14: Display Todos in a table using JSTL Tags
+0:19
+10 days ago
+<p>Haciendo uso de las etiquetas JSTL. Hay que añadir una dependencia al proyecto, y como es un proyecto maven, añadimos al pom:</p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;jstl&lt;/groupId&gt; &lt;artifactId&gt;jstl&lt;/artifactId&gt; &lt;/dependency&gt;</pre><p>En cada jsp hay que añadir el namespace: <code>&lt;%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%&gt;</code> </p>
+3:35
+10 days ago
+<p><br></p><pre class="prettyprint linenums">... &lt;tbody&gt; &lt;c:forEach var="todo" items="${todos}"&gt; &lt;tr&gt; &lt;td&gt;${todo.id}&lt;/td&gt; &lt;td&gt;${todo.user}&lt;/td&gt; &lt;td&gt;${todo.desc}&lt;/td&gt; &lt;td&gt;${todo.targetDate}&lt;/td&gt; &lt;td&gt;${todo.isDone}&lt;/td&gt; &lt;/tr&gt; &lt;/c:forEach&gt; &lt;/tbody&gt; &lt;/table&gt;</pre>
+25. Step 15: Bootstrap for Page Formatting using webjars
+3:11
+10 days ago
+<p>Añadiremos Bootstrap y jQuery al proyecto en forma de webjars en vez de archivos estaticos. Esto va en el pom. Es autoconfigurado por SpringBoot: o.s.w.s.handler.SimpleUrlHandlerMapping : Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]</p><p>Las dependencias para jQuery y Bootstrap son:</p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;org.webjars&lt;/groupId&gt; &lt;artifactId&gt;bootstrap&lt;/artifactId&gt; &lt;version&gt;3.3.6&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.webjars&lt;/groupId&gt; &lt;artifactId&gt;jquery&lt;/artifactId&gt; &lt;version&gt;1.9.1&lt;/version&gt; &lt;/dependency&gt;</pre><p><code>2020-04-14 01:35:43.878 DEBUG 36152 --- [&nbsp; restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping&nbsp; : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'</code> </p>
+3:45
+10 days ago
+<p>Añadiremos Bootstrap y jQuery al proyecto en forma de webjars en vez de archivos estaticos. </p><p>Las dependencias para jQuery y Bootstrap son:</p><pre class="prettyprint linenums">&lt;dependency&gt; &lt;groupId&gt;org.webjars&lt;/groupId&gt; &lt;artifactId&gt;bootstrap&lt;/artifactId&gt; &lt;version&gt;3.3.6&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.webjars&lt;/groupId&gt; &lt;artifactId&gt;jquery&lt;/artifactId&gt; &lt;version&gt;1.9.1&lt;/version&gt; &lt;/dependency&gt;</pre><p><code>2020-04-14 01:35:43.878 DEBUG 36152 --- [&nbsp; restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping&nbsp; : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'</code> </p><p>En una aplicación Spring habría que configurar el controller que se haría cargo de las peticiones /webjars/**, pero con SpringBoot esto forma parte de la autoconfiguración.</p>
+4:59
+10 days ago
+<p>Los archivos <strong>js</strong> de <strong>jQuery </strong>y de <strong>Bootstrap </strong>se descargan a una carpeta dentro de resources. Para incluirlos en un jsp, es una buena practica ponerlos al final de la jsp.</p><pre class="prettyprint linenums">&lt;script src="webjars/jquery/1.9.1/jquery.min.js"&gt;&lt;/script&gt; &lt;script src="webjars/bootstrap/3.3.6/js/bootstrap.min.js"&gt;&lt;/script&gt; </pre><p>El enlace a la hoja de estilos <strong>css </strong>se pone en el head de la pagina</p><p><code>&lt;link href="webjars/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"&gt;</code> </p><p>Las rutas que se ven en los enlaces son las ubicaciones de los archivos dentro de los webjars.</p>
+6:27
+10 days ago
+<p>Los archivos <strong>js</strong> de <strong>jQuery </strong>y de <strong>Bootstrap </strong>se descargan a una carpeta dentro de resources. Para incluirlos en un jsp, es una buena practica ponerlos al final de la jsp.</p><pre class="prettyprint linenums">&lt;script src="webjars/jquery/1.9.1/jquery.min.js"&gt;&lt;/script&gt; &lt;script src="webjars/bootstrap/3.3.6/js/bootstrap.min.js"&gt;&lt;/script&gt; </pre><p>El enlace a la hoja de estilos <strong>css </strong>se pone en el head de la pagina</p><p><code>&lt;link href="webjars/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"&gt;</code> </p><p>Las rutas que se ven en los enlaces son las ubicaciones de los archivos dentro de los webjars.</p>
+9:48
+10 days ago
+<p>Al añadir a la página del listado de todos los js y el css, si desde la perspectiva developer del navegador analizamos la petición a la página, vemos que con la respuesta html se obtienen también el archivo css y los dos js desde nuestro lado back.</p><p>Haremos un pequeño formato de la página: div class container conteniendo el contenido de todo el body, poner el enlace a Add Todo dentro de un div y darle class button al elemento a href. Asignarle class table table-striped a la tabla.</p>
+26. Step 16: Let's delete a Todo
+2:56
+9 days ago
+<p>Borrado de un TODO. Hay que añadir el th en la cabecera, y un td más con un enlace a type="button" y class="btn btn-warning".</p><p>Pregunta: ¿cómo incluir en la petición de borrar TODO el ID del todo que se quiere realmente borrar? Una forma es incluirlo en el path de href. Otra forma es poner la url del href como sigue:"/delete?id=${todo.id}", o sea, pasar el dato como parámetro query.</p><pre class="prettyprint linenums">@GetMapping("/delete-todo-param") public String deleteTodoParam(@RequestParam(name = "id") Integer id) { todoService.deleteTodoById(id); return "redirect:/list"; } @GetMapping("/delete-todo-path/{id}") public String deleteTodoPath(@PathVariable Integer id) { todoService.deleteTodoById(id); return "redirect:/list"; } </pre>
+27. Step 17: Format Add Todo Page and Adding Basic HTML5 form validation
+1:24
+7 days ago
+<p>Formateando la página ADD-TODO con bootstrap: tenemos los includes en la jsp. Creamos el div container. No creamos fila ni columna, tenemos en formulario dentro de un div container.</p><p>Queremos formatear la página y añadir un poco de html validation. </p><p>Bootstrap ofrece para formularios: todos los campos tienen que estar en lo que se llama fieldset.</p><p>En un fieldset cada elemento tiene su &lt;label&gt;</p><p>Al fieldset se le añaden class y al input también. Al fieldset se le pone class="form-group". Al input se le da class="form-control".</p>
+2:36
+7 days ago
+<p>De esta forma se ve el label en negrita, y el campo de form ocupa todo el ancho del container y tiene formato redondeado.</p><p>El botón de submit aparece en otra linea, ya no está en la misma que el input.</p><p>El botón de submit ya no lo ponemos como un input, sino como un button type="submit". Vamos a darle class="btn-success", lo que lo muestra coloreado.</p><pre class="prettyprint linenums">&lt;div class="container"&gt; &lt;form method="post"&gt; &lt;fieldset class="form-group"&gt; &lt;label&gt;Description&lt;/label&gt; &lt;input type="text" name="desc" class="form-control" /&gt; &lt;/fieldset&gt; &lt;fieldset class="form-group"&gt; &lt;button type="submit" class="btn btn-success"&gt;Send Todo&lt;/button&gt; &lt;/fieldset&gt; &lt;/form&gt; &lt;/div&gt;</pre><p><br></p>
+4:29
+7 days ago
+<p>Validación HTML, poner en el input required="required", es el navegador el que impide que se haga el submit de los datos si falla este tipo de validación.</p><p>Se muestra un aviso de que el campo debe ser cubierto. </p><pre class="prettyprint linenums">&lt;fieldset class="form-group"&gt; &lt;label&gt;Description&lt;/label&gt; &lt;input type="text" name="desc" class="form-control" required="required"/&gt; &lt;/fieldset&gt;</pre>
+29. Step 18: Part 1 Validations with Hibernate Validator - Using Command Bean
+1:06
+7 days ago
+<p><code>org.apache.jasper.JasperException: /WEB-INF/views/todo.jsp (line: [20], column: [4]) Unable to find setter method for attribute: [commandName] at org.apache.jasper.compiler.DefaultErrorHandler.jspError(DefaultErrorHandler.java:42) ~[tomcat-embed-jasper-9.0.26.jar:9.0.26]</code></p><p>The solution is to use modelAttribute instead of commandName.</p><p>Lets use a command bean for Todo! org.hibernate:hibernate-validator</p><p>Vamos a usar ahora JSR303 y JSR349 para las validaciones, y parece que haremos uso de una taglib nueva.</p><p>Vamos a usar una cosa que se llama commandBean, y despues de una cosa que se llama modelAttribute. Hibernate provee una implementación para esos standard: hibernate validator, que no tiene que ver con la implementación de JPA.</p><p>Bean Validation API. Nos da herramientas para permitir dar valores a un bean (validaciones).</p>
+3:02
+7 days ago
+<p>Implementar validación del lado del servidor: Form backing bean (tener un bean que corresponda con los campos del form). Añadir la validación, usar validación en el Controller y mostrar los errores en la vista.</p><p>Hasta ahora tenemos un formulario con un solo campo, pero y si tenemos 50? ¿Vamos a declarar un @RequestParam para cada campo? No tiene mucho sentido. Spring da solución a eso con CommandBean.</p><p>(Form backing bean). Podemos mapear lo que ser recibe en la petición directamente con un objeto.</p><p>Una vez que tenemos el pojo al que mapear podemos hacer uso de la Validation API y añadir las validaciones sobre los campos el bean.</p><p>Entonces es puede habilitar la validación en el controller. Y después, el propio método del controller enviará el conjunto de errores a la vista a través del modelMap, si es que no se pasa alguna de las validaciones.</p>
+7:03
+7 days ago
+<p>tenemos que usar spring form tags en el jsp. Esto para que la info del front se convierta en form backing bean en el backend.</p><pre class="prettyprint linenums">&lt;%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%&gt; </pre><p>cambia &lt;form&gt; a &lt;form:form method="post" commandName="todo"&gt;</p><p>commandName="todo" así es como se llamará el parametro recibido en el controller.</p><p>Al metodo el controller que devuelve la vista para Add Todo le hacemos una modificación:</p><p>Obtenemos el modelMap y establecemos en el un new Todo() con id=0 y valores default. Uno de los valores default es el user, que tenemos almacenado en session.</p><p>De esta manera, cuando se hace commit del formulario se está enviando el todo creado.</p>
+8:08
+7 days ago
+<pre class="prettyprint linenums">@GetMapping("/post-todo") public String showPostTodo(ModelMap model) { model.put("todo", new Todo(0,(String)model.get("name"),"", new Date(),false)); return "post-todo"; } @PostMapping("/post-todo") public String postTodo(ModelMap model, Todo formTodo) { todoService.saveTodo(formTodo); return "redirect:/list"; }</pre>
+9:28
+7 days ago
+<p>Cambiamos tambien las tag de label por form:label </p><p>En el input, hemos de cambiar al atributo name por path, que contiene el nombre del campo.</p><p>En los form:label hay que poner también el atributo path correspondiente.</p><p><br></p><p>Más sobre la taglib de spring haciendo control click sobre alguno de los tags. Se llama Spring Framework JSP Tag Library.</p><p>Para que se pueda hacer el binding entre el form y el backend el POJO debe tener un constructor por defecto. </p><pre class="prettyprint linenums">&lt;form:form method="post" commandName="todo"&gt; &lt;fieldset class="form-group"&gt; &lt;form:label path="desc"&gt;Description&lt;/form:label&gt; &lt;form:input type="text" path="desc" class="form-control" required="required"/&gt; &lt;/fieldset&gt; &lt;fieldset class="form-group"&gt; &lt;button type="submit" class="btn btn-success"&gt;Send Todo&lt;/button&gt; &lt;/fieldset&gt; &lt;/form:form&gt;</pre>
+30. Step 18: Part 2 Using JSR 349 Validations
+1:57
+16 hours ago
+<p>Validaciones, doble binding: form-bean, bean-form.</p><p>Cuando creamos una vista con el model y tenemos un formulario que declara un commandName o un modelAttribute (en versiones recientes de SpringBoot).</p><p>Validaciones en backend con JSR: Bean validation API.</p><p><code>@Size(min=10 message="Enter at least 10 Characters")</code> para validar la longitud de un campo cadena</p><p>En el controller hay que @Valid en el parámetro. </p><p>Como sabemos si la validación ha sido buena? binding result. Inyectando ese objeto en el método de controller, podemos acceder a su atributo result.hasErrors() return /post-todo. Volver a la misma página, <strong>pero entonces en el modelo se habrán inyectado los errores.</strong></p><p><strong>El objeto BindingResult se tiene que inyectar en la lista de parametros del metodo del controller (puerta del controller) DESPUÉS del objeto @Valid Todo (modelAttribute).</strong></p>
+5:02
+16 hours ago
+<p>&lt;form:errors path="desc" cssClass="text-danger"&gt;&lt;/form:errors&gt; ¿qué html genera?</p><pre class="prettyprint linenums">&lt;form id="todo" action="/post-todo" method="post"&gt; &lt;fieldset class="form-group"&gt; &lt;label for="desc"&gt;Description&lt;/label&gt; &lt;input id="desc" name="desc" type="text" class="form-control" required="required" value="Default"&gt; &lt;span id="desc.errors" class="text-danger"&gt;A little too short description&lt;/span&gt; &lt;/fieldset&gt; &lt;fieldset class="form-group"&gt; &lt;button type="submit" class="btn btn-success"&gt;Send Todo&lt;/button&gt; &lt;/fieldset&gt; &lt;/form&gt;</pre>
+6:18
+16 hours ago
+<p>Otras funciones de validación:</p><ol><li><p><strong>DecimalMin 1</strong></p></li><li><p><strong>DecimalMax 100</strong></p></li><li><p><strong>Max</strong></p></li><li><p><strong>Min</strong></p></li><li><p><strong>NotNull</strong></p></li><li><p><strong>Null</strong></p></li><li><p><strong>Past (fechas)</strong></p></li><li><p><strong>Future</strong></p></li><li><p><strong>Pattern (valores que cumplen regexp)</strong></p></li><li><p><strong>Size</strong></p></li></ol>
+31. Step 19: Updating a todo
+0:08
+15 hours ago
+<p>Ahora queremos actualizar. Hacen falta : </p><ol><li><p>update botón -&gt; se va a la página de add-todo.</p></li><li><p>manejar la petición GET (muestra el detalle del todo elegido)</p></li><li><p>manejar la petición POST (guardar los cambios).</p></li></ol><p>Botón, copiando del de delete. Crear el método, que será muy parecido al de borrar. Hace falta el metodo de getById y el de updateById en el DaoService.</p><p>Una cosa que hay que hacer es tener el campo, aunque sea oculto, del id en el formulario.</p><p>El framework va a tratar de hacer binding de todo lo que tenga, pero es necesario al menos para el update disponer del campo id.</p><p><strong>&lt;form:hidden path="id"/&gt;</strong></p><p>Cogemos también el user como campo hidden, lo cogemos de la session (del modelMap).</p>

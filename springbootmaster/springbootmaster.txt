@@ -1,0 +1,79 @@
+30 step
+
+Validaciones, doble binding: form-bean, bean-form.
+Cuando creamos una vista con el model y tenemos un formulario que declara un commandName o un
+modelAttribute (en versiones recientes de SpringBoot).
+Validaciones en backend con JSR
+Bean validation API
+
+@Size(min=10 message="Enter at least 10 Characters") para validar la longitud de un campo cadena
+En el controller hay que @Valid en el parámetro. 
+Como sabemos si la validación ha sido buena? binding result. Inyectando ese bean en el metodo de controller, podemos acceder 
+a su atributo result.hasErrors() return /post-todo. Volver a la misma página, pero pasándole al model la colección de errores.
+El objeto BindingResult se tiene que inyectar en la lista de parametros del metodo del controller (puerta del controller)
+DESPUES del objeto @Valid Todo (modelAttribute).
+
+<form:errors path="desc" cssClass="text-danger"></form:errors> ¿qué html genera?
+
+Otras funciones de validación:
+DecimalMin 1
+DecimalMax 100
+Max
+Min
+NotNull
+Null
+Past (fechas)
+Future
+Pattern (valores que cumplen regexp)
+Size
+
+31
+Ahora queremos actualizar. Hacen falta 
+update botón -> se va a la página de add-todo.
+manejar la petición GET (muestra el detalle del todo elegido)
+manejar la petición POST (guardar los cambios).
+
+Boton, copiando del de delete. Crear el método, que será muy parecido al de borrar. Hace falta el metodo de getById y el de updateById en el DaoService.
+Una cosa que hay que hacer es tener el campo, aunque sea oculto, del id en el formulario.
+El framework va a tratar de hacer binding de todo lo que tenga, pero es necesario al menos para el update disponer del campo id.
+<form:hidden path="id"/>
+Cogemos también en user como campo hidden, lo cogemos de la session (del modelMap).
+
+
+32
+Añadiremos el targetDate, tanto para crear un todo como para actualizarlo.
+Primero lo añadimos al JSP, o sea que replicamos un fieldset con todo el codigo (fieldset.form-group, form:label, form:input, form:errors)
+
+Hay que setear un formato de fechas en la aplicación: initBinder (bean que se inyecta en el controller):
+
+@InitBinder //ver DOC:inicializa org.springframework.web.bind.WebDataBinder
+public void initBinder(){
+	//Date dd/MM/yyyy
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+}
+Eso hace que para la clase Date use ese formatter.
+Para formatear la fecha en el JSP: JSTL format
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+usaremos el <fmt:formatDate value="${todo.targetDate}" pattern="dd/MM/yyyy"/>
+No es el mismo formato por defecto que tenemos en la vista de detalle que la que tenemos en la vista de la lista.
+Ponemos el patrón con el atributo pattern. Usamos el mismo de InitBinder.
+
+Pero ahora queremos usar un datepicker, no queremos escribir la fecha manualmente.
+webjars, bootstrap datepicker, es una dependencia nueva.
+groupId org.webjars
+artiactId bootstrap-datepicker
+version 1.0.1
+
+Hay que añadir el <script src="webjars/" del datepicker. Podemos ver el path entrando en dependencias del datepicker y buscar el .css y el .js.
+Hay que añadir los dos, o al menos el .js
+
+Hay que configurar el datepicker de dos maneras: a qué campo de formulario va a aplicar y cual va a ser el formato.
+Se inicializa en un bloque script
+<script>
+ $('#targetDate').datepicker({format:'dd/mm/yyyy'});
+</script>
+
+

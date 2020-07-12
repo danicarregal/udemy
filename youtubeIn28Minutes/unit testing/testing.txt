@@ -1,0 +1,303 @@
+https://www.youtube.com/watch?v=d2KwvXQgQx4
+
+Repositorio: MockitoTutorialForBeginners
+
+Alternativas al mocking: spies.
+
+PowerMock para métodos estáticos, constructores y métodos privados.
+
+Section Unit Testing - Junit
+
+step 1:
+
+Screen Testing o System Testing sería lo que hacía el departamento de testing de VN. Pero eso no es unit testing, que tiene que ser automatizado. También Integration testing tiene que ser automatizado y formar parte del ciclo de CI CD.
+Unit testing es probar un método concreto, o los métodos de una clase concreta. Pueden testarse conjuntos de métodos y métodos concreto. Tipo de valor devuelto, valor, etc.
+La gran ventaja es automatizar los test. 
+
+Valores expected y current, se contraponen para los assert. Los test son métodos en el paquete de src test con la anotación @Test.
+
+package com.daniel.junit5;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+
+import java.time.Duration;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+class StringTest {
+	
+	private String src;
+
+	@BeforeAll
+	static void beforeAll() {
+		
+		System.out.println("Estableciendo conexión a la base de datos");
+	}
+	
+	@AfterAll
+	static void afterAll() {
+		
+		System.out.println("Cerrando conexión a la base de datos");
+	}
+	
+	@BeforeEach
+	void initialize(TestInfo info) {
+	
+		System.out.println("Inicializando " + info.getDisplayName());
+	}
+	
+	@AfterEach
+	void finale(TestInfo info) {
+	
+		System.out.println("Finalizando " + info.getDisplayName());
+	}
+	
+	@Test
+	void test() {
+	
+		int actualLength = "ABCD".length();
+		int expectedLength = 4;
+		//Assert length == 4;
+		assertEquals(expectedLength, actualLength);
+	}
+	
+	@Test
+	void testMax() {
+		
+		int expectedMax = 10;
+		int actualMax = Math.max(10, 5);
+		assertEquals(expectedMax,actualMax);
+	}
+	
+	@Test
+	void toUpperCase() {
+		
+		String st = "abcd";
+		String result = st.toUpperCase();
+		assertEquals("ABCD",result);
+	}
+	
+	@Test
+	void contains_basic() {
+		
+		String st="abcdf";
+		boolean result = st.contains("ijk");
+		assertEquals(false, result);
+		assertFalse(result);
+		//assertTrue;
+	}
+	
+	@Test
+	void split_basic() {
+		
+		String str = "abc def ghi";
+		String splittedStr[] = str.split(" ");
+		String[] expectedStr = {"abc","def","ghi"};
+		String[] unexpectedResult = new String[] {"aa","bb","cc"};
+		assertArrayEquals(expectedStr, splittedStr);
+		
+	}
+	
+	@Test()
+	void testException() {
+		
+		String str = null;
+		assertThrows(NullPointerException.class, ()->{
+			str.length();
+		});
+	}
+	
+	@ParameterizedTest()
+	@ValueSource(strings= {"daniel","coche","moto","chati","bio"})
+	@DisplayName("Test parametrizable con  value source strings")
+	void length_greater_than_zero_test(String src) {
+		
+		assertTrue(src.length()>2);
+	}
+	
+	@Disabled
+	@ParameterizedTest(name="{0} is positive")
+	@ValueSource(ints = {1,2,3,-4,5,6,4,3,-5,66,-6543,2345})
+	@DisplayName("Test parametrizable con  value source ints")
+	void greater_than_zero_test(int int_src) {
+		
+		assertTrue(int_src > 0);
+	}
+	
+	@ParameterizedTest(name="{1} is {0} squared")
+	@CsvSource(value= {"3,9","2.2,4.84","2,4","5,25","6,36","7,49","10,100"})
+	void squareTest(double src,double squareSrc) {
+		
+		assertEquals(squareSrc,Math.pow(src, 2));
+	}
+	
+	@Test
+	void performanceTest() {
+		
+		assertTimeout(Duration.ofSeconds(1),()->{
+			for(int i=0;i<200;i++) {
+				
+				System.out.println(i*i);
+			}
+		});
+	}
+	
+	@Nested
+	class EmptyStringTestNested{
+		
+		@BeforeEach
+		void test() {
+			src = "";
+		}
+		
+		@Test
+		void lengthIsZero() {
+			
+			assertEquals(0,src.length());
+		}
+		
+		@Test
+		void upperCaseIsEmpty() {
+			assertTrue(src.toUpperCase().equals(""));
+		}
+	}
+	
+	
+	@Nested
+	class LargeStringTestNested{
+		
+		@BeforeEach
+		void test() {
+			src = "adlaksjdaslkjaksljdaskasdjsakdjaslkdjsalkd laskjdaslkdjasc jaslkdjasdkl aslkdjasdlkjasd lkjasdlkajdsdsadkljas dscnefhofiuhasdnafla faklfaf asdflakf a dfajf adjf laf a fa fd af adsjfajfdsaijf ";
+		}
+		
+		@Test
+		@DisplayName("String is big (>100chars)")
+		void lengthIsBig() {
+			
+			assertTrue(src.length()>100);
+		}
+		
+		@Test
+		@DisplayName("String is Multiline (>2 lines)")
+		void linesGreaterThanTwo() {
+			
+			assertTrue((src.length()/60)>2);
+		}
+	}
+
+}
+
+
+Mockito:
+
+stubs es menos evolucionado que mocks, pero vamos a ver un ejemplo de ello. Creamos un new test case (clases que incluyen tests). Cuando creas un proyecto maven con spring initializr ya contiene el paquete de identico nombre al de la carpeta de codigo pero con la aplicación SpringBoot de test.
+
+package com.carregal.springboot.mockito;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MockitoDemoApplicationTests {
+
+	@Test
+	public void contextLoads() {
+	}
+
+}
+
+JUnitTestCase: tiene métodos anotados con @Test. 
+Stubs consiste en crear implementaciones dummy en el src folder de test, que implementen las interfaces que habría que mockear a la hora de hacer los test.
+
+package com.carregal.springboot.mockito;
+
+class DataServiceImplStub implements IDataService {
+
+	@Override
+	public int[] retrieveAllData() {
+
+		return new int[] { 24, 12, 4, 121, 3 };
+	}
+
+}
+
+Sin embargo, los stub no son una gran idea: escribir codigo para cada cosa nueva, para cada nueva escenario, etc. Los mocks no tienen ese fallo, son mas agiles.
+Con un mock creas casos tan facil como: 
+
+DataService dataServiceMock = mock(DataService.class); //y decirle al mock 
+when(dataServiceMock.retrieveAllData()).thenReturn(new int[] {24,15,6});
+
+De esta forma ya podemos hacer test unitarios a la clase que hace uso de este servicio, inyectándole una versión mock del servicio y corriendo un @Test.
+
+Para no tener que nombrar la clase Mock de Mockito al hacer uso de los métodos, hacemos un import static de la clase org.mockito.Mockito.when.
+
+Puedes hacer mocks de interfaces y de clases. Puedes hacerles devolver los datos que quieres tras la invocación mockeada de sus métodos. Es posible que para test de integración sea necesario levantar la aplicación que reside en la carpeta de codigo de test.
+
+Anotaciones de mockito:
+
+El componente que se mockea es un atributo de la clase de Test, y se anota con @Mock. El componente bajo test que hará uso del componente mockeado es otro atributo de la clase y se anota con @InjectMocks.
+La clase que contiene los test (si se va a hacer uso de las anotaciones @Mock y @InjectMocks) tiene que estar anotada con @RunWith(MockitoJUnitRunner.class).
+
+@RunWith(MockitoJUnitRunner.class)
+public class DataServiceMockTest {
+
+	@Mock
+	IDataService mockedService;
+
+	@InjectMocks
+	SomeBusinessImpl busin;
+
+	@Test
+	public void testFindTheGreatestFromAllData() {
+
+		when(mockedService.retrieveAllData()).thenReturn(new int[] { 11, 12, 2121 });
+		SomeBusinessImpl someBu = new SomeBusinessImpl(mockedService);
+		assertEquals(2121, someBu.findMaximumFromAllData());
+	}
+
+	@Test
+	public void testFindTheGreatestFromOtherData() {
+
+		when(mockedService.retrieveAllData()).thenReturn(new int[] { 21 });
+		SomeBusinessImpl someBu = new SomeBusinessImpl(mockedService);
+		assertEquals(21, someBu.findMaximumFromAllData());
+	}
+
+}
+
+Probando la interfaz List: si tenemos multiples when(llamada).thenReturn(resultado1)..thenReturn(resultado1)...thenReturn(resultado_N), el assert n+1 (y posteriores) tambien obtiene el resultado N (el último).
+
+Para probar métodos con parámetros vamos a probar el método get de la List, que ha de recibir un entero con el indice.
+Si en el when indicamos un valor de parametro concreto y un resultado, cualquier otro valor del parametro dara un resultado null. Si por el contrario, queremos especificar un valor default, o sea, que para cualquier entero (por poner un ejemplo) devuelva el resultado "Hello", usamos las constantes Mockito.anyInt y similares:
+
+
+@Test
+public void testGet_GenericParameter() {
+	List mockList = mock(List.class);
+	when(mockList.get(Mockito.anyInt())).thenReturn(10);
+	when(mockList.get(0)).thenReturn(1);
+	assertEquals(mockList.get(0), 1);
+	assertEquals(mockList.get(1), 10);
+}
+
+Si tienes dos parámetros y uno es genérico, el otro va a tener que ser genérico también.  
