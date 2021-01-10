@@ -1,0 +1,164 @@
+funcional programming
+no es un curso de spring, es un curso de java 
+
+create java project
+java 9
+
+pintar numeros
+Una funcionalidad: List.of(2, 3, 5, 6, 54, 34, 232)
+La forma tradicional se centra en el how de como resolver las cosas, como iterar por una coleccion con un for o con un for mejorado.
+La forma funcional se centra en el what to do en vez de en el how to do. Convierte la lista en un stream, o flujo.
+List<Integer> numeros:
+De esta manera van saltando uno detras de otro:
+
+private static void print(int num){
+system out number
+}
+
+numeros.stream().forEach(FP01Functional::print); // Method reference: el parametro es implicito por el metodo
+
+Functional approach es un cambio de paradigma, pero termina simplificando las cosas.
+Con filter se filtran los elementos de una coleccion proporcionando un metodo boolean que determine con true o false qué será ejecutado.
+
+Con un filter se puede usar una lambda expression, que no deja de ser un metodo. 
+numer -> number%2==0
+.filter(number->number%2 == 0)
+.forEach(System.out::println);
+
+reduce, sorted, etc.
+
+Situación, obtener un resultado final de procesar todos los elementos de una lista: una especie de acumulación de resultados.
+
+reduce:
+Combine values into one result -> one values
+
+valor inicial de cero.
+
+Integer suma = numbers.stream().reduce(0, Integer::sum)  //0 es el valor inicial. Hay que decir cual es el metodo a usar para la acumulacion
+En vez de con un metodo se puede poner una lambda:
+
+(x,y)->x+y
+numbers.stream().reduce(0,(x,y)->x+y) pero la forma con Integer::sum esta muy bien
+
+
+JShell: desde java 11 tenemos una herraminta de linea de comandos en la que se puede escribir lineas de java y ejecutarlas.
+
+List<Integer> numbers = List.of(2,3,6,2,1);
+numbers.stream().reduce(0,Integer::sum) saca por la pantalla 14
+
+jshell> List<Integer> numbers = List.of(1,6,3,6,9,12,45)
+numbers ==> [1, 6, 3, 6, 9, 12, 45]
+
+jshell> numbers.stream().reduce(Integer.MAX_VALUE, Integer::min)
+$2 ==> 1
+
+jshell> numbers.stream().reduce(Integer.MIN_VALUE, Integer::max)
+$3 ==> 45
+
+filter, map, collect(Collectors.toList())
+
+jshell> List<Integer> lista = List.of(2,4,6,7)
+lista ==> [2, 4, 6, 7]
+
+jshell> lista.stream().map(x->x*x).reduce(0,Integer::sum)
+$2 ==> 105
+
+Suma de numeros impares -> filter //proporcionar una funcion booleana que diga qué elementos se consideran y cuales no
+
+distinct y sorted
+
+numbers.stream().distinct().sorted().forEach(System.out::println)
+Se puede usar con strings
+
+Dentro de sorted se puede incluir el criterio de comparacion mediante Comparator.algo -> ejemplo:
+
+Comparator.reverseOrder() // de mayor a menor
+Definir un compador:
+Comparator.comparing(lambda)
+
+courses.stream().sorted(Comparator.comparing(str->str.lenght())).forEach(System.out::println)
+
+Operaciones que se pueden hacer sobre un stram son intermedias o finales:
+
+Intermediate and terminal
+
+Las operaciones que devuelven un stream, como distinct, filter, map, sorted, son intermediate.
+
+Sin embargo, forEach retorna void como valor de salida, es una operacion final. Collect retorna otro tipo de dato, pero un stream, por tanto es tambien una operacion terminal.
+Reduce tambien, como el caso anterior. 
+
+Interfaces funcionales
+cuando hacemos uso de una lambda, por ejemplo cuando se la pasamos a filter, o asi, estamos pasando logica, no datos.
+Esto es una novedad.
+
+Qué clases hay detrás de este mecanismo? Function, Predicate y Consumer
+
+Cuando se sustituye una lambda por algo como System.out::println (method reference) eso es una simplificación de una lambda.
+En este caso, como la funcion no esta destinada a producir ningun resultado, en un Consumer.
+En el caso de un filter, como esta destinado a ser un metodo que devuelve un valor boolean, se le llama Predicate.
+En otros casos, es una Function.
+
+Predicate: es una @FunctionalInterface, o sea, es algo (una Interface) que solo tiene un metodo abstracto. 
+En el caso de Predicate, solo tiene un método test() que no sea default o static.
+
+Qué es un método default? lo primero, es que esos métodos solo se permiten en interfaces, y son implicitamente publicos.
+Necesitan proporcionar una implementación para pasar la compilación.
+new Predicate<Integer>(){
+
+	@Override
+	publc boolean test(Integer x){
+		return x%2==0;
+	}
+}
+
+Predicate: represents a predicate (boolean valued function) of one argument.
+
+Function tambien es una interfaz funcional. En ese caso el metodo que hay que implementar es apply
+
+Consumer, otra interfaz funcional. Consume lo que se le pasa, o sea, hace algo con ello. Metodo accept()
+
+Ejercicio:
+Ver qué tipo de interfaz funcional sale de reduce:
+
+Represents an operation upon two operands of the same type, producing a result of the same type as the operands. This is a specialization of BiFunction for the case where the operands and the result are all of the same type.
+This is a functional interface whose functional method is apply(Object, Object).
+
+    private static BinaryOperator<Integer> getSum() {
+        return Integer::sum;
+    }
+
+.-Predicate
+.-Function
+.-Consumer
+
+Function acepta un parametro y produce un resultado.
+
+Ejercicio 12:
+Encontrar cual es la interfaz funcional del segundo argumento del metodo reduce.
+Crear una implementación de esa interfaz funcional.
+
+ Integer suma = lista.stream().reduce(0, new BinaryOperator<Integer>() {
+	@Override
+	public Integer apply(Integer integer, Integer integer2) {
+		return integer + integer2;
+	}
+});
+
+En las interfaces funcionales, como hemos visto hasta ahora, solo hay un metodo. Su nombre no sigue ninguna standarizacion, y hemos visto que varía. Pero genericamente se denominan function descriptor. Apply, test, accept, son function descriptors.
+
+Behavioural parametrization.
+En un ejemplo previo hemos visto como con una expresión lambda se puede pasar conducta como parametro.
+Cuando lo unico que va a cambiar en dos fragmentos de codigo es la conducta, o el Predicate, se puede pasar este como parametro y crear un unico metodo.
+
+
+
+
+
+
+
+
+
+
+
+
+

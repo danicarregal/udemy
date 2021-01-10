@@ -1,0 +1,56 @@
+Los comandos de linux más o menos tienen un patrón común en su sintáxis.
+Ctrl alt t para abrir un terminal con el atajo de teclado.
+Con view zoom in se ve más grandote.
+
+echo pone a la salida lo que se le pasa como parámetro.
+cal muestra un calendatio del mes en curso, por defecto. Se pueden hacer más cosas:
+
+cal 2020 (año actual)
+cal -y
+
+Hay dos maneras de customizar los comandos, dandole parmeters y dándole options.
+
+date devuelve la fecha del día en curso, con la hora y la timezone.
+
+clear limpia el terminal, tiene un shortcut: ctrl L.
+
+pulsar la flecha arriba cicla entre la history, que podemos mostrar con el comando 
+history.
+
+history muestra un listado de los comandos de la historia de ese terminal.
+Puedes reejecutar el numerado con el 5 introduciendo !5 y pulsando INTRO.
+
+Si se quiere ejecutar el ULTIMO comando otra vez se puede escribir !! + INTRO
+
+Si se quiere eliminar la historia: history -c; history -w
+
+Para cerrar el terminal: exito o ctrl D (shift ctrl Q).
+
+Terminals, Commands and the Shell.
+
+Cuando introducimos un comando de consola, un programa llamado shell lo interpreta.
+El terminal es una ventana al shell. Hay un shell que es el más común:
+el shell bash. Tiene su propio lenguaje de scripting.
+
+Hay distintos tipos de shell en linux y pueden interpretar los comandos en forma distinta.
+
+Los comandos son case sensitive.
+
+Estructura de los comandos:
+
+Todos los comandos son pequeños programas instalados en la compu, y almacenados en alguna parte.
+date, cal, echo, history, son programas.
+
+command name + options + inputs
+
+Una vez elegimos un programa, el shell lo busca en el path:lista de carpetas.
+
+Podemos ver el path mediante el comando echo $PATH
+
+
+
+
+
+
+
+

@@ -1,0 +1,259 @@
+Un stream es un flujo continuo de datos, sin limite.
+Los datos no se guardan en bd necesariamente. 
+Real time stream processing applications.
+
+problemas:
+Crear y gestionar streams
+Real-time Stream Processing.
+
+Para gestionar grandes cantidades de datos en la epoca del año 2000 surgió la necesidad 
+de nuevas formas de procesamiento, procesamiento por streams. 
+Big data born. Big data problems:
+-Data Collection
+-Data Storage
+-Data Processing
+-Data Access
+
+En el caso de ejemplo, google y su buscador, los web crawler tenian la inmensa tarea
+de leer todas las páginas web de internet y almacenarlas, para procesar su contenido
+y de esa forma poder indexarlas con su PageRank algorithm. 
+
+Speed is the main point in the real time systems. 
+
+Data Storage: google file system.
+Data processing: map reduce.
+Data retrieval: Google Big Table.
+
+Estas soluciones facilitaron la aparición de Hadoop, solución para batch processing de grandes volumenes de datos.
+
+recolectar en volumen y procesar en batches, lo que produce sucesivos resultados que 
+son combinados para producir un resultado 'vivo' que va cambiando conforme se procesan nuevos batches.
+
+
+Events, real time stream processing
+Retail Business: orders, returns, shipment.
+Banking: service request, stock tocks, trade transactions...
+
+Mostrar un anuncio en una web también es un evento.
+
+looking to business activities as events. 
+
+Como modelar un stream de events, y cómo procesarlos.
+
+Identificar y modelar eventos: 
+Las actividades se realizan por actores, una acción suya genera un evento.
+POS Operator creates invoice: evento es el resultado de una acción realizada por un actor.
+
+Capturar el evento como un objeto de datos que puede ser procesado.
+Es tan sencillo como generar un objeto json para el resultado de esa acción.
+
+La primera idea para implantar este paradigma es fijarse en las actividades de una empresa como eventos.
+
+Como identificar y modelar los eventos de tu actividad empresarial
+
+POS creates Invoice: la factura es el evento producto de la acción de creación iniciada por el operador de caja.
+
+The event is the result of an action performed by an actor.
+
+Para modelar el evento creamos un modelado como un data object que puede ser streamed y transportado de un punto a otro y puede ser procesado por una aplicación procesadora de eventos.
+Capturar el evento como data object pasa por crear un objeto json para la factura.
+Ejemplo
+
+{
+"Invoice number":12345,
+"StoreId":"STR1534",
+"CashierId":"OAS898"
+}
+Lo siguiente es crear un stream de events. De forma continua a lo largo del tiempo se produce un flujo interminable de eventos.
+El tiempo que transcurre entre eventos consecutivos es indeterminista. 
+El stream es un fenomeno normal propio del negocio. Se deben transportar los eventos desde el punto de origen hasta el punto de procesamiento.
+
+Transporting events:
+Escenario:
+-no se puede procesar todos los eventos en una unica maquina ni en una aplicación monolitica.
+-arquitecturas de microservicios: un conjunto de aplicaciones simples, cada una responsable de alguna faceta.
+Invoice, shipment service (scheduling), analytics (extracting business information).
+
+transportar datos de una aplicación a otra puede acarrearr un problema:
+el producto cartesiano de productores de eventos y consumidores resulta en un gran numero de interconexiones.
+Pongamos como ejemplo que tenemos 99 tiendas físicas y una tienda online, y todas ellas producen facturas a lo largo del tiempo.
+Tenemos como consumidores Data Lake, analytics, Inventory, Loyanlty, Shipment, Finance.
+
+Se trata de reducir el many to many, y no crear tantos pipelines como combinaciones hemos mencionado.
+
+Processing events:
+Como procesarlos en tiempo real. Pongamos un ejemplo, según se genera la factura para un cliente que participa en un programa de fidelización, se genera una recompensa para el cliente, para sus futuras compras.
+Y se quiere enviar un sms al cliente tras unos pocos segundos tras la creación de la factura.
+
+CASOS DE USO DE STREAM Processing
+
+Vamos a ver 5 casos de uso por orden de complejidad.
+
+ETL: Extract, transform, load (Extract, transform and load)
+Incremental ETL: sería coger datos de BD y convertirlos en un stream de eventos.
+Después, propagar el stream, procesarlos en tiempo real y ponerlos en el data store de destino, 
+donde son usados los datos.
+CDC & Real Time transformation pipeline. Se usan en data warehouses.
+Un change producer lee en los logs los cambios según se producen en bd origen.
+Eso se traduce en un stream de eventos, donde cada evento es un cambio sobre la bd de origen.
+Del otro lado, tenemos el change consumer, tras cuyo procesado se ejecutan las mismas operaciones sobre la bd de destino.
+En la figura se muestra también un coordinator para configurar, coordinar y monitorizar todo el proceso.
+En este stream se pueden incluir operaciones como enriquecimiento de los datos, quality checks, etc.
+
+
+What is Change Data Capture?
+Change Data Capture (CDC) is the process that captures the changes made to a 
+database. Change refers to the data added, deleted, updated, etc.
+
+Taking a database dump will export a database and import it to a data 
+warehouse/lake, but this is not a scalable approach.  
+Change Data Capture will capture just the changes made to the database and 
+apply those to the target database. CDC reduces the overhead and supports 
+real-time analytics. It enables incremental loading and eliminates the need 
+for bulk load updating.
+
+Incremental ETL es la forma más básica de streaming, pero los mismo principios se pueden emplear para implementar Real-time Data Preparation.
+Como ejemplo pone una red social donde los usuarios pueden hacer operaciones de escritura y lectura, se particiona el sistema para servir a un numero de usuarios 
+por particion a una velocidad determinada conocida. 
+Pero en todo esto, donde está el procesado por streams? El feed, los mensajes y las notificaciones provienen de cualquier usuario, por lo tanto pueden pertenecer a particiones diferentes.
+Estos son los eventos que producen otras fuentes, que son las personas que sigo. Lo que comentan de mis publicaciones, si le dan a like, o si me escriben un mensaje. Todo esto se modela como eventos.
+Esos son los eventos que se propagan hacia mi partición en tiempo real. Mi partición incluye mi trozo de disco, mi base de datos. 
+Este ejemplo cae en la categoría de Incremental ETL. 
+
+Real Time Reporting:
+dashboards en tiempo real. Métricas. 
+live dashboards. Esta es la seguna categoria mas popular del streaming. 
+Para monitorización de parametros, para poder conocer el uso de los usuarios de nuevas caracteristicas de una aplicacion, o 
+Nueva feature, empiezas a recolectar información de uso de los usuarios. 
+Campagin Management, ver la incidencia de ofertas.
+
+
+Real Time Alerting:
+Notificaciones y alertas hacen mucho uso del streaming en tiempo real. Estas aplicaciones comprueban continuamente que ciertos parámetros se encuentren dentro de los umbrales establecidos, generando eventos de alarma cuando se exceden.
+Supply alerts, warehouses, stock. Health monitoring, hearth rate. Traffic monitoring.
+
+Real Time Decision Making and ML:
+Detectar eventos y responder a ellos usando cierta lógica de negocio. 
+Esta lógica puede incluir decisiones o reglas. Se puede usar en el contexto de machine learning.
+Son decisiones concretas y claras, para ser automatizadas. Fraud detection, real time clinical measurement, real time bidding, personalized customer experience.
+
+Online Machine Learning:
+No se debe confundir con la categoría anterior. Esta es específica del machine learning online, y IA.
+El modelo se emplea contra live data online. Esta es el area que más relacionada está con la inteligencia artificial, y la mas dificil.
+Los datos en tiempo real se emplean para buscar una predicción. En muchos casos se produce una adaptación con los nuevos patrones en los datos. 
+Y esto optimiza el modelo de aprendizaje en tiempo real. 
+
+
+Retos del streaming en tiempo real:
+Modelado de eventos: creación de un objeto json, o avro, o xml.
+Es parecido al modelo de bases de datos, pero en la versión serializada para transporte.
+
+
+Transporte de eventos:
+En el ejemplo que veiamos al principio, teníamos N productores y M consumidores, lo que daba un potencial numero de pipelines de NxM, que queremos reducir.
+Many to many relationship: stream mesh. No tiene sentido que si M consumidores están interesados en consumir un evento, haya que enviarlo M veces...
+Una solución inicial sería la comunicación a través de una BD relacional. Evaluando alternativas es como vamos a poder saber si esta es una buena opción, o no.
+Decision criteria, alternative options.
+
+Consideraciones de diseño:
+
+-Time sensitivity: se debe cumplir que entre el productor y el procesado del evento en el consumidor pasen segundos, o milisegundos.
+
+-Decoupling: la integración debe permitir que las aplicaciones implicadas cambien según sea necesario.
+Minimizar la dependencia.
+
+-Data format evolution: no podemos forzar a que el modelo de datos sea fijo, debe poder evolucionar con el tiempo. Evolución y extendibilidad.
+
+-Reliability: failure free operations. Evitar single point of failure.
+
+-Scalability: necesitamos que los sistemas puedan escalar horizontalmente.
+
+Se deben conseguir al menos estos 5 criterios para un sistema. 
+
+¿Qué opciones hay pues, para la intgración de aplicaciones que quieren intercambiar datos?
+Existen 4 patrones principalmente. Vamos a ver hasta que punto cumplen con los criterios expuestos, con las consideraciones de diseño:
+
+-Shared Database: hasta cierto punto, time sensitivity y decoupling lo cumplen bien.
+Data format evolution mal. Reliablity y Scalability, muchas aplicaciones leyendo y modificando a la vez la misma bd, rendimiento a peor.
+Esta solución deja que desear en aspectos importantes. 
+
+-RPC/RMI: uso corriente es realizar acciones de apis de otras aplicaciones, y proveer de los datos necesarios para la operación.
+La api la ofrece la aplicación receptora y necesita ser implementada por la sender app. 
+Esto crea type couplig entre las apps. Falla en decoupling y scalability.
+
+-File transfer: es la forma más directa para intercambio de información entre aplicaciones, data integration. Las productoras producen archivos de datos, y las consumidoras los leen.
+Esta solución, obviamente no va a funcionar bien en entornos real time. Falla en time sensitivity. Generar archivos y consumirlos en tiempo real va a generar muchos otros trade-offs (compromisos).
+
+-Messaging: se trata de intercambio de chunks de datos entre los sistemas a través de un canal. 
+point to point o publish-subscribe. En el point to point cada mensaje solo tiene un consumidor objetivo. 
+Esto no sirve para nuestro one to many. Publish-subscribe. Publisher, broker, topic and subscribers.
+Publisher son los elementos que producen eventos. Los subscriber, apps que leen datos emitidos por los productores.
+Consumer, receiver, todo refiere a lo mismo: subscribers. Broker: corazón del pub-subs system. Esta en el medio y hace de middleware. Es responsable de recibir mensajes de los publishers, almacenarlos en un archivo de log y enviar los mensajes a los subscribers.
+El broker envia ACKs por los mensajes recibidos de los publishers, antes de meterlos en archivos de log. 
+Cuando un consumer quiere consumir un dato, lo consume del broker. Topic es el otro componente, es como un namespace para los mensajes, de modo que sirve para categorizarlos. 
+Si venimos de las bd, podemos pensar en un topic como un nombre de tabla de bd.
+El productor siempre escribe los mensajes a un topic. Y el consumidor lo lee de un topic. 
+El broker crea un log file para cada topic. El borker tiene multiple topics. 
+Cuando el productor envia un mensaje especifica el topic name. 
+
+Este sistema cumple los criterios de diseño. Las tres primeras casi son inherentes a la solución como abstracción. La fiabilidad y la escalabilidad son aportaciones adicionales de Apache Kafka.
+
+Configuración del entorno de trabajo.
+1.-Apache Kafka Cluster
+2.-Confluent Kafka Cluster
+Avro y Schema Registry, no disponibles en la versión desnuda de Apache.
+3.-Apache Kafka Cluster Container
+Docker container.
+
+Configuración del plugin de IntelliJ con Docker.
+Instalación de kafka: descomprimir zip resource en c:/kafka y crear KAFKA_HOME y actualizar PATH.
+Para probar la instalación hacemos uso de un project del curso.
+
+El proyecto viene con unos scripts. Estos scripts funcionan OTB para win, pero para linux o mac hay que revisarlos.
+.bat por .sh, %KAFKA_HOME% por $KAFKA_HOME$ (linux).
+
+Para hacer uso de la versión de confluent, descargar la community ed de confluent.
+
+HAy que hacer un truquillo que se puede consultar en 
+https://medium.com/@praveenkumarsingh/confluent-kafka-on-windows-how-to-fix-classpath-is-empty-cf7c31d9c787
+
+Cuando se ejecuta la aplicacion de Avro pos-simulator-avro se genera una carpeta temp con los ficheros de log, entre otras cosas.
+Se debe borrar entre rondas de ejecución o pruebas, para que no haya conflictos entre los datos.
+
+
+
+
+
+
+
+
+Arquitectura de Kafka
+
+Que es: es un messaging broker. Todo lo demás es un API, library o un framework para interactuar con el broker.
+Tres responsabilidades: Recibe mensajes de los producer y los asiente, almacena los mensajes en un log file, para salvaguardarlo de perdidas de datos.
+Aunque en este curso se van a leer en tiempo real, o sea que no se leen de archivo. Por ultimo, entregar los mensajes a los consumidores, cuando los piden.
+Eso hace Kafka.
+
+Una respuesta más precisa de los que es kafka sería:
+Es una plataforma de streaming horizontalmente escalable, tolerante a fallos y distribuida.
+
+1 Kafka Storage Architecture.
+Topicos tienen un log file de respaldo. También son particionados, replicados y segmentados.
+
+topic es un nombre logico para agrupar mensajes. Como en las bd con los nombres de tablas.
+
+
+
+
+
+2 Kafka Cluster Architecture.
+3 Work Distribution Architecture.
+
+
+
+
+Procesado de eventos
+
+
+
+
